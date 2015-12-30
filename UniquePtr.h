@@ -30,7 +30,7 @@
 namespace IC
 {
 
-	template <typename TType> using UniquePtr = std::unique_ptr<TType, void(*)(TType*)>;
+    template <typename TType> using UniquePtr = std::unique_ptr<TType, void(*)(TType*)>;
 }
 
 #endif

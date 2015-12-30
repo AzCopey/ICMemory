@@ -30,30 +30,30 @@
 
 namespace IC
 {
-	//------------------------------------------------------------------------------
-	FrameAllocator::FrameAllocator(std::size_t in_bufferSize, std::uint32_t in_alignment) noexcept
-		: m_bufferSize(in_bufferSize), m_alignment(in_alignment)
-	{
-		assert(MemoryUtils::isPowerOfTwo(in_bufferSize));
-		assert(MemoryUtils::isPowerOfTwo(in_alignment));
+    //------------------------------------------------------------------------------
+    FrameAllocator::FrameAllocator(std::size_t in_bufferSize, std::uint32_t in_alignment) noexcept
+        : m_bufferSize(in_bufferSize), m_alignment(in_alignment)
+    {
+        assert(MemoryUtils::isPowerOfTwo(in_bufferSize));
+        assert(MemoryUtils::isPowerOfTwo(in_alignment));
 
-		m_buffer = std::unique_ptr<std::uint8_t[]>(new std::uint8_t[m_bufferSize]);
-		reset();
-	}
+        m_buffer = std::unique_ptr<std::uint8_t[]>(new std::uint8_t[m_bufferSize]);
+        reset();
+    }
 
-	//------------------------------------------------------------------------------
-	void FrameAllocator::reset() noexcept
-	{
-		m_nextPointer = MemoryUtils::align(m_buffer.get(), m_alignment);
-	}
+    //------------------------------------------------------------------------------
+    void FrameAllocator::reset() noexcept
+    {
+        m_nextPointer = MemoryUtils::align(m_buffer.get(), m_alignment);
+    }
 
-	//------------------------------------------------------------------------------
-	void* FrameAllocator::allocate(std::size_t in_allocationSize) noexcept
-	{
-		void* output = m_nextPointer;
+    //------------------------------------------------------------------------------
+    void* FrameAllocator::allocate(std::size_t in_allocationSize) noexcept
+    {
+        void* output = m_nextPointer;
 
-		m_nextPointer = MemoryUtils::align(m_nextPointer + in_allocationSize, m_alignment);
+        m_nextPointer = MemoryUtils::align(m_nextPointer + in_allocationSize, m_alignment);
 
-		return output;
-	}
+        return output;
+    }
 }

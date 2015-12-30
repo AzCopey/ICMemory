@@ -31,49 +31,49 @@
 
 namespace IC
 {
-	/// TODO
-	///
-	class FrameAllocator final
-	{
-	public:
-		/// TODO
-		///
-		template <typename TType> using UniquePtr = std::unique_ptr<TType, decltype(&destroy<TType>)>;
+    /// TODO
+    ///
+    class FrameAllocator final
+    {
+    public:
+        /// TODO
+        ///
+        template <typename TType> using UniquePtr = std::unique_ptr<TType, decltype(&destroy<TType>)>;
 
-		/// TODO
-		/// 
-		FrameAllocator(std::size_t in_bufferSize, std::uint32_t in_alignment = sizeof(std::intptr_t)) noexcept;
+        /// TODO
+        /// 
+        FrameAllocator(std::size_t in_bufferSize, std::uint32_t in_alignment = sizeof(std::intptr_t)) noexcept;
 
-		/// TODO
-		/// 
-		template <typename TType, typename... TConstructorArgs> UniquePtr<TType> allocate(TConstructorArgs&&... in_constructorArgs) noexcept;
+        /// TODO
+        /// 
+        template <typename TType, typename... TConstructorArgs> UniquePtr<TType> allocate(TConstructorArgs&&... in_constructorArgs) noexcept;
 
-		/// TODO
-		/// 
-		void reset() noexcept;
+        /// TODO
+        /// 
+        void reset() noexcept;
 
-	private:
-		void* allocate(std::size_t in_allocationSize) noexcept;
+    private:
+        void* allocate(std::size_t in_allocationSize) noexcept;
 
-		const std::size_t m_bufferSize;
-		const std::size_t m_alignment;
-		std::unique_ptr<std::uint8_t[]> m_buffer;
-		std::uint8_t* m_nextPointer = 0;
-	};
+        const std::size_t m_bufferSize;
+        const std::size_t m_alignment;
+        std::unique_ptr<std::uint8_t[]> m_buffer;
+        std::uint8_t* m_nextPointer = 0;
+    };
 
-	//-----------------------------------------------------------------------------
-	template <typename TType, typename... TConstructorArgs> FrameAllocator::UniquePtr<TType> FrameAllocator::allocate(TConstructorArgs&&... in_constructorArgs) noexcept
-	{
-		void* memory = allocate(sizeof(TType));
-		TType* object = new (memory) TType(std::forward<TConstructorArgs>(in_constructorArgs)...);
-		return UniquePtr<TType>(object, destroy);
-	}
+    //-----------------------------------------------------------------------------
+    template <typename TType, typename... TConstructorArgs> FrameAllocator::UniquePtr<TType> FrameAllocator::allocate(TConstructorArgs&&... in_constructorArgs) noexcept
+    {
+        void* memory = allocate(sizeof(TType));
+        TType* object = new (memory) TType(std::forward<TConstructorArgs>(in_constructorArgs)...);
+        return UniquePtr<TType>(object, destroy);
+    }
 
-	//-----------------------------------------------------------------------------
-	template <typename TType> void destroy(TType* in_object) noexcept
-	{
-		in_object->~TType();
-	}
+    //-----------------------------------------------------------------------------
+    template <typename TType> void destroy(TType* in_object) noexcept
+    {
+        in_object->~TType();
+    }
 }
 
 #endif
