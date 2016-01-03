@@ -30,7 +30,15 @@ namespace IC
 {
     namespace MemoryUtils
     {
-        /// TODO
+        /// Aligns the given pointer to the given alignment. The alignment should be a power
+        /// of two.
+        ///
+        /// @param in_value
+        ///     The value to align.
+        /// @param in_alignment
+        ///     The alignment.
+        ///
+        /// @return The aligned pointer.
         ///
         template <typename TValueType, typename TAlignmentType> TValueType* align(TValueType* in_value, TAlignmentType in_alignment)
         {
@@ -43,7 +51,15 @@ namespace IC
             return reinterpret_cast<TValueType*>((value + alignment - 1) & ~(alignment - 1));
         }
 
-        /// TODO
+        /// Aligns the given integer to the given alignment. The alignment should be a power
+        /// of two.
+        ///
+        /// @param in_value
+        ///     The value to align.
+        /// @param in_alignment
+        ///     The alignment.
+        ///
+        /// @return The aligned integer.
         ///
         template <typename TValueType, typename TAlignmentType> TValueType align(TValueType in_value, TAlignmentType in_alignment)
         {
@@ -58,7 +74,12 @@ namespace IC
             return static_cast<TValueType>((value + alignment - 1) & ~(alignment - 1));
         }
 
-        /// TODO
+        /// @param in_value
+        ///     The value.
+        /// @param in_alignment
+        ///     The alignment.
+        ///
+        /// @return Whether or not the given integer is aligned.
         ///
         template <typename TValueType, typename TAlignmentType> TValueType isAligned(TValueType in_value, TAlignmentType in_alignment)
         {
@@ -68,7 +89,10 @@ namespace IC
             return static_cast<TValueType>((static_cast<TAlignmentType>(in_value) & (in_alignment - 1)) == 0);
         }
 
-        /// TODO
+        /// @param in_value
+        ///     The value to check.
+        ///
+        /// @return Whether or not the given integer is a power of two.
         ///
         template <typename TType> constexpr bool isPowerOfTwo(TType in_value)
         {
@@ -78,7 +102,10 @@ namespace IC
             return (in_value > 0) && ((in_value & (~in_value + 1)) == in_value);
         }
 
-        /// TODO
+        /// @param in_value
+        ///     The value.
+        ///
+        /// @return The next power ot two on from the given value. This only supports 32-bit values.
         ///
         template <typename TType> TType nextPowerofTwo(TType in_value)
         {
@@ -96,7 +123,10 @@ namespace IC
             return in_value;
         }
 
-        /// TODO
+        /// @param in_value
+        ///     The value. Must be a power of two.
+        ///
+        /// @return The number of times 0x1 has to be shifted to get the given value. 
         ///
         template <typename TType> std::size_t calcShift(TType in_value)
         {
@@ -112,7 +142,13 @@ namespace IC
             return output;
         }
 
-        /// TODO
+        /// @param in_pointer
+        ///     The pointer.
+        /// @param in_relativeTo
+        ///     The pointer that the other is relative to. Must have a lower memory address
+        ///     than the value.
+        ///
+        /// @return The offset in bytes between the two pointers. 
         ///
         template <typename TTypeA, typename TTypeB> std::uintptr_t getPointerOffset(TTypeA* in_pointer, TTypeB* in_relativeTo)
         {

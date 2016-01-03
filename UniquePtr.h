@@ -26,11 +26,12 @@
 #define _IC_UNIQUEPTR_H_
 
 #include <memory>
+#include <functional>
 
 namespace IC
 {
 
-    template <typename TType> using UniquePtr = std::unique_ptr<TType, void(*)(TType*)>;
+    template <typename TType> using UniquePtr = std::unique_ptr<TType, std::function<void(TType*)>>;
 }
 
 #endif

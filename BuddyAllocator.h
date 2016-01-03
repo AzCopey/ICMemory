@@ -89,6 +89,97 @@ namespace IC
         template <typename TType, typename... TConstructorArgs> UniquePtr<TType> allocate(TConstructorArgs&&... in_constructorArgs) noexcept;
 
     private:
+
+        /// Encapsulates functionality required for navigating the free list table.
+        /// This allocates no memory, instead relying on the memory provided in the
+        /// constructor. This allows the buddy allocator to store the free list inside
+        /// its buffer.
+        ///
+        /// The given buffer is used to store the first element in the free list for
+        /// each level in the free list table. Each element in the free list then stores
+        /// the pointers to the previous and next elements.
+        ///
+        /// This is not thread-safe, so the buddy allocator mutex should always be held
+        /// when calling any of the free list table's methods.
+        ///
+        class FreeListTable final
+        {
+        public:
+
+            /// Constructs an empty free list.
+            ///
+            FreeListTable() noexcept;
+
+            /// Initialises the free list table with the given memory buffer. 
+            ///
+            /// @param in_numLevels
+            ///     The number of levels in the table.
+            /// @param in_buffer
+            ///     The buffer in which the first element in each list should
+            ///     be stored.
+            ///
+            FreeListTable(std::size_t in_numLevels, void* in_buffer) noexcept;
+
+            /// This is not thread-safe.
+            ///
+            /// @param in_level
+            ///     The table level requested.
+            ///
+            /// @return The pointer to the start of the free list.
+            ///
+            void* getStart(std::size_t in_level) const noexcept;
+
+            /// This is not thread-safe.
+            ///
+            /// @param in_listElement
+            ///     The pointer to an element in the free list.
+            ///
+            /// @return The pointer to the next element in the free list.
+            ///
+            void* getNext(void* in_listElement) const noexcept;
+
+            /// This is not thread-safe.
+            ///
+            /// @param in_listElement
+            ///     The pointer to an element in the free list.
+            ///
+            /// @return The pointer to the previous element in the free list.
+            ///
+            void* getPrevious(void* in_listElement) const noexcept;
+
+            /// Adds the given pointer to the start of the free list.
+            ///
+            /// This is not thread-safe.
+            ///
+            /// @param in_level
+            ///     The table level requested.
+            /// @param in_start
+            ///     The pointer to add of the list.
+            ///
+            void add(std::size_t in_level, void* in_listElement) noexcept;
+
+            /// Removes the given pointer from the free list.
+            ///
+            /// This is not thread-safe.
+            ///
+            /// @param in_start
+            ///     The pointer to remove.
+            ///
+            void remove(std::size_t in_level, void* in_listElement) noexcept;
+
+        private:
+            /// A container for the next and previous elements in a list.
+            ///
+            struct ListNode final
+            {
+                ListNode* m_previous = nullptr;
+                ListNode* m_next = nullptr;
+            };
+
+            std::size_t m_numLevels = 0;
+            ListNode** m_freeListTable = nullptr;
+        };
+
         /// Initialises the 'free' list table, which describes the first free block in any
         /// given level of the memory pool. Note that the pointers to the rest of the list
         /// are stored in the free block itself.
@@ -185,37 +276,6 @@ namespace IC
         ///
         std::size_t getParentBlockIndex(std::size_t in_level, std::size_t in_blockIndex) const noexcept;
 
-        /// This is thread-safe
-        ///
-        /// @param in_level
-        ///     The level of the block.
-        /// @param in_blockIndex
-        ///     The index of the block.
-        ///
-        /// @return The pointer to the block in memory.
-        ///
-        void* getBlockPointer(std::size_t in_level, std::size_t in_blockIndex) const noexcept;
-
-        /// This is not thread-safe and should only be called while the mutex is held.
-        ///
-        /// @param in_level
-        ///     The block level requested.
-        ///
-        /// @return The pointer to the start of the free list.
-        ///
-        void* getFreeListStart(std::size_t in_level) noexcept;
-
-        /// Sets the pointer to the start of the free list for the given level.
-        ///
-        /// This is not thread-safe and should only be called while the mutex is held.
-        ///
-        /// @param in_level
-        ///     The block level requested.
-        /// @param in_start
-        ///     The pointer to the start of the list.
-        ///
-        void setFreeListStart(std::size_t in_level, void* in_start) noexcept;
-
         /// Toggles the allocated flag for the given block index and level. Note that
         /// this flag is shared with the buddy, and that the root level block cannot 
         /// be toggled as it does not have a buddy.
@@ -229,7 +289,7 @@ namespace IC
         ///
         void toggleChildrenAllocated(std::size_t in_level, std::size_t in_blockIndex) noexcept;
 
-        /// Sets wehther or not the block at the given level and index is split. Note
+        /// Sets whether or not the block at the given level and index is split. Note
         /// that only blocks which can be split can be set - i.e the bottom level cannot
         /// be supplied.
         ///
@@ -244,6 +304,19 @@ namespace IC
         ///
         void setSplit(std::size_t in_level, std::size_t in_blockIndex, bool in_isSplit) noexcept;
 
+        /// Splits a block in the requested level into two blocks one level higher. If
+        /// There are no available blocks at the requested level blocks will be split
+        /// recursively at lower levels. If no block can be split after recursion then
+        /// the memory pool has run out of memory and will assert.
+        ///
+        /// This is not thread-safe and should only be called while the mutex is held.
+        ///
+        /// @param in_level
+        ///     The block level which should be split. Cannot be the lowest or highest
+        ///     block levels.
+        ///
+        void splitBlock(std::size_t in_level) noexcept;
+
         const std::size_t m_bufferSize;
         const std::size_t m_minBlockSize;
         const std::size_t m_numLevels;
@@ -254,7 +327,7 @@ namespace IC
         const std::size_t m_headerSize;
 
         std::unique_ptr<std::uint8_t[]> m_buffer;
-        void** m_freeListTable;
+        FreeListTable m_freeListTable;
         void* m_allocatedTable;
         void* m_splitTable;
 
@@ -266,11 +339,11 @@ namespace IC
     {
         void* memory = allocate(sizeof(TType));
         TType* object = new (memory) TType(std::forward<TConstructorArgs>(in_constructorArgs)...);
-        return UniquePtr<TType>(object, [](TType* in_object) -> void
+        return UniquePtr<TType>(object, [=](TType* in_object) -> void
         {
             in_object->~TType();
 
-            //TODO: Deallocate
+            deallocate(reinterpret_cast<void*>(in_object));
         });
     }
 }

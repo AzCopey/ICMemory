@@ -148,17 +148,20 @@ namespace IC
     //------------------------------------------------------------------------------
     void BuddyAllocator::initFreeListTable() noexcept
     {
-        m_freeListTable = reinterpret_cast<void**>(m_buffer.get());
-        memset(m_freeListTable, 0, m_freeListTableSize);
+        m_freeListTable = FreeListTable(m_numLevels, m_buffer.get());
 
         auto relativeBufferBodyStart = static_cast<std::uintptr_t>(MemoryUtils::align(m_headerSize, m_minBlockSize));
-        for (std::size_t level = 0; level < m_numLevels; ++level)
+        for (int level = 0; level < m_numLevels; ++level)
         {
             auto relativeFirstFreeBlock = MemoryUtils::align(relativeBufferBodyStart, getBlockSize(level));
             if (relativeFirstFreeBlock < m_bufferSize)
             {
                 void* firstFreeBlock = m_buffer.get() + relativeFirstFreeBlock;
-                setFreeListStart(level, firstFreeBlock);
+
+                if (getBlockIndex(level, firstFreeBlock) % 2 == 1)
+                {
+                    m_freeListTable.add(level, firstFreeBlock);
+                }
             }
         }
     }
@@ -212,17 +215,20 @@ namespace IC
 
         std::unique_lock<std::mutex> lock(m_mutex);
 
-        auto block = getFreeListStart(level);
-        if (block)
+        auto block = m_freeListTable.getStart(level);
+        if (!block)
         {
-            auto blockIndex = getBlockIndex(level, block);
-            auto parentBlockIndex = getParentBlockIndex(level, blockIndex);
-            toggleChildrenAllocated(level - 1, blockIndex);
+            splitBlock(level - 1);
+
+            block = m_freeListTable.getStart(level);
+            assert(block);
         }
-        else
-        {
-            //TODO: !?
-        }
+
+        m_freeListTable.remove(level, block);
+
+        auto blockIndex = getBlockIndex(level, block);
+        auto parentBlockIndex = getParentBlockIndex(level, blockIndex);
+        toggleChildrenAllocated(level - 1, parentBlockIndex);
 
         return block;
     }
@@ -230,7 +236,7 @@ namespace IC
     //------------------------------------------------------------------------------
     void BuddyAllocator::deallocate(void* in_buffer) noexcept
     {
-        //TODO: !?
+        //TODO: Return block to the free pool.
     }
 
     //------------------------------------------------------------------------------
@@ -279,28 +285,90 @@ namespace IC
     }
 
     //------------------------------------------------------------------------------
-    void* BuddyAllocator::getBlockPointer(std::size_t in_level, std::size_t in_blockIndex) const noexcept
+    BuddyAllocator::FreeListTable::FreeListTable() noexcept
+        : m_numLevels(0)
     {
-        //TODO: !?
-        return nullptr;
     }
 
     //------------------------------------------------------------------------------
-    void* BuddyAllocator::getFreeListStart(std::size_t in_level) noexcept
+    BuddyAllocator::FreeListTable::FreeListTable(std::size_t in_numLevels, void* in_buffer) noexcept
+        : m_numLevels(in_numLevels)
     {
-        assert(in_level >= 0 && in_level < m_numLevels);
-
-        return m_freeListTable[in_level];
+        m_freeListTable = reinterpret_cast<ListNode**>(in_buffer);
+        
+        for (std::size_t i = 0; i < m_numLevels; ++i)
+        {
+            m_freeListTable[i] = nullptr;
+        }
     }
 
     //------------------------------------------------------------------------------
-    void BuddyAllocator::setFreeListStart(std::size_t in_level, void* in_start) noexcept
+    void* BuddyAllocator::FreeListTable::getStart(std::size_t in_level) const noexcept
     {
         assert(in_level >= 0 && in_level < m_numLevels);
-        assert(in_start >= m_buffer.get());
-        assert(MemoryUtils::isAligned(MemoryUtils::getPointerOffset(in_start, m_buffer.get()), getBlockSize(in_level)));
 
-        m_freeListTable[in_level] = in_start;
+        return reinterpret_cast<void*>(m_freeListTable[in_level]);
+    }
+
+    //------------------------------------------------------------------------------
+    void* BuddyAllocator::FreeListTable::getNext(void* in_listElement) const noexcept
+    {
+        assert(in_listElement != nullptr);
+
+        ListNode* listNode = reinterpret_cast<ListNode*>(in_listElement);
+        return reinterpret_cast<void*>(listNode->m_next);
+    }
+
+    //------------------------------------------------------------------------------
+    void* BuddyAllocator::FreeListTable::getPrevious(void* in_listElement) const noexcept
+    {
+        assert(in_listElement != nullptr);
+
+        ListNode* listNode = reinterpret_cast<ListNode*>(in_listElement);
+        return reinterpret_cast<void*>(listNode->m_previous);
+    }
+
+    //------------------------------------------------------------------------------
+    void BuddyAllocator::FreeListTable::add(std::size_t in_level, void* in_listElement) noexcept
+    {
+        assert(in_level >= 0 && in_level < m_numLevels);
+        assert(in_listElement != nullptr);
+
+        ListNode* newStart = reinterpret_cast<ListNode*>(in_listElement);
+        newStart->m_previous = nullptr;
+        newStart->m_next = m_freeListTable[in_level];
+
+        if (m_freeListTable[in_level])
+        {
+            assert(m_freeListTable[in_level]->m_previous == nullptr);
+            m_freeListTable[in_level]->m_previous = newStart;
+        }
+
+        m_freeListTable[in_level] = newStart;
+    }
+
+    //------------------------------------------------------------------------------
+    void BuddyAllocator::FreeListTable::remove(std::size_t in_level, void* in_listElement) noexcept
+    {
+        assert(in_level >= 0 && in_level < m_numLevels);
+        assert(in_listElement != nullptr);
+
+        ListNode* toRemove = reinterpret_cast<ListNode*>(in_listElement);
+
+        if (toRemove == m_freeListTable[in_level])
+        {
+            m_freeListTable[in_level] = toRemove->m_next;
+        }
+
+        if (toRemove->m_next)
+        {
+            toRemove->m_next->m_previous = toRemove->m_previous;
+        }
+
+        if (toRemove->m_previous)
+        {
+            toRemove->m_previous->m_next = toRemove->m_next;
+        }
     }
 
     //------------------------------------------------------------------------------
@@ -334,5 +402,29 @@ namespace IC
         {
             reinterpret_cast<std::uint8_t*>(m_allocatedTable)[bufferByteIndex] &= ~(1 << bufferBitIndex);
         }
+    }
+
+    //------------------------------------------------------------------------------
+    void BuddyAllocator::splitBlock(std::size_t in_level) noexcept
+    {
+        assert(in_level > 0 && in_level < m_numLevels - 1);
+
+        auto block = m_freeListTable.getStart(in_level);
+        if (!block)
+        {
+            assert(in_level > 1);
+
+            splitBlock(in_level - 1);
+
+            block = m_freeListTable.getStart(in_level);
+            assert(block);
+        }
+
+        m_freeListTable.remove(in_level, block);
+
+        setSplit(in_level, getBlockIndex(in_level, block), true);
+
+        m_freeListTable.add(in_level + 1, block);
+        m_freeListTable.add(in_level + 1, reinterpret_cast<std::uint8_t*>(block) + getBlockSize(in_level + 1));
     }
 }
