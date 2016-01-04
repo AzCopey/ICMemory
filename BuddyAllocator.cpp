@@ -67,9 +67,9 @@ namespace IC
         ///
         /// @return The split or allocated table size in bits.
         ///
-        constexpr std::size_t calcAllocatedTableSizeBits(std::size_t in_numBlockLevels) noexcept
+        constexpr std::size_t calcBlockDataTableSizeBits(std::size_t in_numBlockLevels) noexcept
         {
-            return (1 << in_numBlockLevels) - 1;
+            return (1 << (in_numBlockLevels - 1)) - 1;
         }
 
         /// Calculates the size of the split or allocated tables in bytes based on the number
@@ -80,9 +80,9 @@ namespace IC
         ///
         /// @return The split or allocated table size in bytes.
         ///
-        constexpr std::size_t calcAllocatedTableSize(std::size_t in_numBlockLevels) noexcept
+        constexpr std::size_t calcBlockDataTableSize(std::size_t in_numBlockLevels) noexcept
         {
-            return (calcAllocatedTableSizeBits(in_numBlockLevels) + CHAR_BIT - 1) / CHAR_BIT;
+            return (calcBlockDataTableSizeBits(in_numBlockLevels) + CHAR_BIT - 1) / CHAR_BIT;
         }
 
         /// Calculates the size of the split or allocated tables in bytes, aligned to the size
@@ -93,9 +93,9 @@ namespace IC
         ///
         /// @return The aligned split or allocated table size in bytes.
         ///
-        inline std::size_t calcAllocatedTableSizeAligned(std::size_t in_numBlockLevels) noexcept
+        inline std::size_t calcBlockDataTableSizeAligned(std::size_t in_numBlockLevels) noexcept
         {
-            return MemoryUtils::align(calcAllocatedTableSize(in_numBlockLevels), sizeof(std::uintptr_t));
+            return MemoryUtils::align(calcBlockDataTableSize(in_numBlockLevels), sizeof(std::uintptr_t));
         }
 
         /// Calculates the total size of the header, based on the number of levels.
@@ -107,17 +107,17 @@ namespace IC
         ///
         inline std::size_t calcHeaderSize(std::size_t in_numBlockLevels) noexcept
         {
-            return calcFreeListTableSize(in_numBlockLevels) + calcAllocatedTableSizeAligned(in_numBlockLevels);
+            return calcFreeListTableSize(in_numBlockLevels) + 2 * calcBlockDataTableSizeAligned(in_numBlockLevels);
         }
 
-        /// @param in_level
+        /// @param in_blockLevel
         ///     The level requested.
         ///
         /// @return The number of indices in the requested level.
         ///
-        constexpr std::size_t getNumIndicesForLevel(std::size_t in_level) noexcept
+        constexpr std::size_t getNumIndicesForLevel(std::size_t in_blockLevel) noexcept
         {
-            return (1 << in_level);
+            return (1 << in_blockLevel);
         }
     }
 
@@ -138,6 +138,7 @@ namespace IC
 
         initFreeListTable();
         initAllocatedTable();
+        initSplitTable();
     }
 
     //------------------------------------------------------------------------------
@@ -166,14 +167,43 @@ namespace IC
     {
         m_allocatedTable = AllocatedTable(m_numBlockLevels, m_buffer.get() + calcFreeListTableSize(m_numBlockLevels));
 
-        auto relativeBufferBodyStart = static_cast<std::uintptr_t>(MemoryUtils::align(m_headerSize, m_minBlockSize));
-        auto bufferBodyStart = m_buffer.get() + relativeBufferBodyStart;
-        auto bottomLevel = m_numBlockLevels - 1;
-        auto bodyStartIndex = getBlockIndex(bottomLevel, bufferBodyStart);
-
-        for (std::size_t index = 0; index < bodyStartIndex; ++index)
+        for (std::size_t level = 1; level < m_numBlockLevels; ++level)
         {
-            m_allocatedTable.setAllocated(bottomLevel, index, true);
+            auto relativeEndOfAllocated = static_cast<std::uintptr_t>(MemoryUtils::align(m_headerSize, getBlockSize(level)));
+            
+            auto firstFreeIndex = getNumIndicesForLevel(level);
+            if (relativeEndOfAllocated < m_bufferSize)
+            {
+                auto endOfAllocated = m_buffer.get() + relativeEndOfAllocated;
+                firstFreeIndex = getBlockIndex(level, endOfAllocated);
+            }
+
+            for (std::size_t index = 0; index < firstFreeIndex; ++index)
+            {
+                m_allocatedTable.toggleAllocatedFlag(level, index);
+            }
+        }
+    }
+
+    //------------------------------------------------------------------------------
+    void BuddyAllocator::initSplitTable() noexcept
+    {
+        const auto numParentLevels = m_numBlockLevels - 1;
+
+        m_splitTable = SplitTable(numParentLevels, m_buffer.get() + calcFreeListTableSize(m_numBlockLevels) + calcBlockDataTableSizeAligned(m_numBlockLevels));
+
+        auto relativeBufferBodyStart = static_cast<std::uintptr_t>(MemoryUtils::align(m_headerSize, m_minBlockSize));
+
+        for (std::size_t level = 0; level < numParentLevels; ++level)
+        {
+            auto relativeLastSplitBlock = MemoryUtils::align(relativeBufferBodyStart, getBlockSize(level)) - getBlockSize(level);
+            auto lastSplitBlock = m_buffer.get() + relativeLastSplitBlock;
+            auto lastSplitBlockIndex = getBlockIndex(level, lastSplitBlock);
+
+            for (std::size_t index = 0; index <= lastSplitBlockIndex; ++index)
+            {
+                m_splitTable.setSplit(level, index, true);
+            }
         }
     }
 
@@ -198,25 +228,25 @@ namespace IC
         m_freeListTable.remove(level, block);
 
         auto blockIndex = getBlockIndex(level, block);
-        m_allocatedTable.setAllocated(level, blockIndex, true);
+        m_allocatedTable.toggleAllocatedFlag(level, blockIndex);
 
         return block;
     }
 
     //------------------------------------------------------------------------------
-    void BuddyAllocator::deallocate(void* in_pointer) noexcept
+    void BuddyAllocator::deallocate(void* in_blockPointer) noexcept
     {
-        assert(in_pointer >= m_buffer.get());
-        assert(MemoryUtils::getPointerOffset(in_pointer, m_buffer.get()) < m_bufferSize);
+        assert(in_blockPointer >= m_buffer.get());
+        assert(MemoryUtils::getPointerOffset(in_blockPointer, m_buffer.get()) < m_bufferSize);
 
         std::unique_lock<std::mutex> lock(m_mutex);
 
         std::size_t level, index;
-        getAllocatedBlockInfo(in_pointer, level, index);
+        getAllocatedBlockInfo(in_blockPointer, level, index);
         assert(level > 0 && level < m_numBlockLevels);
 
-        m_allocatedTable.setAllocated(level, index, false);
-        m_freeListTable.add(level, in_pointer);
+        m_allocatedTable.toggleAllocatedFlag(level, index);
+        m_freeListTable.add(level, in_blockPointer);
 
         std::size_t parentLevel = level - 1;
         std::size_t parentIndex = getParentBlockIndex(level, index);
@@ -224,12 +254,12 @@ namespace IC
     }
 
     //------------------------------------------------------------------------------
-    std::size_t BuddyAllocator::getBlockSize(std::size_t in_level) const noexcept
+    std::size_t BuddyAllocator::getBlockSize(std::size_t in_blockLevel) const noexcept
     {
-        assert(in_level >= 0 && in_level < m_numBlockLevels);
+        assert(in_blockLevel >= 0 && in_blockLevel < m_numBlockLevels);
 
         auto output = m_bufferSize;
-        for (std::size_t level = 0; level < in_level; ++level)
+        for (std::size_t level = 0; level < in_blockLevel; ++level)
         {
             output >>= 1;
         }
@@ -248,22 +278,22 @@ namespace IC
     }
 
     //------------------------------------------------------------------------------
-    std::size_t BuddyAllocator::getBlockIndex(std::size_t in_level, void* in_pointer) const noexcept
+    std::size_t BuddyAllocator::getBlockIndex(std::size_t in_blockLevel, void* in_blockPointer) const noexcept
     {
-        assert(in_level >= 0 && in_level < m_numBlockLevels);
-        assert(in_pointer >= m_buffer.get());
-        assert(MemoryUtils::getPointerOffset(in_pointer, m_buffer.get()) < m_bufferSize);
-        assert(MemoryUtils::isAligned(MemoryUtils::getPointerOffset(in_pointer, m_buffer.get()), getBlockSize(in_level)));
+        assert(in_blockLevel >= 0 && in_blockLevel < m_numBlockLevels);
+        assert(in_blockPointer >= m_buffer.get());
+        assert(MemoryUtils::getPointerOffset(in_blockPointer, m_buffer.get()) < m_bufferSize);
+        assert(MemoryUtils::isAligned(MemoryUtils::getPointerOffset(in_blockPointer, m_buffer.get()), getBlockSize(in_blockLevel)));
 
-        auto pointerDiff = reinterpret_cast<std::uintptr_t>(in_pointer) - reinterpret_cast<std::uintptr_t>(m_buffer.get());
-        return static_cast<std::size_t>(pointerDiff) / getBlockSize(in_level);
+        auto pointerDiff = reinterpret_cast<std::uintptr_t>(in_blockPointer) - reinterpret_cast<std::uintptr_t>(m_buffer.get());
+        return static_cast<std::size_t>(pointerDiff) / getBlockSize(in_blockLevel);
     }
 
     //------------------------------------------------------------------------------
-    std::size_t BuddyAllocator::getParentBlockIndex(std::size_t in_level, std::size_t in_blockIndex) const noexcept
+    std::size_t BuddyAllocator::getParentBlockIndex(std::size_t in_blockLevel, std::size_t in_blockIndex) const noexcept
     {
-        assert(in_level > 0 && in_level < m_numBlockLevels);
-        assert(in_blockIndex < getNumIndicesForLevel(in_level));
+        assert(in_blockLevel > 0 && in_blockLevel < m_numBlockLevels);
+        assert(in_blockIndex < getNumIndicesForLevel(in_blockLevel));
 
         return in_blockIndex >> 1;
     }
@@ -288,19 +318,20 @@ namespace IC
     }
 
     //------------------------------------------------------------------------------
-    void BuddyAllocator::getAllocatedBlockInfo(void* in_pointer, std::size_t& out_level, std::size_t& out_index) const noexcept
+    void BuddyAllocator::getAllocatedBlockInfo(void* in_blockPointer, std::size_t& out_level, std::size_t& out_index) const noexcept
     {
-        assert(in_pointer);
+        assert(in_blockPointer);
 
         out_level = 0;
         out_index = 0;
 
         for (std::size_t level = 1; level < m_numBlockLevels; ++level)
         {
-            if (MemoryUtils::isAligned(MemoryUtils::getPointerOffset(in_pointer, m_buffer.get()), getBlockSize(level)))
+            if (MemoryUtils::isAligned(MemoryUtils::getPointerOffset(in_blockPointer, m_buffer.get()), getBlockSize(level)))
             {
-                auto index = getBlockIndex(level, in_pointer);
-                if (m_allocatedTable.isAllocated(level, index))
+                auto index = getBlockIndex(level, in_blockPointer);
+
+                if (level == m_numBlockLevels - 1 || !m_splitTable.isSplit(level, index))
                 {
                     out_level = level;
                     out_index = index;
@@ -317,22 +348,26 @@ namespace IC
     {
         assert(in_blockLevel > 0 && in_blockLevel < m_numBlockLevels - 1);
 
-        auto block = m_freeListTable.getStart(in_blockLevel);
-        if (!block)
+        auto blockPointer = m_freeListTable.getStart(in_blockLevel);
+        if (!blockPointer)
         {
             assert(in_blockLevel > 1);
 
             splitBlock(in_blockLevel - 1);
 
-            block = m_freeListTable.getStart(in_blockLevel);
-            assert(block);
+            blockPointer = m_freeListTable.getStart(in_blockLevel);
+            assert(blockPointer);
         }
 
-        m_freeListTable.remove(in_blockLevel, block);
+        auto blockIndex = getBlockIndex(in_blockLevel, blockPointer);
+
+        m_freeListTable.remove(in_blockLevel, blockPointer);
+        m_allocatedTable.toggleAllocatedFlag(in_blockLevel, blockIndex);
+        m_splitTable.setSplit(in_blockLevel, blockIndex, true);
         
         std::size_t childBlockLevel = in_blockLevel + 1;
-        m_freeListTable.add(childBlockLevel, block);
-        m_freeListTable.add(childBlockLevel, reinterpret_cast<std::uint8_t*>(block) + getBlockSize(childBlockLevel));
+        m_freeListTable.add(childBlockLevel, blockPointer);
+        m_freeListTable.add(childBlockLevel, reinterpret_cast<std::uint8_t*>(blockPointer) + getBlockSize(childBlockLevel));
     }
 
     //------------------------------------------------------------------------------
@@ -344,10 +379,14 @@ namespace IC
         std::size_t childBlockIndexA, childBlockIndexB;
         getChildBlockIndices(in_blockLevel, in_blockIndex, childBlockIndexA, childBlockIndexB);
 
-        if (!m_allocatedTable.isAllocated(childBlockLevel, childBlockIndexA) && !m_allocatedTable.isAllocated(childBlockLevel, childBlockIndexB))
+        if (!m_allocatedTable.getAllocatedFlag(childBlockLevel, childBlockIndexA))
         {
             m_freeListTable.remove(childBlockLevel, getBlockPointer(childBlockLevel, childBlockIndexA));
             m_freeListTable.remove(childBlockLevel, getBlockPointer(childBlockLevel, childBlockIndexB));
+
+            m_splitTable.setSplit(in_blockLevel, in_blockIndex, false);
+            m_allocatedTable.toggleAllocatedFlag(in_blockLevel, in_blockIndex);
+
             m_freeListTable.add(in_blockLevel, getBlockPointer(in_blockLevel, in_blockIndex));
 
             std::size_t parentLevel = in_blockLevel - 1;
@@ -372,11 +411,11 @@ namespace IC
     }
 
     //------------------------------------------------------------------------------
-    void* BuddyAllocator::FreeListTable::getStart(std::size_t in_level) const noexcept
+    void* BuddyAllocator::FreeListTable::getStart(std::size_t in_tableLevel) const noexcept
     {
-        assert(in_level >= 0 && in_level < m_numBlockLevels);
+        assert(in_tableLevel >= 0 && in_tableLevel < m_numBlockLevels);
 
-        return reinterpret_cast<void*>(m_freeListTable[in_level]);
+        return reinterpret_cast<void*>(m_freeListTable[in_tableLevel]);
     }
 
     //------------------------------------------------------------------------------
@@ -398,35 +437,35 @@ namespace IC
     }
 
     //------------------------------------------------------------------------------
-    void BuddyAllocator::FreeListTable::add(std::size_t in_level, void* in_listElement) noexcept
+    void BuddyAllocator::FreeListTable::add(std::size_t in_tableLevel, void* in_listElement) noexcept
     {
-        assert(in_level >= 0 && in_level < m_numBlockLevels);
+        assert(in_tableLevel >= 0 && in_tableLevel < m_numBlockLevels);
         assert(in_listElement != nullptr);
 
         ListNode* newStart = reinterpret_cast<ListNode*>(in_listElement);
         newStart->m_previous = nullptr;
-        newStart->m_next = m_freeListTable[in_level];
+        newStart->m_next = m_freeListTable[in_tableLevel];
 
-        if (m_freeListTable[in_level])
+        if (m_freeListTable[in_tableLevel])
         {
-            assert(m_freeListTable[in_level]->m_previous == nullptr);
-            m_freeListTable[in_level]->m_previous = newStart;
+            assert(m_freeListTable[in_tableLevel]->m_previous == nullptr);
+            m_freeListTable[in_tableLevel]->m_previous = newStart;
         }
 
-        m_freeListTable[in_level] = newStart;
+        m_freeListTable[in_tableLevel] = newStart;
     }
 
     //------------------------------------------------------------------------------
-    void BuddyAllocator::FreeListTable::remove(std::size_t in_level, void* in_listElement) noexcept
+    void BuddyAllocator::FreeListTable::remove(std::size_t in_tableLevel, void* in_listElement) noexcept
     {
-        assert(in_level >= 0 && in_level < m_numBlockLevels);
+        assert(in_tableLevel >= 0 && in_tableLevel < m_numBlockLevels);
         assert(in_listElement != nullptr);
 
         ListNode* toRemove = reinterpret_cast<ListNode*>(in_listElement);
 
-        if (toRemove == m_freeListTable[in_level])
+        if (toRemove == m_freeListTable[in_tableLevel])
         {
-            m_freeListTable[in_level] = toRemove->m_next;
+            m_freeListTable[in_tableLevel] = toRemove->m_next;
         }
 
         if (toRemove->m_next)
@@ -444,40 +483,78 @@ namespace IC
     BuddyAllocator::AllocatedTable::AllocatedTable(std::size_t in_numBlockLevels, void* in_buffer) noexcept
         : m_numBlockLevels(in_numBlockLevels), m_allocatedTable(in_buffer)
     {
-        memset(m_allocatedTable, 0, calcAllocatedTableSizeAligned(in_numBlockLevels));
+        memset(m_allocatedTable, 0, calcBlockDataTableSizeAligned(in_numBlockLevels));
     }
 
     //------------------------------------------------------------------------------
-    bool BuddyAllocator::AllocatedTable::isAllocated(std::size_t in_level, std::size_t in_blockIndex) const noexcept
+    bool BuddyAllocator::AllocatedTable::getAllocatedFlag(std::size_t in_blockLevel, std::size_t in_blockIndex) const noexcept
     {
-        assert(in_level >= 0 && in_level < m_numBlockLevels);
-        assert(in_blockIndex < getNumIndicesForLevel(in_level));
+        assert(in_blockLevel > 0 && in_blockLevel < m_numBlockLevels);
+        assert(in_blockIndex < getNumIndicesForLevel(in_blockLevel));
 
-        auto bufferBlockIndex = (1 << in_level) - 1 + in_blockIndex;
-        auto bufferByteIndex = bufferBlockIndex / CHAR_BIT;
-        auto bufferBitIndex = bufferBlockIndex % CHAR_BIT;
+        auto tableLevel = in_blockLevel - 1;
+        auto tableIndex = in_blockIndex >> 1;
 
-        return (reinterpret_cast<std::uint8_t*>(m_allocatedTable)[bufferByteIndex] & (1 << bufferBitIndex)) != 0;
+        auto flagIndex = (1 << tableLevel) - 1 + tableIndex;
+        auto flagByteIndex = flagIndex / CHAR_BIT;
+        auto flagBitIndex = flagIndex % CHAR_BIT;
+
+        return (reinterpret_cast<std::uint8_t*>(m_allocatedTable)[flagByteIndex] & (1 << flagBitIndex)) != 0;
     }
 
     //------------------------------------------------------------------------------
-    void BuddyAllocator::AllocatedTable::setAllocated(std::size_t in_level, std::size_t in_blockIndex, bool in_isAllocated) noexcept
+    void BuddyAllocator::AllocatedTable::toggleAllocatedFlag(std::size_t in_blockLevel, std::size_t in_blockIndex) noexcept
     {
-        assert(in_level >= 0 && in_level < m_numBlockLevels);
-        assert(in_blockIndex < getNumIndicesForLevel(in_level));
+        assert(in_blockLevel > 0 && in_blockLevel < m_numBlockLevels);
+        assert(in_blockIndex < getNumIndicesForLevel(in_blockLevel));
 
-        auto bufferBlockIndex = (1 << in_level) - 1 + in_blockIndex;
+        auto tableLevel = in_blockLevel - 1;
+        auto tableIndex = in_blockIndex >> 1;
+
+        auto flagIndex = (1 << tableLevel) - 1 + tableIndex;
+        auto flagByteIndex = flagIndex / CHAR_BIT;
+        auto flagBitIndex = flagIndex % CHAR_BIT;
+
+        reinterpret_cast<std::uint8_t*>(m_allocatedTable)[flagByteIndex] ^= (1 << flagBitIndex);
+    }
+
+    //------------------------------------------------------------------------------
+    BuddyAllocator::SplitTable::SplitTable(std::size_t in_numBlockLevels, void* in_buffer) noexcept
+        : m_numBlockLevels(in_numBlockLevels), m_splitTable(in_buffer)
+    {
+        memset(m_splitTable, 0, calcBlockDataTableSizeAligned(in_numBlockLevels));
+    }
+
+    //------------------------------------------------------------------------------
+    bool BuddyAllocator::SplitTable::isSplit(std::size_t in_blockLevel, std::size_t in_blockIndex) const noexcept
+    {
+        assert(in_blockLevel >= 0 && in_blockLevel < m_numBlockLevels);
+        assert(in_blockIndex < getNumIndicesForLevel(in_blockLevel));
+
+        auto flagIndex = (1 << in_blockLevel) - 1 + in_blockIndex;
+        auto flagByteIndex = flagIndex / CHAR_BIT;
+        auto flagBitIndex = flagIndex % CHAR_BIT;
+
+        return (reinterpret_cast<std::uint8_t*>(m_splitTable)[flagByteIndex] & (1 << flagBitIndex)) != 0;
+    }
+
+    //------------------------------------------------------------------------------
+    void BuddyAllocator::SplitTable::setSplit(std::size_t in_blockLevel, std::size_t in_blockIndex, bool in_isSplit) noexcept
+    {
+        assert(in_blockLevel >= 0 && in_blockLevel < m_numBlockLevels);
+        assert(in_blockIndex < getNumIndicesForLevel(in_blockLevel));
+
+        auto bufferBlockIndex = (1 << in_blockLevel) - 1 + in_blockIndex;
         auto bufferByteIndex = bufferBlockIndex / CHAR_BIT;
         auto bufferBitIndex = bufferBlockIndex % CHAR_BIT;
 
-        if (in_isAllocated)
+        if (in_isSplit)
         {
-            reinterpret_cast<std::uint8_t*>(m_allocatedTable)[bufferByteIndex] |= (1 << bufferBitIndex);
+            reinterpret_cast<std::uint8_t*>(m_splitTable)[bufferByteIndex] |= (1 << bufferBitIndex);
         }
         else
         {
-            reinterpret_cast<std::uint8_t*>(m_allocatedTable)[bufferByteIndex] &= ~(1 << bufferBitIndex);
+            reinterpret_cast<std::uint8_t*>(m_splitTable)[bufferByteIndex] &= ~(1 << bufferBitIndex);
         }
-
     }
 }
