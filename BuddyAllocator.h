@@ -108,17 +108,17 @@ namespace IC
 
             /// Constructs an empty free list.
             ///
-            FreeListTable() noexcept;
+            FreeListTable() noexcept {}
 
             /// Initialises the free list table with the given memory buffer. 
             ///
-            /// @param in_numLevels
+            /// @param in_numBlockLevels
             ///     The number of levels in the table.
             /// @param in_buffer
             ///     The buffer in which the first element in each list should
             ///     be stored.
             ///
-            FreeListTable(std::size_t in_numLevels, void* in_buffer) noexcept;
+            FreeListTable(std::size_t in_numBlockLevels, void* in_buffer) noexcept;
 
             /// This is not thread-safe.
             ///
@@ -176,8 +176,66 @@ namespace IC
                 ListNode* m_next = nullptr;
             };
 
-            std::size_t m_numLevels = 0;
+            std::size_t m_numBlockLevels = 0;
             ListNode** m_freeListTable = nullptr;
+        };
+
+        /// Encapsulates functionality for accessing the allocated table. This requires no
+        /// memory, instead using the buffer provided in the constructor. This allows the
+        /// Buddy Allocator to use memory inside its buffer.
+        ///
+        /// For each block in the buffer, a single bit is stored describing whether or not
+        /// the block is allocated.
+        ///
+        /// This is not thread-safe, so the buddy allocator mutex should always be held
+        /// when calling any of the free list table's methods.
+        ///
+        class AllocatedTable final
+        {
+        public:
+            /// Constructs an empty allocated table.
+            ///
+            AllocatedTable() noexcept {}
+
+            /// Initialises the allocated table with the given memory buffer. 
+            ///
+            /// @param in_numBlockLevels
+            ///     The number of levels in the table.
+            /// @param in_buffer
+            ///     The buffer in which the allocated table should be stored.
+            ///
+            AllocatedTable(std::size_t in_numBlockLevels, void* in_buffer) noexcept;
+
+            /// This is not thread-safe.
+            ///
+            /// @param in_level
+            ///     The level of the parent.
+            /// @param in_blockIndex
+            ///     The block index of the parent.
+            ///
+            /// @return Whether or not the described block is allocated. A block is only 
+            /// considered to be allocated if a pointer to the block has been provided to 
+            /// the user; split blocks are not flagged allocated.
+            bool isAllocated(std::size_t in_level, std::size_t in_blockIndex) const noexcept;
+
+            /// Sets whether or not a block is allocated. A block is only considered to be
+            /// allocated if a pointer to the block has been provided to the user; split
+            /// blocks are not flagged allocated.
+            ///
+            /// This is not thread-safe.
+            ///
+            /// @param in_level
+            ///     The level of the parent.
+            /// @param in_blockIndex
+            ///     The block index of the parent.
+            /// @param in_isAllocated
+            ///     Whether or not the block should be set to allocated.
+            ///
+            void setAllocated(std::size_t in_level, std::size_t in_blockIndex, bool in_isAllocated) noexcept;
+
+        private:
+            std::size_t m_numBlockLevels = 0;
+            void* m_allocatedTable;
         };
 
         /// Initialises the 'free' list table, which describes the first free block in any
@@ -192,28 +250,14 @@ namespace IC
         void initFreeListTable() noexcept;
 
         /// Initialises the allocated table. This describes whether or not each block in the
-        /// buffer is allocated or not. Note that only one value is stored for each pair of
-        /// "buddies" for efficiency. When either buddy is allocated or deallocated the flag
-        /// is toggled meaning it is false if neither or both are allocated. The only time
-        /// this is read is during the deallocation of a block and since it already knows its
-        /// own state, this is enough to determine the state of the other.
-        ///        
-        /// For the sake of efficiency, this data is stored directly within the memory
-        /// buffer.
+        /// buffer is allocated or not. 
+        ///
+        /// This is stored as a single bit per block in the buffer. For the sake of efficiency,
+        /// this data is stored directly within the memory buffer.
         ///
         /// This is not thread-safe and should only be called during construction.
         ///
         void initAllocatedTable() noexcept;
-
-        /// Initialises the split table. This describes whether or not each possible parent
-        /// block in the buffer has been split into two "buddies".
-        ///
-        /// For the sake of efficiency, this data is stored directly within the memory
-        /// buffer.
-        ///
-        /// This is not thread-safe and should only be called during construction.
-        ///
-        void initSplitTable() noexcept;
 
         /// Allocates a new block of memory of the requested size.
         /// 
@@ -231,10 +275,10 @@ namespace IC
         /// 
         /// This is thread-safe, though it will require locking.
         ///
-        /// @param in_buffer
+        /// @param in_pointer
         ///     The memory which is to be freed.
         ///
-        void deallocate(void* in_buffer) noexcept;
+        void deallocate(void* in_pointer) noexcept;
 
         /// This is thread-safe.
         ///
@@ -276,33 +320,46 @@ namespace IC
         ///
         std::size_t getParentBlockIndex(std::size_t in_level, std::size_t in_blockIndex) const noexcept;
 
-        /// Toggles the allocated flag for the given block index and level. Note that
-        /// this flag is shared with the buddy, and that the root level block cannot 
-        /// be toggled as it does not have a buddy.
+        /// Calculates the indices of the children of the given block.
+        /// 
+        /// This is thread-safe.
         ///
-        /// This is not thread-safe and should only be called while the mutex is held.
+        /// @param in_parentBlockLevel
+        ///     The level of the parent block.
+        /// @param in_parentBlockIndex
+        ///     The index of the parent block.
+        /// @param out_childBlockIndexA
+        ///     (Out) The first child index.
+        /// @param out_childBlockIndexB
+        ///     (Out) The second child index.
         ///
-        /// @param in_level
-        ///     The level of the parent.
-        /// @param in_blockIndex
-        ///     The block index of the parent.
-        ///
-        void toggleChildrenAllocated(std::size_t in_level, std::size_t in_blockIndex) noexcept;
+        void getChildBlockIndices(std::size_t in_parentBlockLevel, std::size_t in_parentBlockIndex, std::size_t& out_childBlockIndexA, std::size_t& out_childBlockIndexB) const noexcept;
 
-        /// Sets whether or not the block at the given level and index is split. Note
-        /// that only blocks which can be split can be set - i.e the bottom level cannot
-        /// be supplied.
+        /// This is thread-safe.
         ///
+        /// @param in_blockLevel
+        ///     The requested block level.
+        /// @param in_blockIndex
+        ///     The index of the block.
+        ///
+        /// @return The block pointer described by the given block level and index.
+        ///
+        void* getBlockPointer(std::size_t in_blockLevel, std::size_t in_blockIndex) const noexcept;
+
+        /// Calculates both the level and index of the given allocated block pointer. 
+        /// If the block is not allocated, or the pointer is not to a valid block, this
+        /// will assert.
+        /// 
         /// This is not thread-safe and should only be called while the mutex is held.
         ///
-        /// @param in_level
-        ///     The level of of the block which was split.
-        /// @param in_blockIndex
-        ///     The index of the block within the level.
-        /// @param in_isSplit
-        ///     Whether or not the block is split.
+        /// @param in_pointer
+        ///     The pointer to the block.
+        /// @param out_level
+        ///     (Out) The output level.
+        /// @param out_index
+        ///     (Out) The output index.
         ///
-        void setSplit(std::size_t in_level, std::size_t in_blockIndex, bool in_isSplit) noexcept;
+        void getAllocatedBlockInfo(void* in_pointer, std::size_t& out_level, std::size_t& out_index) const noexcept;
 
         /// Splits a block in the requested level into two blocks one level higher. If
         /// There are no available blocks at the requested level blocks will be split
@@ -311,25 +368,32 @@ namespace IC
         ///
         /// This is not thread-safe and should only be called while the mutex is held.
         ///
-        /// @param in_level
+        /// @param in_blockLevel
         ///     The block level which should be split. Cannot be the lowest or highest
         ///     block levels.
         ///
-        void splitBlock(std::size_t in_level) noexcept;
+        void splitBlock(std::size_t in_blockLevel) noexcept;
+
+        /// Tries to merge the given block. If successful, this will recurse and try to
+        /// merge its parent.
+        ///
+        /// This is not thread-safe and should only be called while the mutex is held.
+        ///
+        /// @param in_blockLevel
+        ///     The level of the block which should attempt to merge.
+        /// @param in_blockIndex
+        ///     The index of the block which should attempt to merge.
+        ///
+        void tryMergeBlock(std::size_t in_blockLevel, std::size_t in_blockIndex) noexcept;
 
         const std::size_t m_bufferSize;
         const std::size_t m_minBlockSize;
-        const std::size_t m_numLevels;
-        const std::size_t m_freeListTableSize;
-        const std::size_t m_blockDataTableSize;
-        const std::size_t m_blockDataTableSizeAligned;
-        const std::size_t m_blockDataTableSizeBits;
+        const std::size_t m_numBlockLevels;
         const std::size_t m_headerSize;
 
         std::unique_ptr<std::uint8_t[]> m_buffer;
         FreeListTable m_freeListTable;
-        void* m_allocatedTable;
-        void* m_splitTable;
+        AllocatedTable m_allocatedTable;
 
         std::mutex m_mutex;
     };
