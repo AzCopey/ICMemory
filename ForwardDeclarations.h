@@ -1,4 +1,4 @@
-// Created by Ian Copland on 2015-09-20
+// Created by Ian Copland on 2016-01-18
 //
 // The MIT License(MIT)
 // 
@@ -22,16 +22,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _IC_UNIQUEPTR_H_
-#define _IC_UNIQUEPTR_H_
+#ifndef _IC_FORWARDDECLARATIONS_H_
+#define _IC_FORWARDDECLARATIONS_H_
 
-#include <memory>
 #include <functional>
+#include <memory>
 
 namespace IC
 {
-
+    class BuddyAllocator;
+    class FrameAllocator;
     template <typename TType> using UniquePtr = std::unique_ptr<TType, std::function<void(TType*)>>;
+    template <typename TType> using SharedPtr = std::shared_ptr<TType>;
 }
 
 #endif

@@ -22,6 +22,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#ifndef _IC_MEMORYUTILS_H_
+#define _IC_MEMORYUTILS_H_
+
+#include "ForwardDeclarations.h"
+
 #include <cstdint>
 #include <cassert>
 #include <type_traits>
@@ -160,3 +165,5 @@ namespace IC
         }
     }
 }
+
+#endif

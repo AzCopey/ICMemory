@@ -25,6 +25,8 @@
 #ifndef _IC_FRAMEALLOCATOR_H_
 #define _IC_FRAMEALLOCATOR_H_
 
+#include "ForwardDeclarations.h"
+
 #include <cstdint>
 #include <memory>
 #include <functional>

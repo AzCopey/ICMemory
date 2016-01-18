@@ -25,7 +25,7 @@
 #ifndef _IC_BUDDYALLOCATOR_H_
 #define _IC_BUDDYALLOCATOR_H_
 
-#include "UniquePtr.h"
+#include "ForwardDeclarations.h"
 
 #include <cstdint>
 #include <memory>
@@ -82,9 +82,10 @@ namespace IC
         /// 
         /// This is thread-safe, though it will require locking.
         ///
-        /// @params The arguments for the constructor if appropriate.
+        /// @param in_constructorArgs
+        ///     The arguments for the constructor if appropriate.
         ///
-        /// @return A unique pointer to the allocated memory.
+        /// @return A unique pointer to the allocated instance.
         /// 
         template <typename TType, typename... TConstructorArgs> UniquePtr<TType> allocate(TConstructorArgs&&... in_constructorArgs) noexcept;
 
@@ -476,7 +477,7 @@ namespace IC
     {
         void* memory = allocate(sizeof(TType));
         TType* object = new (memory) TType(std::forward<TConstructorArgs>(in_constructorArgs)...);
-        return UniquePtr<TType>(object, [=](TType* in_object) -> void
+        return UniquePtr<TType>(object, [=](TType* in_object) noexcept -> void
         {
             in_object->~TType();
 
