@@ -1,8 +1,8 @@
-// Created by Ian Copland on 2016-01-18
+// Created by Ian Copland on 2016-01-23
 //
 // The MIT License(MIT)
 // 
-// Copyright(c) 2015 Ian Copland
+// Copyright(c) 2016 Ian Copland
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files(the "Software"), to deal
@@ -22,19 +22,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _IC_FORWARDDECLARATIONS_H_
-#define _IC_FORWARDDECLARATIONS_H_
+#ifndef _IC_MAKESHARED_H_
+#define _IC_MAKESHARED_H_
 
-#include <functional>
-#include <memory>
-#include <type_traits>
+#include "ForwardDeclarations.h"
+
+#include "BuddyAllocator.h"
 
 namespace IC
 {
-    class BuddyAllocator;
-    class FrameAllocator;
-    template <typename TType> using UniquePtr = std::unique_ptr<TType, std::function<void(typename std::remove_all_extents<TType>::type*)>>;
-    template <typename TType> using SharedPtr = std::shared_ptr<TType>;
+    /// Allocates a new shared pointer from the given Buddy Allocator with the
+    /// given constructor parameters. This follows the make_* convention set in
+    /// the standard library.
+    ///
+    /// @param in_allocator
+    ///     The allocator from which to allocate the requested type.
+    /// @param in_constructorArgs
+    ///     The arguments for the constructor if appropriate.
+    ///
+    /// @return A shared pointer to the allocated instance.
+    ///
+    template <typename TType, typename... TConstructorArgs> SharedPtr<TType> makeShared(BuddyAllocator& in_allocator, TConstructorArgs&&... in_constructorArgs) noexcept
+    {
+        return in_allocator.allocate<TType>(std::forward<TConstructorArgs>(in_constructorArgs)...);
+    }
 }
 
 #endif

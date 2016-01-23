@@ -2,7 +2,7 @@
 //
 // The MIT License(MIT)
 // 
-// Copyright(c) 2015 Ian Copland
+// Copyright(c) 2016 Ian Copland
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files(the "Software"), to deal
@@ -45,6 +45,22 @@ namespace IC
     template <typename TType, typename... TConstructorArgs> UniquePtr<TType> makeUnique(BuddyAllocator& in_allocator, TConstructorArgs&&... in_constructorArgs) noexcept
     {
         return in_allocator.allocate<TType>(std::forward<TConstructorArgs>(in_constructorArgs)...);
+    }
+
+    /// Allocates a new unique pointer to an array from the given Buddy Allocator 
+    /// with the given constructor parameters. This follows the make_* convention 
+    /// set in the standard library.
+    ///
+    /// @param in_allocator
+    ///     The allocator from which to allocate the requested type.
+    /// @param in_size
+    ///     The size of the array.
+    ///
+    /// @return A unique pointer to the allocated array.
+    ///
+    template <typename TType> UniquePtr<TType[]> makeUniqueArray(BuddyAllocator& in_allocator, std::size_t in_size) noexcept
+    {
+        return in_allocator.allocate_array<TType>(in_size);
     }
 }
 

@@ -89,6 +89,19 @@ namespace IC
         /// 
         template <typename TType, typename... TConstructorArgs> UniquePtr<TType> allocate(TConstructorArgs&&... in_constructorArgs) noexcept;
 
+        /// Allocates a new block of memory for an array of the
+        /// requested type. Note that, like new[], fundamental types
+        /// will not be set to a default value. 
+        /// 
+        /// This is thread-safe, though it will require locking.
+        ///
+        /// @param in_size
+        ///     The size of the array.
+        ///
+        /// @return A unique pointer to the allocated array.
+        /// 
+        template <typename TType> UniquePtr<TType[]> allocate_array(std::size_t in_size) noexcept;
+
     private:
 
         /// Encapsulates functionality required for navigating the free list table.
@@ -482,6 +495,32 @@ namespace IC
             in_object->~TType();
 
             deallocate(reinterpret_cast<void*>(in_object));
+        });
+    }
+
+    //-----------------------------------------------------------------------------
+    template <typename TType> UniquePtr<TType[]> BuddyAllocator::allocate_array(std::size_t in_size) noexcept
+    {
+        auto array = reinterpret_cast<TType*>(allocate(sizeof(TType) * in_size));
+        if (!std::is_fundamental<TType>::value)
+        {
+            for (std::size_t i = 0; i < in_size; ++i)
+            {
+                new (array + i) TType();
+            }
+        }
+
+        return UniquePtr<TType[]>(array, [=](TType* in_array) noexcept -> void
+        {
+            if (!std::is_fundamental<TType>::value)
+            {
+                for (std::size_t i = 0; i < in_size; ++i)
+                {
+                    (in_array + i)->~TType();
+                }
+            }
+
+            deallocate(reinterpret_cast<void*>(in_array));
         });
     }
 }

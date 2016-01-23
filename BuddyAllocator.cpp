@@ -373,7 +373,7 @@ namespace IC
     //------------------------------------------------------------------------------
     void BuddyAllocator::tryMergeBlock(std::size_t in_blockLevel, std::size_t in_blockIndex) noexcept
     {
-        assert(in_blockLevel > 0 && in_blockLevel < m_numBlockLevels - 1);
+        assert(in_blockLevel >= 0 && in_blockLevel < m_numBlockLevels - 1);
 
         std::size_t childBlockLevel = in_blockLevel + 1;
         std::size_t childBlockIndexA, childBlockIndexB;

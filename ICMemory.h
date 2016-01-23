@@ -27,6 +27,7 @@
 
 #include "BuddyAllocator.h"
 #include "FrameAllocator.h"
+#include "MakeShared.h"
 #include "MakeUnique.h"
 
 #endif
