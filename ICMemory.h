@@ -2,7 +2,7 @@
 //
 // The MIT License(MIT)
 // 
-// Copyright(c) 2015 Ian Copland
+// Copyright(c) 2016 Ian Copland
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files(the "Software"), to deal
@@ -22,8 +22,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _IC_ICMEMORY_H_
-#define _IC_ICMEMORY_H_
+#ifndef _ICMEMORY_ICMEMORY_H_
+#define _ICMEMORY_ICMEMORY_H_
 
 #include "BuddyAllocator.h"
 #include "FrameAllocator.h"
