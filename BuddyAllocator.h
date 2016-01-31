@@ -100,7 +100,7 @@ namespace IC
         ///
         /// @return A unique pointer to the allocated array.
         /// 
-        template <typename TType> UniquePtr<TType[]> allocate_array(std::size_t in_size) noexcept;
+        template <typename TType> UniquePtr<TType[]> allocateArray(std::size_t in_size) noexcept;
 
     private:
 
@@ -499,7 +499,7 @@ namespace IC
     }
 
     //-----------------------------------------------------------------------------
-    template <typename TType> UniquePtr<TType[]> BuddyAllocator::allocate_array(std::size_t in_size) noexcept
+    template <typename TType> UniquePtr<TType[]> BuddyAllocator::allocateArray(std::size_t in_size) noexcept
     {
         auto array = reinterpret_cast<TType*>(allocate(sizeof(TType) * in_size));
         if (!std::is_fundamental<TType>::value)

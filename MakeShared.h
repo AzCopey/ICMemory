@@ -46,6 +46,22 @@ namespace IC
     {
         return in_allocator.allocate<TType>(std::forward<TConstructorArgs>(in_constructorArgs)...);
     }
+
+    /// Allocates a new shared pointer from the given Frame Allocator with the
+    /// given constructor parameters. This follows the make_* convention set in
+    /// the standard library.
+    ///
+    /// @param in_allocator
+    ///     The allocator from which to allocate the requested type.
+    /// @param in_constructorArgs
+    ///     The arguments for the constructor if appropriate.
+    ///
+    /// @return A shared pointer to the allocated instance.
+    ///
+    template <typename TType, typename... TConstructorArgs> SharedPtr<TType> makeShared(FrameAllocator& in_allocator, TConstructorArgs&&... in_constructorArgs) noexcept
+    {
+        return in_allocator.allocate<TType>(std::forward<TConstructorArgs>(in_constructorArgs)...);
+    }
 }
 
 #endif

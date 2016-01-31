@@ -31,29 +31,29 @@
 namespace IC
 {
     //------------------------------------------------------------------------------
-    FrameAllocator::FrameAllocator(std::size_t in_bufferSize, std::uint32_t in_alignment) noexcept
-        : m_bufferSize(in_bufferSize), m_alignment(in_alignment)
+    FrameAllocator::FrameAllocator(BuddyAllocator& in_buddyAllocator, std::size_t in_pageSize) noexcept
+        : m_pageSize(in_pageSize), m_buddyAllocator(in_buddyAllocator)
     {
-        assert(MemoryUtils::isPowerOfTwo(in_bufferSize));
-        assert(MemoryUtils::isPowerOfTwo(in_alignment));
-
-        m_buffer = std::unique_ptr<std::uint8_t[]>(new std::uint8_t[m_bufferSize]);
-        reset();
+        //TODO: !?
     }
 
     //------------------------------------------------------------------------------
     void FrameAllocator::reset() noexcept
     {
-        m_nextPointer = MemoryUtils::align(m_buffer.get(), m_alignment);
+        //TODO: !?
+        //m_nextPointer = MemoryUtils::align(m_buffer.get(), m_alignment);
     }
 
     //------------------------------------------------------------------------------
     void* FrameAllocator::allocate(std::size_t in_allocationSize) noexcept
     {
-        void* output = m_nextPointer;
+        //TODO: !?
+        //void* output = m_nextPointer;
 
-        m_nextPointer = MemoryUtils::align(m_nextPointer + in_allocationSize, m_alignment);
+        //m_nextPointer = MemoryUtils::align(m_nextPointer + in_allocationSize, m_alignment);
 
-        return output;
+        //return output;
+        
+        return nullptr;
     }
 }

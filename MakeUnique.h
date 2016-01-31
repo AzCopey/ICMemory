@@ -47,6 +47,22 @@ namespace IC
         return in_allocator.allocate<TType>(std::forward<TConstructorArgs>(in_constructorArgs)...);
     }
 
+    /// Allocates a new unique pointer from the given Frame Allocator with the
+    /// given constructor parameters. This follows the make_* convention set in
+    /// the standard library.
+    ///
+    /// @param in_allocator
+    ///     The allocator from which to allocate the requested type.
+    /// @param in_constructorArgs
+    ///     The arguments for the constructor if appropriate.
+    ///
+    /// @return A unique pointer to the allocated instance.
+    ///
+    template <typename TType, typename... TConstructorArgs> UniquePtr<TType> makeUnique(FrameAllocator& in_allocator, TConstructorArgs&&... in_constructorArgs) noexcept
+    {
+        return in_allocator.allocate<TType>(std::forward<TConstructorArgs>(in_constructorArgs)...);
+    }
+
     /// Allocates a new unique pointer to an array from the given Buddy Allocator 
     /// with the given constructor parameters. This follows the make_* convention 
     /// set in the standard library.
@@ -60,7 +76,23 @@ namespace IC
     ///
     template <typename TType> UniquePtr<TType[]> makeUniqueArray(BuddyAllocator& in_allocator, std::size_t in_size) noexcept
     {
-        return in_allocator.allocate_array<TType>(in_size);
+        return in_allocator.allocateArray<TType>(in_size);
+    }
+
+    /// Allocates a new unique pointer to an array from the given Frame Allocator 
+    /// with the given constructor parameters. This follows the make_* convention 
+    /// set in the standard library.
+    ///
+    /// @param in_allocator
+    ///     The allocator from which to allocate the requested type.
+    /// @param in_size
+    ///     The size of the array.
+    ///
+    /// @return A unique pointer to the allocated array.
+    ///
+    template <typename TType> UniquePtr<TType[]> makeUniqueArray(FrameAllocator& in_allocator, std::size_t in_size) noexcept
+    {
+        return in_allocator.allocateArray<TType>(in_size);
     }
 }
 
