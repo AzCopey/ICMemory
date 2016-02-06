@@ -44,7 +44,13 @@ namespace IC
     ///
     template <typename TType, typename... TConstructorArgs> UniquePtr<TType> makeUnique(BuddyAllocator& in_allocator, TConstructorArgs&&... in_constructorArgs) noexcept
     {
-        return in_allocator.allocate<TType>(std::forward<TConstructorArgs>(in_constructorArgs)...);
+        void* memory = in_allocator.allocate(sizeof(TType));
+        TType* object = new (memory) TType(std::forward<TConstructorArgs>(in_constructorArgs)...);
+        return UniquePtr<TType>(object, [&in_allocator](TType* in_object) noexcept -> void
+        {
+            in_object->~TType();
+            in_allocator.deallocate(reinterpret_cast<void*>(in_object));
+        });
     }
 
     /// Allocates a new unique pointer from the given Frame Allocator with the
@@ -60,12 +66,19 @@ namespace IC
     ///
     template <typename TType, typename... TConstructorArgs> UniquePtr<TType> makeUnique(FrameAllocator& in_allocator, TConstructorArgs&&... in_constructorArgs) noexcept
     {
-        return in_allocator.allocate<TType>(std::forward<TConstructorArgs>(in_constructorArgs)...);
+        void* memory = in_allocator.allocate(sizeof(TType));
+        TType* object = new (memory) TType(std::forward<TConstructorArgs>(in_constructorArgs)...);
+        return UniquePtr<TType>(object, [&in_allocator](TType* in_object) noexcept -> void
+        {
+            in_object->~TType();
+            in_allocator.deallocate(reinterpret_cast<void*>(in_object));
+        });
     }
 
     /// Allocates a new unique pointer to an array from the given Buddy Allocator 
     /// with the given constructor parameters. This follows the make_* convention 
-    /// set in the standard library.
+    /// set in the standard library. Note that, like new[], fundamental types  will 
+    /// not be set to a default value. 
     ///
     /// @param in_allocator
     ///     The allocator from which to allocate the requested type.
@@ -76,12 +89,33 @@ namespace IC
     ///
     template <typename TType> UniquePtr<TType[]> makeUniqueArray(BuddyAllocator& in_allocator, std::size_t in_size) noexcept
     {
-        return in_allocator.allocateArray<TType>(in_size);
+        auto array = reinterpret_cast<TType*>(in_allocator.allocate(sizeof(TType) * in_size));
+        if (!std::is_fundamental<TType>::value)
+        {
+            for (std::size_t i = 0; i < in_size; ++i)
+            {
+                new (array + i) TType();
+            }
+        }
+
+        return UniquePtr<TType[]>(array, [&in_allocator, in_size](TType* in_array) noexcept -> void
+        {
+            if (!std::is_fundamental<TType>::value)
+            {
+                for (std::size_t i = 0; i < in_size; ++i)
+                {
+                    (in_array + i)->~TType();
+                }
+            }
+
+            in_allocator.deallocate(reinterpret_cast<void*>(in_array));
+        });
     }
 
     /// Allocates a new unique pointer to an array from the given Frame Allocator 
     /// with the given constructor parameters. This follows the make_* convention 
-    /// set in the standard library.
+    /// set in the standard library. Note that, like new[], fundamental types  will 
+    /// not be set to a default value. 
     ///
     /// @param in_allocator
     ///     The allocator from which to allocate the requested type.
@@ -92,7 +126,27 @@ namespace IC
     ///
     template <typename TType> UniquePtr<TType[]> makeUniqueArray(FrameAllocator& in_allocator, std::size_t in_size) noexcept
     {
-        return in_allocator.allocateArray<TType>(in_size);
+        auto array = reinterpret_cast<TType*>(in_allocator.allocate(sizeof(TType) * in_size));
+        if (!std::is_fundamental<TType>::value)
+        {
+            for (std::size_t i = 0; i < in_size; ++i)
+            {
+                new (array + i) TType();
+            }
+        }
+
+        return UniquePtr<TType[]>(array, [&in_allocator, in_size](TType* in_array) noexcept -> void
+        {
+            if (!std::is_fundamental<TType>::value)
+            {
+                for (std::size_t i = 0; i < in_size; ++i)
+                {
+                    (in_array + i)->~TType();
+                }
+            }
+
+            in_allocator.deallocate(reinterpret_cast<void*>(in_array));
+        });
     }
 }
 

@@ -64,32 +64,12 @@ namespace IC
         ///
         std::size_t getPageSize() const noexcept { return m_pageSize; }
 
-        /// Allocates a new block of memory for the requested type. 
+        /// This thread-safe.
         ///
-        /// @param in_constructorArgs
-        ///     The arguments for the constructor if appropriate.
+        /// @return The maximum allocation size from this allocator. This will always be 
+        /// the size of a single page.
         ///
-        /// @return A unique pointer to the allocated instance.
-        /// 
-        template <typename TType, typename... TConstructorArgs> UniquePtr<TType> allocate(TConstructorArgs&&... in_constructorArgs) noexcept;
-
-        /// Allocates a new block of memory for an array of the requested type. Note that, like new[], 
-        /// fundamental types will not be set to a default value. 
-        ///
-        /// @param in_size
-        ///     The size of the array.
-        ///
-        /// @return A unique pointer to the allocated array.
-        /// 
-        template <typename TType> UniquePtr<TType[]> allocateArray(std::size_t in_size) noexcept;
-
-        /// Ends the current "frame", resetting the buffer and allowing all previously allocated
-        /// memory to be reused. Before reset() is called, all previously allocated UniquePtrs
-        /// should have been reset().
-        /// 
-        void reset() noexcept;
-
-    private:
+        std::size_t getMaxAllocationSize() const noexcept { return getPageSize(); }
 
         /// Allocates a new block of memory of the requested size.
         ///
@@ -103,8 +83,18 @@ namespace IC
         /// Decriments the allocation count. This is checked when resetting to ensure that all previously
         /// allocated memory has been deallocated.
         ///
-        void deallocate() noexcept;
+        /// @param in_pointer
+        ///     The pointer to deallocate.
+        ///
+        void deallocate(void* in_pointer) noexcept;
 
+        /// Ends the current "frame", resetting the buffer and allowing all previously allocated
+        /// memory to be reused. Before reset() is called, all previously allocated UniquePtrs
+        /// should have been reset().
+        /// 
+        void reset() noexcept;
+
+    private:
         /// Creates a new page to allocate from. If there is a current page prior to this being called
         /// it will be added to the previous pages list.
         ///
@@ -118,45 +108,6 @@ namespace IC
         std::uint8_t* m_nextPointer = nullptr;
         std::size_t m_activeAllocationCount = 0;
     };
-
-    //-----------------------------------------------------------------------------
-    template <typename TType, typename... TConstructorArgs> UniquePtr<TType> FrameAllocator::allocate(TConstructorArgs&&... in_constructorArgs) noexcept
-    {
-        void* memory = allocate(sizeof(TType));
-        TType* object = new (memory) TType(std::forward<TConstructorArgs>(in_constructorArgs)...);
-        return UniquePtr<TType>(object, [=](TType* in_object) noexcept -> void
-        {
-            in_object->~TType();
-
-            deallocate();
-        });
-    }
-
-    //-----------------------------------------------------------------------------
-    template <typename TType> UniquePtr<TType[]> FrameAllocator::allocateArray(std::size_t in_size) noexcept
-    {
-        auto array = reinterpret_cast<TType*>(allocate(sizeof(TType) * in_size));
-        if (!std::is_fundamental<TType>::value)
-        {
-            for (std::size_t i = 0; i < in_size; ++i)
-            {
-                new (array + i) TType();
-            }
-        }
-
-        return UniquePtr<TType[]>(array, [=](TType* in_array) noexcept -> void
-        {
-            if (!std::is_fundamental<TType>::value)
-            {
-                for (std::size_t i = 0; i < in_size; ++i)
-                {
-                    (in_array + i)->~TType();
-                }
-            }
-
-            deallocate();
-        });
-    }
 }
 
 #endif

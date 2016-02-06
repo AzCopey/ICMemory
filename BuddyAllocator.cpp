@@ -142,6 +142,52 @@ namespace IC
     }
 
     //------------------------------------------------------------------------------
+    void* BuddyAllocator::allocate(std::size_t in_allocationSize) noexcept
+    {
+        auto blockSize = MemoryUtils::align(MemoryUtils::nextPowerofTwo(in_allocationSize), m_minBlockSize);
+        auto level = getLevel(blockSize);
+        assert(level != 0);
+
+        std::unique_lock<std::mutex> lock(m_mutex);
+
+        auto block = m_freeListTable.getStart(level);
+        if (!block)
+        {
+            splitBlock(level - 1);
+
+            block = m_freeListTable.getStart(level);
+            assert(block);
+        }
+
+        m_freeListTable.remove(level, block);
+
+        auto blockIndex = getBlockIndex(level, block);
+        m_allocatedTable.toggleAllocatedFlag(level, blockIndex);
+
+        return block;
+    }
+
+    //------------------------------------------------------------------------------
+    void BuddyAllocator::deallocate(void* in_blockPointer) noexcept
+    {
+        assert(in_blockPointer >= m_buffer.get());
+        assert(MemoryUtils::getPointerOffset(in_blockPointer, m_buffer.get()) < m_bufferSize);
+
+        std::unique_lock<std::mutex> lock(m_mutex);
+
+        std::size_t level, index;
+        getAllocatedBlockInfo(in_blockPointer, level, index);
+        assert(level > 0 && level < m_numBlockLevels);
+
+        m_allocatedTable.toggleAllocatedFlag(level, index);
+        m_freeListTable.add(level, in_blockPointer);
+
+        std::size_t parentLevel = level - 1;
+        std::size_t parentIndex = getParentBlockIndex(level, index);
+        tryMergeBlock(parentLevel, parentIndex);
+    }
+
+    //------------------------------------------------------------------------------
     void BuddyAllocator::initFreeListTable() noexcept
     {
         m_freeListTable = FreeListTable(m_numBlockLevels, m_buffer.get());
@@ -205,52 +251,6 @@ namespace IC
                 m_splitTable.setSplit(level, index, true);
             }
         }
-    }
-
-    //------------------------------------------------------------------------------
-    void* BuddyAllocator::allocate(std::size_t in_allocationSize) noexcept
-    {
-        auto blockSize = MemoryUtils::align(MemoryUtils::nextPowerofTwo(in_allocationSize), m_minBlockSize);
-        auto level = getLevel(blockSize);
-        assert(level != 0);
-
-        std::unique_lock<std::mutex> lock(m_mutex);
-
-        auto block = m_freeListTable.getStart(level);
-        if (!block)
-        {
-            splitBlock(level - 1);
-
-            block = m_freeListTable.getStart(level);
-            assert(block);
-        }
-
-        m_freeListTable.remove(level, block);
-
-        auto blockIndex = getBlockIndex(level, block);
-        m_allocatedTable.toggleAllocatedFlag(level, blockIndex);
-
-        return block;
-    }
-
-    //------------------------------------------------------------------------------
-    void BuddyAllocator::deallocate(void* in_blockPointer) noexcept
-    {
-        assert(in_blockPointer >= m_buffer.get());
-        assert(MemoryUtils::getPointerOffset(in_blockPointer, m_buffer.get()) < m_bufferSize);
-
-        std::unique_lock<std::mutex> lock(m_mutex);
-
-        std::size_t level, index;
-        getAllocatedBlockInfo(in_blockPointer, level, index);
-        assert(level > 0 && level < m_numBlockLevels);
-
-        m_allocatedTable.toggleAllocatedFlag(level, index);
-        m_freeListTable.add(level, in_blockPointer);
-
-        std::size_t parentLevel = level - 1;
-        std::size_t parentIndex = getParentBlockIndex(level, index);
-        tryMergeBlock(parentLevel, parentIndex);
     }
 
     //------------------------------------------------------------------------------

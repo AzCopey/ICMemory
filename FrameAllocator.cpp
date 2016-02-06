@@ -26,6 +26,7 @@
 
 #include "BuddyAllocator.h"
 #include "MemoryUtils.h"
+#include "MakeUnique.h"
 
 #include <cassert>
 
@@ -35,16 +36,6 @@ namespace IC
     FrameAllocator::FrameAllocator(BuddyAllocator& in_buddyAllocator, std::size_t in_pageSize) noexcept
         : m_pageSize(in_pageSize), m_buddyAllocator(in_buddyAllocator)
     {
-    }
-
-    //------------------------------------------------------------------------------
-    void FrameAllocator::reset() noexcept
-    {
-        assert(m_activeAllocationCount == 0);
-
-        m_previousPages.clear();
-        m_currentPage.reset();
-        m_nextPointer = nullptr;
     }
 
     //------------------------------------------------------------------------------
@@ -66,9 +57,19 @@ namespace IC
     }
 
     //------------------------------------------------------------------------------
-    void FrameAllocator::deallocate() noexcept
+    void FrameAllocator::deallocate(void* in_pointer) noexcept
     {
         --m_activeAllocationCount;
+    }
+
+    //------------------------------------------------------------------------------
+    void FrameAllocator::reset() noexcept
+    {
+        assert(m_activeAllocationCount == 0);
+
+        m_previousPages.clear();
+        m_currentPage.reset();
+        m_nextPointer = nullptr;
     }
 
     //------------------------------------------------------------------------------
@@ -79,7 +80,7 @@ namespace IC
             m_previousPages.push_back(std::move(m_currentPage));
         }
 
-        m_currentPage = m_buddyAllocator.allocateArray<std::uint8_t>(m_pageSize);
+        m_currentPage = makeUniqueArray<std::uint8_t>(m_buddyAllocator, m_pageSize);
         m_nextPointer = MemoryUtils::align(m_currentPage.get(), sizeof(std::intptr_t));
     }
 }

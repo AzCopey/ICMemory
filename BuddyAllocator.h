@@ -78,32 +78,36 @@ namespace IC
         ///
         std::size_t getMinBlockSize() const noexcept { return m_minBlockSize; }
 
-        /// Allocates a new block of memory for the requested type. 
-        /// 
-        /// This is thread-safe, though it will require locking.
+        /// This thread-safe.
         ///
-        /// @param in_constructorArgs
-        ///     The arguments for the constructor if appropriate.
+        /// @return The maximum allocation size from this allocator. This will always be 
+        /// half the size of the full buffer.
         ///
-        /// @return A unique pointer to the allocated instance.
-        /// 
-        template <typename TType, typename... TConstructorArgs> UniquePtr<TType> allocate(TConstructorArgs&&... in_constructorArgs) noexcept;
+        std::size_t getMaxAllocationSize() const noexcept { return getBufferSize() / 2; }
 
-        /// Allocates a new block of memory for an array of the
-        /// requested type. Note that, like new[], fundamental types
-        /// will not be set to a default value. 
+        /// Allocates a new block of memory of the requested size. When the memory allocated
+        /// is no longer required it must be returned to the allocator by calling deallocate().
         /// 
         /// This is thread-safe, though it will require locking.
         ///
-        /// @param in_size
-        ///     The size of the array.
+        /// @param in_allocationSize
+        ///     The size of the allocation.
         ///
-        /// @return A unique pointer to the allocated array.
+        /// @return The allocated memory.
+        ///
+        void* allocate(std::size_t in_allocationSize) noexcept;
+
+        /// Deallocates the given memory, returning the memory block to the free list. If
+        /// appropriate the block will be re-merged with its buddy.
         /// 
-        template <typename TType> UniquePtr<TType[]> allocateArray(std::size_t in_size) noexcept;
+        /// This is thread-safe, though it will require locking.
+        ///
+        /// @param in_pointer
+        ///     The memory which is to be freed.
+        ///
+        void deallocate(void* in_pointer) noexcept;
 
     private:
-
         /// Encapsulates functionality required for navigating the free list table.
         /// This allocates no memory, instead relying on the memory provided in the
         /// constructor. This allows the buddy allocator to store the free list inside
@@ -344,27 +348,6 @@ namespace IC
         ///
         void initSplitTable() noexcept;
 
-        /// Allocates a new block of memory of the requested size.
-        /// 
-        /// This is thread-safe, though it will require locking.
-        ///
-        /// @param in_allocationSize
-        ///     The size of the allocation.
-        ///
-        /// @return The allocated memory.
-        ///
-        void* allocate(std::size_t in_allocationSize) noexcept;
-
-        /// Deallocates the given memory, returning the memory block to the free list. If
-        /// appropriate the block will be re-merged with its buddy.
-        /// 
-        /// This is thread-safe, though it will require locking.
-        ///
-        /// @param in_blockPointer
-        ///     The memory which is to be freed.
-        ///
-        void deallocate(void* in_blockPointer) noexcept;
-
         /// This is thread-safe.
         ///
         /// @param in_blockLevel
@@ -484,45 +467,6 @@ namespace IC
 
         std::mutex m_mutex;
     };
-
-    //-----------------------------------------------------------------------------
-    template <typename TType, typename... TConstructorArgs> UniquePtr<TType> BuddyAllocator::allocate(TConstructorArgs&&... in_constructorArgs) noexcept
-    {
-        void* memory = allocate(sizeof(TType));
-        TType* object = new (memory) TType(std::forward<TConstructorArgs>(in_constructorArgs)...);
-        return UniquePtr<TType>(object, [=](TType* in_object) noexcept -> void
-        {
-            in_object->~TType();
-
-            deallocate(reinterpret_cast<void*>(in_object));
-        });
-    }
-
-    //-----------------------------------------------------------------------------
-    template <typename TType> UniquePtr<TType[]> BuddyAllocator::allocateArray(std::size_t in_size) noexcept
-    {
-        auto array = reinterpret_cast<TType*>(allocate(sizeof(TType) * in_size));
-        if (!std::is_fundamental<TType>::value)
-        {
-            for (std::size_t i = 0; i < in_size; ++i)
-            {
-                new (array + i) TType();
-            }
-        }
-
-        return UniquePtr<TType[]>(array, [=](TType* in_array) noexcept -> void
-        {
-            if (!std::is_fundamental<TType>::value)
-            {
-                for (std::size_t i = 0; i < in_size; ++i)
-                {
-                    (in_array + i)->~TType();
-                }
-            }
-
-            deallocate(reinterpret_cast<void*>(in_array));
-        });
-    }
 }
 
 #endif

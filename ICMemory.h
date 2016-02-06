@@ -29,5 +29,7 @@
 #include "FrameAllocator.h"
 #include "MakeShared.h"
 #include "MakeUnique.h"
+#include "MakeVector.h"
+#include "StdAllocator.h"
 
 #endif

@@ -1,4 +1,4 @@
-// Created by Ian Copland on 2016-01-18
+// Created by Ian Copland on 2016-02-06
 //
 // The MIT License(MIT)
 // 
@@ -22,24 +22,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_FORWARDDECLARATIONS_H_
-#define _ICMEMORY_FORWARDDECLARATIONS_H_
+#ifndef _ICMEMORY_MAKEVECTOR_H_
+#define _ICMEMORY_MAKEVECTOR_H_
 
-#include <functional>
-#include <memory>
-#include <type_traits>
-#include <vector>
+#include "ForwardDeclarations.h"
+
+#include "BuddyAllocator.h"
+#include "StdAllocator.h"
 
 namespace IC
 {
-    class BuddyAllocator;
-    class FrameAllocator;
-    template <typename TValueType, typename TAllocatorType> class StdAllocator;
-    template <typename TType> using UniquePtr = std::unique_ptr<TType, std::function<void(typename std::remove_all_extents<TType>::type*)>>;
-    template <typename TType> using SharedPtr = std::shared_ptr<TType>;
-    
-    //using String = std::basic_string<char, StdAllocator<char, BuddyAllocator>>;
-    template <typename TType> using Vector = std::vector<TType, StdAllocator<TType, BuddyAllocator>>;
+    /// TODO
+    ///
+    template <typename TType> Vector<TType> makeVector(BuddyAllocator& in_allocator) noexcept
+    {
+        StdAllocator<TType, BuddyAllocator> sdkAllocator(in_allocator);
+        return IC::Vector<TType>(sdkAllocator);
+    }
 }
 
 #endif

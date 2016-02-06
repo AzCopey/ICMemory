@@ -28,6 +28,7 @@
 #include "ForwardDeclarations.h"
 
 #include "BuddyAllocator.h"
+#include "MakeUnique.h"
 
 namespace IC
 {
@@ -44,7 +45,7 @@ namespace IC
     ///
     template <typename TType, typename... TConstructorArgs> SharedPtr<TType> makeShared(BuddyAllocator& in_allocator, TConstructorArgs&&... in_constructorArgs) noexcept
     {
-        return in_allocator.allocate<TType>(std::forward<TConstructorArgs>(in_constructorArgs)...);
+        return makeUnique<TType>(in_allocator, std::forward<TConstructorArgs>(in_constructorArgs)...);
     }
 
     /// Allocates a new shared pointer from the given Frame Allocator with the
@@ -60,7 +61,7 @@ namespace IC
     ///
     template <typename TType, typename... TConstructorArgs> SharedPtr<TType> makeShared(FrameAllocator& in_allocator, TConstructorArgs&&... in_constructorArgs) noexcept
     {
-        return in_allocator.allocate<TType>(std::forward<TConstructorArgs>(in_constructorArgs)...);
+        return makeUnique<TType>(in_allocator, std::forward<TConstructorArgs>(in_constructorArgs)...);
     }
 }
 
