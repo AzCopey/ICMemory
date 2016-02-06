@@ -24,6 +24,7 @@
 
 #include "FrameAllocator.h"
 
+#include "BuddyAllocator.h"
 #include "MemoryUtils.h"
 
 #include <cassert>
@@ -34,26 +35,51 @@ namespace IC
     FrameAllocator::FrameAllocator(BuddyAllocator& in_buddyAllocator, std::size_t in_pageSize) noexcept
         : m_pageSize(in_pageSize), m_buddyAllocator(in_buddyAllocator)
     {
-        //TODO: !?
     }
 
     //------------------------------------------------------------------------------
     void FrameAllocator::reset() noexcept
     {
-        //TODO: !?
-        //m_nextPointer = MemoryUtils::align(m_buffer.get(), m_alignment);
+        assert(m_activeAllocationCount == 0);
+
+        m_previousPages.clear();
+        m_currentPage.reset();
+        m_nextPointer = nullptr;
     }
 
     //------------------------------------------------------------------------------
     void* FrameAllocator::allocate(std::size_t in_allocationSize) noexcept
     {
-        //TODO: !?
-        //void* output = m_nextPointer;
+        assert(in_allocationSize <= m_pageSize);
 
-        //m_nextPointer = MemoryUtils::align(m_nextPointer + in_allocationSize, m_alignment);
+        if (!m_currentPage || m_nextPointer + in_allocationSize > m_currentPage.get() + m_pageSize)
+        {
+            createPage();
+        }
 
-        //return output;
-        
-        return nullptr;
+        std::uint8_t* output = m_nextPointer;
+        m_nextPointer = MemoryUtils::align(m_nextPointer + in_allocationSize, sizeof(std::intptr_t));
+
+        ++m_activeAllocationCount;
+
+        return output;
+    }
+
+    //------------------------------------------------------------------------------
+    void FrameAllocator::deallocate() noexcept
+    {
+        --m_activeAllocationCount;
+    }
+
+    //------------------------------------------------------------------------------
+    void FrameAllocator::createPage() noexcept
+    {
+        if (m_currentPage)
+        {
+            m_previousPages.push_back(std::move(m_currentPage));
+        }
+
+        m_currentPage = m_buddyAllocator.allocateArray<std::uint8_t>(m_pageSize);
+        m_nextPointer = MemoryUtils::align(m_currentPage.get(), sizeof(std::intptr_t));
     }
 }

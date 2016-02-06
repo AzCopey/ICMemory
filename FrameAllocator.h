@@ -100,27 +100,62 @@ namespace IC
         ///
         void* allocate(std::size_t in_allocationSize) noexcept;
 
+        /// Decriments the allocation count. This is checked when resetting to ensure that all previously
+        /// allocated memory has been deallocated.
+        ///
+        void deallocate() noexcept;
+
+        /// Creates a new page to allocate from. If there is a current page prior to this being called
+        /// it will be added to the previous pages list.
+        ///
+        void createPage() noexcept;
+
         const std::size_t m_pageSize;
 
         BuddyAllocator& m_buddyAllocator;
         UniquePtr<std::uint8_t[]> m_currentPage;
         std::vector<UniquePtr<std::uint8_t[]>> m_previousPages;
-        std::uint8_t* m_nextPointer = 0;
+        std::uint8_t* m_nextPointer = nullptr;
+        std::size_t m_activeAllocationCount = 0;
     };
 
     //-----------------------------------------------------------------------------
     template <typename TType, typename... TConstructorArgs> UniquePtr<TType> FrameAllocator::allocate(TConstructorArgs&&... in_constructorArgs) noexcept
     {
-        //TODO: !?
-        return UniquePtr<TType>();
+        void* memory = allocate(sizeof(TType));
+        TType* object = new (memory) TType(std::forward<TConstructorArgs>(in_constructorArgs)...);
+        return UniquePtr<TType>(object, [=](TType* in_object) noexcept -> void
+        {
+            in_object->~TType();
+
+            deallocate();
+        });
     }
 
     //-----------------------------------------------------------------------------
     template <typename TType> UniquePtr<TType[]> FrameAllocator::allocateArray(std::size_t in_size) noexcept
     {
+        auto array = reinterpret_cast<TType*>(allocate(sizeof(TType) * in_size));
+        if (!std::is_fundamental<TType>::value)
+        {
+            for (std::size_t i = 0; i < in_size; ++i)
+            {
+                new (array + i) TType();
+            }
+        }
 
-        //TODO: !?
-        return UniquePtr<TType[]>();
+        return UniquePtr<TType[]>(array, [=](TType* in_array) noexcept -> void
+        {
+            if (!std::is_fundamental<TType>::value)
+            {
+                for (std::size_t i = 0; i < in_size; ++i)
+                {
+                    (in_array + i)->~TType();
+                }
+            }
+
+            deallocate();
+        });
     }
 }
 
