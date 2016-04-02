@@ -37,90 +37,90 @@ namespace IC
 
     /// Creates a new empty vector. The given allocator is used for all memory allocations.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator which should be used.
     ///
     /// @return The new vector.
     ///
-    template <typename TType> Vector<TType> makeVector(BuddyAllocator& in_allocator) noexcept
+    template <typename TType> Vector<TType> MakeVector(BuddyAllocator& allocator) noexcept
     {
-        return IC::Vector<TType>(AllocatorWrapper<TType>(&in_allocator));
+        return IC::Vector<TType>(AllocatorWrapper<TType>(&allocator));
     }
 
     /// Creates a new empty vector. The given allocator is used for all memory allocations.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator which should be used.
     ///
     /// @return The new vector.
     ///
-    template <typename TType> Vector<TType> makeVector(LinearAllocator& in_allocator) noexcept
+    template <typename TType> Vector<TType> MakeVector(LinearAllocator& allocator) noexcept
     {
-        return IC::Vector<TType>(AllocatorWrapper<TType>(&in_allocator));
+        return IC::Vector<TType>(AllocatorWrapper<TType>(&allocator));
     }
 
     /// Creates a new vector from the given range. The given allocator is used for all 
     /// memory allocations.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator which should be used.
-    /// @param in_first
+    /// @param first
     ///     The iterator pointing to the start of the range.
-    /// @param in_last
+    /// @param last
     ///     The iterator pointing to the end of the range.
     ///
     /// @return The new vector.
     ///
-    template <typename TValueType, typename TIteratorType> Vector<TValueType> makeVector(BuddyAllocator& in_allocator, const TIteratorType& in_first, const TIteratorType& in_last) noexcept
+    template <typename TValueType, typename TIteratorType> Vector<TValueType> MakeVector(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
     {
-        return IC::Vector<TValueType>(in_first, in_last, AllocatorWrapper<TValueType>(&in_allocator));
+        return IC::Vector<TValueType>(first, last, AllocatorWrapper<TValueType>(&allocator));
     }
 
     /// Creates a new vector from the given range. The given allocator is used for all 
     /// memory allocations.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator which should be used.
-    /// @param in_first
+    /// @param first
     ///     The iterator pointing to the start of the range.
-    /// @param in_last
+    /// @param last
     ///     The iterator pointing to the end of the range.
     ///
     /// @return The new vector.
     ///
-    template <typename TValueType, typename TIteratorType> Vector<TValueType> makeVector(LinearAllocator& in_allocator, const TIteratorType& in_first, const TIteratorType& in_last) noexcept
+    template <typename TValueType, typename TIteratorType> Vector<TValueType> MakeVector(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
     {
-        return IC::Vector<TValueType>(in_first, in_last, AllocatorWrapper<TValueType>(&in_allocator));
+        return IC::Vector<TValueType>(first, last, AllocatorWrapper<TValueType>(&allocator));
     }
 
     /// Creates a new vector from the std::vector. The given allocator is used for all 
     /// memory allocations.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator which should be used.
-    /// @param in_toCopy
+    /// @param toCopy
     ///     The std::vector which should be copied.
     ///
     /// @return The new vector.
     ///
-    template <typename TType> Vector<TType> makeVector(BuddyAllocator& in_allocator, const std::vector<TType>& in_toCopy) noexcept
+    template <typename TType> Vector<TType> MakeVector(BuddyAllocator& allocator, const std::vector<TType>& toCopy) noexcept
     {
-        return IC::Vector<TType>(in_toCopy.begin(), in_toCopy.end(), AllocatorWrapper<TType>(&in_allocator));
+        return IC::Vector<TType>(toCopy.begin(), toCopy.end(), AllocatorWrapper<TType>(&allocator));
     }
 
     /// Creates a new vector from the std::vector. The given allocator is used for all 
     /// memory allocations.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator which should be used.
-    /// @param in_toCopy
+    /// @param toCopy
     ///     The std::vector which should be copied.
     ///
     /// @return The new vector.
     ///
-    template <typename TType> Vector<TType> makeVector(LinearAllocator& in_allocator, const std::vector<TType>& in_toCopy) noexcept
+    template <typename TType> Vector<TType> MakeVector(LinearAllocator& allocator, const std::vector<TType>& toCopy) noexcept
     {
-        return IC::Vector<TType>(in_toCopy.begin(), in_toCopy.end(), AllocatorWrapper<TType>(&in_allocator));
+        return IC::Vector<TType>(toCopy.begin(), toCopy.end(), AllocatorWrapper<TType>(&allocator));
     }
 }
 

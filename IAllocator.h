@@ -44,26 +44,26 @@ namespace IC
     public:
         /// @return the maximum allocation size allowed by the allocator.
         ///
-        virtual std::size_t getMaxAllocationSize() const noexcept = 0;
+        virtual std::size_t GetMaxAllocationSize() const noexcept = 0;
 
         /// Allocates a new block of memory of the requested size. Note that the underlying
         /// implemention may allocate more memory than has been requested.
         ///
-        /// @param in_allocationSize
+        /// @param allocationSize
         ///     The size of the allocation.
         ///
         /// @return The allocated memory.
         ///
-        virtual void* allocate(std::size_t in_allocationSize) noexcept = 0;
+        virtual void* Allocate(std::size_t allocationSize) noexcept = 0;
 
         /// Deallocates the given memory. This must have been allocated via this allocator.
         /// Note that the underlying implementation may not actually deallocate the memory
         /// at this point, though deallocate must still be called.
         ///
-        /// @param in_pointer
+        /// @param pointer
         ///     The pointer to deallocate.
         ///
-        virtual void deallocate(void* in_pointer) noexcept = 0;
+        virtual void Deallocate(void* pointer) noexcept = 0;
 
         virtual ~IAllocator() noexcept { }
     };

@@ -36,21 +36,21 @@ namespace IC
     /// given constructor parameters. This follows the make_* convention set in
     /// the standard library.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator from which to allocate the requested type.
-    /// @param in_constructorArgs
+    /// @param constructorArgs
     ///     The arguments for the constructor if appropriate.
     ///
     /// @return A unique pointer to the allocated instance.
     ///
-    template <typename TType, typename... TConstructorArgs> UniquePtr<TType> makeUnique(BuddyAllocator& in_allocator, TConstructorArgs&&... in_constructorArgs) noexcept
+    template <typename TType, typename... TConstructorArgs> UniquePtr<TType> MakeUnique(BuddyAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept
     {
-        void* memory = in_allocator.allocate(sizeof(TType));
-        TType* object = new (memory) TType(std::forward<TConstructorArgs>(in_constructorArgs)...);
-        return UniquePtr<TType>(object, [&in_allocator](TType* in_object) noexcept -> void
+        void* memory = allocator.Allocate(sizeof(TType));
+        TType* object = new (memory) TType(std::forward<TConstructorArgs>(constructorArgs)...);
+        return UniquePtr<TType>(object, [&allocator](TType* object) noexcept -> void
         {
-            in_object->~TType();
-            in_allocator.deallocate(reinterpret_cast<void*>(in_object));
+            object->~TType();
+            allocator.Deallocate(reinterpret_cast<void*>(object));
         });
     }
 
@@ -58,21 +58,21 @@ namespace IC
     /// given constructor parameters. This follows the make_* convention set in
     /// the standard library.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator from which to allocate the requested type.
-    /// @param in_constructorArgs
+    /// @param constructorArgs
     ///     The arguments for the constructor if appropriate.
     ///
     /// @return A unique pointer to the allocated instance.
     ///
-    template <typename TType, typename... TConstructorArgs> UniquePtr<TType> makeUnique(LinearAllocator& in_allocator, TConstructorArgs&&... in_constructorArgs) noexcept
+    template <typename TType, typename... TConstructorArgs> UniquePtr<TType> MakeUnique(LinearAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept
     {
-        void* memory = in_allocator.allocate(sizeof(TType));
-        TType* object = new (memory) TType(std::forward<TConstructorArgs>(in_constructorArgs)...);
-        return UniquePtr<TType>(object, [&in_allocator](TType* in_object) noexcept -> void
+        void* memory = allocator.Allocate(sizeof(TType));
+        TType* object = new (memory) TType(std::forward<TConstructorArgs>(constructorArgs)...);
+        return UniquePtr<TType>(object, [&allocator](TType* object) noexcept -> void
         {
-            in_object->~TType();
-            in_allocator.deallocate(reinterpret_cast<void*>(in_object));
+            object->~TType();
+            allocator.Deallocate(reinterpret_cast<void*>(object));
         });
     }
 
@@ -81,35 +81,35 @@ namespace IC
     /// set in the standard library. Note that, like new[], fundamental types  will 
     /// not be set to a default value. 
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator from which to allocate the requested type.
-    /// @param in_size
+    /// @param size
     ///     The size of the array.
     ///
     /// @return A unique pointer to the allocated array.
     ///
-    template <typename TType> UniquePtr<TType[]> makeUniqueArray(BuddyAllocator& in_allocator, std::size_t in_size) noexcept
+    template <typename TType> UniquePtr<TType[]> MakeUniqueArray(BuddyAllocator& allocator, std::size_t size) noexcept
     {
-        auto array = reinterpret_cast<TType*>(in_allocator.allocate(sizeof(TType) * in_size));
+        auto array = reinterpret_cast<TType*>(allocator.Allocate(sizeof(TType) * size));
         if (!std::is_fundamental<TType>::value)
         {
-            for (std::size_t i = 0; i < in_size; ++i)
+            for (std::size_t i = 0; i < size; ++i)
             {
                 new (array + i) TType();
             }
         }
 
-        return UniquePtr<TType[]>(array, [&in_allocator, in_size](TType* in_array) noexcept -> void
+        return UniquePtr<TType[]>(array, [&allocator, size](TType* array) noexcept -> void
         {
             if (!std::is_fundamental<TType>::value)
             {
-                for (std::size_t i = 0; i < in_size; ++i)
+                for (std::size_t i = 0; i < size; ++i)
                 {
-                    (in_array + i)->~TType();
+                    (array + i)->~TType();
                 }
             }
 
-            in_allocator.deallocate(reinterpret_cast<void*>(in_array));
+            allocator.Deallocate(reinterpret_cast<void*>(array));
         });
     }
 
@@ -118,35 +118,35 @@ namespace IC
     /// set in the standard library. Note that, like new[], fundamental types  will 
     /// not be set to a default value. 
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator from which to allocate the requested type.
-    /// @param in_size
+    /// @param size
     ///     The size of the array.
     ///
     /// @return A unique pointer to the allocated array.
     ///
-    template <typename TType> UniquePtr<TType[]> makeUniqueArray(LinearAllocator& in_allocator, std::size_t in_size) noexcept
+    template <typename TType> UniquePtr<TType[]> MakeUniqueArray(LinearAllocator& allocator, std::size_t size) noexcept
     {
-        auto array = reinterpret_cast<TType*>(in_allocator.allocate(sizeof(TType) * in_size));
+        auto array = reinterpret_cast<TType*>(allocator.Allocate(sizeof(TType) * size));
         if (!std::is_fundamental<TType>::value)
         {
-            for (std::size_t i = 0; i < in_size; ++i)
+            for (std::size_t i = 0; i < size; ++i)
             {
                 new (array + i) TType();
             }
         }
 
-        return UniquePtr<TType[]>(array, [&in_allocator, in_size](TType* in_array) noexcept -> void
+        return UniquePtr<TType[]>(array, [&allocator, size](TType* array) noexcept -> void
         {
             if (!std::is_fundamental<TType>::value)
             {
-                for (std::size_t i = 0; i < in_size; ++i)
+                for (std::size_t i = 0; i < size; ++i)
                 {
-                    (in_array + i)->~TType();
+                    (array + i)->~TType();
                 }
             }
 
-            in_allocator.deallocate(reinterpret_cast<void*>(in_array));
+            allocator.Deallocate(reinterpret_cast<void*>(array));
         });
     }
 }

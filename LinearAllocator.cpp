@@ -33,23 +33,23 @@
 namespace IC
 {
     //------------------------------------------------------------------------------
-    LinearAllocator::LinearAllocator(BuddyAllocator& in_buddyAllocator, std::size_t in_pageSize) noexcept
-        : m_pageSize(in_pageSize), m_buddyAllocator(in_buddyAllocator)
+    LinearAllocator::LinearAllocator(BuddyAllocator& buddyAllocator, std::size_t pageSize) noexcept
+        : m_pageSize(pageSize), m_buddyAllocator(buddyAllocator)
     {
     }
 
     //------------------------------------------------------------------------------
-    void* LinearAllocator::allocate(std::size_t in_allocationSize) noexcept
+    void* LinearAllocator::Allocate(std::size_t allocationSize) noexcept
     {
-        assert(in_allocationSize <= m_pageSize);
+        assert(allocationSize <= m_pageSize);
 
-        if (!m_currentPage || m_nextPointer + in_allocationSize > m_currentPage.get() + m_pageSize)
+        if (!m_currentPage || m_nextPointer + allocationSize > m_currentPage.get() + m_pageSize)
         {
-            createPage();
+            CreatePage();
         }
 
         std::uint8_t* output = m_nextPointer;
-        m_nextPointer = MemoryUtils::align(m_nextPointer + in_allocationSize, sizeof(std::intptr_t));
+        m_nextPointer = MemoryUtils::Align(m_nextPointer + allocationSize, sizeof(std::intptr_t));
 
         ++m_activeAllocationCount;
 
@@ -57,13 +57,13 @@ namespace IC
     }
 
     //------------------------------------------------------------------------------
-    void LinearAllocator::deallocate(void* in_pointer) noexcept
+    void LinearAllocator::Deallocate(void* pointer) noexcept
     {
         --m_activeAllocationCount;
     }
 
     //------------------------------------------------------------------------------
-    void LinearAllocator::reset() noexcept
+    void LinearAllocator::Reset() noexcept
     {
         assert(m_activeAllocationCount == 0);
 
@@ -73,14 +73,14 @@ namespace IC
     }
 
     //------------------------------------------------------------------------------
-    void LinearAllocator::createPage() noexcept
+    void LinearAllocator::CreatePage() noexcept
     {
         if (m_currentPage)
         {
             m_previousPages.push_back(std::move(m_currentPage));
         }
 
-        m_currentPage = makeUniqueArray<std::uint8_t>(m_buddyAllocator, m_pageSize);
-        m_nextPointer = MemoryUtils::align(m_currentPage.get(), sizeof(std::intptr_t));
+        m_currentPage = MakeUniqueArray<std::uint8_t>(m_buddyAllocator, m_pageSize);
+        m_nextPointer = MemoryUtils::Align(m_currentPage.get(), sizeof(std::intptr_t));
     }
 }

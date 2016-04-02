@@ -39,130 +39,130 @@ namespace IC
 
     /// Creates a new empty string. The given allocator is used for all memory allocations.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator which should be used.
     ///
     /// @return The new string.
     ///
-    String makeString(BuddyAllocator& in_allocator) noexcept;
+    String MakeString(BuddyAllocator& allocator) noexcept;
 
     /// Creates a new empty string. The given allocator is used for all memory allocations.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator which should be used.
     ///
     /// @return The new string.
     ///
-    String makeString(LinearAllocator& in_allocator) noexcept;
+    String MakeString(LinearAllocator& allocator) noexcept;
 
     /// Creates a new string from the given C string. The given allocator is used for all 
     /// memory allocations.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator which should be used.
-    /// @param in_cString
+    /// @param cString
     ///     The C string. Must be null terminated.
     ///
     /// @return The new string.
     ///
-    String makeString(BuddyAllocator& in_allocator, const char* in_cString) noexcept;
+    String MakeString(BuddyAllocator& allocator, const char* cString) noexcept;
 
     /// Creates a new string from the given C string. The given allocator is used for all 
     /// memory allocations.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator which should be used.
-    /// @param in_cString
+    /// @param cString
     ///     The C string. Must be null terminated.
     ///
     /// @return The new string.
     ///
-    String makeString(LinearAllocator& in_allocator, const char* in_cString) noexcept;
+    String MakeString(LinearAllocator& allocator, const char* cString) noexcept;
 
     /// Creates a new string from the buffer. The given allocator is used for all 
     /// memory allocations.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator which should be used.
-    /// @param in_buffer
+    /// @param buffer
     ///     The buffer.
-    /// @param in_bufferSize
+    /// @param bufferSize
     ///     The size of the buffer.
     ///
     /// @return The new string.
     ///
-    String makeString(BuddyAllocator& in_allocator, const char* in_buffer, std::size_t in_bufferSize) noexcept;
+    String MakeString(BuddyAllocator& allocator, const char* buffer, std::size_t bufferSize) noexcept;
 
     /// Creates a new string from the buffer. The given allocator is used for all 
     /// memory allocations.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator which should be used.
-    /// @param in_buffer
+    /// @param buffer
     ///     The buffer.
-    /// @param in_bufferSize
+    /// @param bufferSize
     ///     The size of the buffer.
     ///
     /// @return The new string.
     ///
-    String makeString(LinearAllocator& in_allocator, const char* in_buffer, std::size_t in_bufferSize) noexcept;
+    String MakeString(LinearAllocator& allocator, const char* buffer, std::size_t bufferSize) noexcept;
 
     /// Creates a new string from a std::string. The given allocator is used for all  
     /// memory allocations.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator which should be used.
-    /// @param in_toCopy
+    /// @param toCopy
     ///     The string to copy.
     ///
     /// @return The new string.
     ///
-    String makeString(BuddyAllocator& in_allocator, const std::string& in_toCopy) noexcept;
+    String MakeString(BuddyAllocator& allocator, const std::string& toCopy) noexcept;
 
     /// Creates a new string from a std::string. The given allocator is used for all  
     /// memory allocations.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator which should be used.
-    /// @param in_toCopy
+    /// @param toCopy
     ///     The string to copy.
     ///
     /// @return The new string.
     ///
-    String makeString(LinearAllocator& in_allocator, const std::string& in_toCopy) noexcept;
+    String MakeString(LinearAllocator& allocator, const std::string& toCopy) noexcept;
 
     /// Creates a new string from the given range. The given allocator is used for all 
     /// memory allocations.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator which should be used.
-    /// @param in_first
+    /// @param first
     ///     The iterator pointing to the start of the range.
-    /// @param in_last
+    /// @param last
     ///     The iterator pointing to the end of the range.
     ///
     /// @return The new string.
     ///
-    template <typename TIteratorType> String makeString(BuddyAllocator& in_allocator, const TIteratorType& in_first, const TIteratorType& in_last) noexcept
+    template <typename TIteratorType> String MakeString(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
     {
-        return String(in_first, in_last, AllocatorWrapper<char>(&in_allocator));
+        return String(first, last, AllocatorWrapper<char>(&allocator));
     }
 
     /// Creates a new string from the given range. The given allocator is used for all 
     /// memory allocations.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator which should be used.
-    /// @param in_first
+    /// @param first
     ///     The iterator pointing to the start of the range.
-    /// @param in_last
+    /// @param last
     ///     The iterator pointing to the end of the range.
     ///
     /// @return The new string.
     ///
-    template <typename TIteratorType> String makeString(LinearAllocator& in_allocator, const TIteratorType& in_first, const TIteratorType& in_last) noexcept
+    template <typename TIteratorType> String MakeString(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
     {
-        return String(in_first, in_last, AllocatorWrapper<char>(&in_allocator));
+        return String(first, last, AllocatorWrapper<char>(&allocator));
     }
 }
 

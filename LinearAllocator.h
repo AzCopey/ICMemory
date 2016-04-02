@@ -52,53 +52,53 @@ namespace IC
         /// Initialises a new Linear Allocator with the given page size and backed by the given Buddy
         /// Allocator.
         ///
-        /// @param in_buddyAllocator
+        /// @param buddyAllocator
         ///     The buddy allocator from which pages will be allocated.
-        /// @param in_pageSize
+        /// @param pageSize
         ///     The size of each page. Although not required, ideally pages should be powers of two.
         /// 
-        LinearAllocator(BuddyAllocator& in_buddyAllocator, std::size_t in_pageSize) noexcept;
+        LinearAllocator(BuddyAllocator& buddyAllocator, std::size_t pageSize) noexcept;
 
         /// This thread-safe.
         ///
         /// @return The maximum allocation size from this allocator. This will always be 
         /// the size of a single page.
         ///
-        std::size_t getMaxAllocationSize() const noexcept override { return getPageSize(); }
+        std::size_t GetMaxAllocationSize() const noexcept override { return GetPageSize(); }
 
         /// This thread-safe.
         ///
         /// @return The size of the buffer. 
         ///
-        std::size_t getPageSize() const noexcept { return m_pageSize; }
+        std::size_t GetPageSize() const noexcept { return m_pageSize; }
 
         /// Allocates a new block of memory of the requested size.
         ///
-        /// @param in_allocationSize
+        /// @param allocationSize
         ///     The size of the allocation.
         ///
         /// @return The allocated memory.
         ///
-        void* allocate(std::size_t in_allocationSize) noexcept override;
+        void* Allocate(std::size_t allocationSize) noexcept override;
 
         /// Decriments the allocation count. This is checked when resetting to ensure that all previously
         /// allocated memory has been deallocated.
         ///
-        /// @param in_pointer
+        /// @param pointer
         ///     The pointer to deallocate.
         ///
-        void deallocate(void* in_pointer) noexcept override;
+        void Deallocate(void* pointer) noexcept override;
 
         /// Resets the buffer, allowing all previously allocated memory to be reused. Deallocate() must
         /// have been called for all allocated blocks prior to reset() being called.
         /// 
-        void reset() noexcept;
+        void Reset() noexcept;
 
     private:
         /// Creates a new page to allocate from. If there is a current page prior to this being called
         /// it will be added to the previous pages list.
         ///
-        void createPage() noexcept;
+        void CreatePage() noexcept;
 
         const std::size_t m_pageSize;
 

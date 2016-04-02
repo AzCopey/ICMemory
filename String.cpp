@@ -27,50 +27,50 @@
 namespace IC
 {
     //------------------------------------------------------------------------------
-    String makeString(BuddyAllocator& in_allocator) noexcept
+    String MakeString(BuddyAllocator& allocator) noexcept
     {
-        return String(AllocatorWrapper<char>(&in_allocator));
+        return String(AllocatorWrapper<char>(&allocator));
     }
 
     //------------------------------------------------------------------------------
-    String makeString(LinearAllocator& in_allocator) noexcept
+    String MakeString(LinearAllocator& allocator) noexcept
     {
-        return String(AllocatorWrapper<char>(&in_allocator));
+        return String(AllocatorWrapper<char>(&allocator));
     }
 
     //------------------------------------------------------------------------------
-    String makeString(BuddyAllocator& in_allocator, const char* in_cString) noexcept
+    String MakeString(BuddyAllocator& allocator, const char* cString) noexcept
     {
-        return String(in_cString, AllocatorWrapper<char>(&in_allocator));
+        return String(cString, AllocatorWrapper<char>(&allocator));
     }
 
     //------------------------------------------------------------------------------
-    String makeString(LinearAllocator& in_allocator, const char* in_cString) noexcept
+    String MakeString(LinearAllocator& allocator, const char* cString) noexcept
     {
-        return String(in_cString, AllocatorWrapper<char>(&in_allocator));
+        return String(cString, AllocatorWrapper<char>(&allocator));
     }
 
     //------------------------------------------------------------------------------
-    String makeString(BuddyAllocator& in_allocator, const char* in_buffer, std::size_t in_bufferSize) noexcept
+    String MakeString(BuddyAllocator& allocator, const char* buffer, std::size_t bufferSize) noexcept
     {
-        return String(in_buffer, in_bufferSize, AllocatorWrapper<char>(&in_allocator));
+        return String(buffer, bufferSize, AllocatorWrapper<char>(&allocator));
     }
 
     //------------------------------------------------------------------------------
-    String makeString(LinearAllocator& in_allocator, const char* in_buffer, std::size_t in_bufferSize) noexcept
+    String MakeString(LinearAllocator& allocator, const char* buffer, std::size_t bufferSize) noexcept
     {
-        return String(in_buffer, in_bufferSize, AllocatorWrapper<char>(&in_allocator));
+        return String(buffer, bufferSize, AllocatorWrapper<char>(&allocator));
     }
 
     //------------------------------------------------------------------------------
-    String makeString(BuddyAllocator& in_allocator, const std::string& in_toCopy) noexcept
+    String MakeString(BuddyAllocator& allocator, const std::string& toCopy) noexcept
     {
-        return String(in_toCopy.c_str(), in_toCopy.size(), AllocatorWrapper<char>(&in_allocator));
+        return String(toCopy.c_str(), toCopy.size(), AllocatorWrapper<char>(&allocator));
     }
 
     //------------------------------------------------------------------------------
-    String makeString(LinearAllocator& in_allocator, const std::string& in_toCopy) noexcept
+    String MakeString(LinearAllocator& allocator, const std::string& toCopy) noexcept
     {
-        return String(in_toCopy.c_str(), in_toCopy.size(), AllocatorWrapper<char>(&in_allocator));
+        return String(toCopy.c_str(), toCopy.size(), AllocatorWrapper<char>(&allocator));
     }
 }

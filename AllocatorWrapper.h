@@ -56,100 +56,100 @@ namespace IC
         /// Constructs a new wrapper with the given allocator. The wrapper must not
         /// out live the given allocator.
         ///
-        /// @param in_allocator
+        /// @param allocator
         ///     The allocator which should be wrapped.
         ///
-        AllocatorWrapper(IAllocator* in_allocator) noexcept
-            : m_allocator(in_allocator)
+        AllocatorWrapper(IAllocator* allocator) noexcept
+            : m_allocator(allocator)
         {
         }
 
         /// Constructors a new wrapper using the allocator contained by the given
         /// wrapper.
         ///
-        /// @param in_allocator
+        /// @param allocator
         ///     The allocator which should be wrapped.
         ///
-        AllocatorWrapper(const AllocatorWrapper& in_allocatorWrapper) noexcept
-            : m_allocator(in_allocatorWrapper.get_allocator())
+        AllocatorWrapper(const AllocatorWrapper& allocatorWrapper) noexcept
+            : m_allocator(allocatorWrapper.get_allocator())
         {
         }
 
         /// Constructors a new wrapper using the allocator contained by the given
         /// wrapper.
         ///
-        /// @param in_allocator
+        /// @param allocator
         ///     The allocator which should be wrapped.
         ///
-        template <class TOtherType> AllocatorWrapper(const AllocatorWrapper<TOtherType>& in_allocatorWrapper) noexcept
-            : m_allocator(in_allocatorWrapper.get_allocator())
+        template <class TOtherType> AllocatorWrapper(const AllocatorWrapper<TOtherType>& allocatorWrapper) noexcept
+            : m_allocator(allocatorWrapper.get_allocator())
         {
         }
 #
         /// @return The address of the given reference.
         ///
-        pointer address(reference in_ref) const noexcept 
+        pointer address(reference ref) const noexcept 
         { 
-            return &in_ref; 
+            return &ref; 
         }
 
         /// @return The address of the given reference.
         ///
-        const_pointer address(const_reference in_ref) const noexcept 
+        const_pointer address(const_reference ref) const noexcept 
         { 
-            return &in_ref; 
+            return &ref; 
         }
 
         /// Allocates a series of ValueType objects from the wrapped allocator.
         ///
-        /// @param in_count
+        /// @param count
         ///     The number of objects to allocate.
-        /// @param in_hint
+        /// @param hint
         ///     Unused in this implementation. Should be left null.
         ///
-        pointer allocate(size_type in_count, std::allocator<void>::const_pointer in_hint = nullptr) noexcept
+        pointer allocate(size_type count, std::allocator<void>::const_pointer hint = nullptr) noexcept
         {
-            return reinterpret_cast<TValueType*>(m_allocator->allocate(sizeof(TValueType) * in_count));
+            return reinterpret_cast<TValueType*>(m_allocator->Allocate(sizeof(TValueType) * count));
         }
 
         /// Deallocates the memory block previously allocated though allocate.
         /// The count must be identical to that provided to allocator otherwise the
         /// behaviour is undefined.
         ///
-        /// @param in_pointer
+        /// @param pointer
         ///     The memory location to deallocate.
-        /// @param in_count
+        /// @param count
         ///     The number of objects in the original allocation.
         ///
-        void deallocate(pointer in_pointer, size_type in_count) noexcept
+        void deallocate(pointer pointer, size_type count) noexcept
         {
-            m_allocator->deallocate(reinterpret_cast<void*>(in_pointer));
+            m_allocator->Deallocate(reinterpret_cast<void*>(pointer));
         }
 
         /// @return The max size the contained allocator can allocate in a single block.
         ///
         size_type max_size() const noexcept
         {
-            return m_allocator->getMaxAllocationSize();
+            return m_allocator->GetMaxAllocationSize();
         }
 
         /// Calls the constructor on the object at the given memory address.
         ///
-        /// @param in_pointer
+        /// @param pointer
         ///     The memory address.
-        /// @param in_value
+        /// @param value
         ///     The value to construct the object with.
         ///
-        void construct(pointer in_pointer, const TValueType& in_value) noexcept
+        void construct(pointer pointer, const TValueType& value) noexcept
         {
-            new (in_pointer) TValueType(in_value);
+            new (pointer) TValueType(value);
         }
 
         /// Calls the destructor on the object at the given memory address.
         ///
-        void destroy(pointer in_pointer) noexcept
+        void destroy(pointer pointer) noexcept
         {
-            in_pointer->~TValueType();
+            pointer->~TValueType();
         }
 
         /// @return The contained allocator.
@@ -159,24 +159,24 @@ namespace IC
             return m_allocator;
         }
 
-        /// @param in_allocatorWrapper
+        /// @param allocatorWrapper
         ///     The wrapper to compare
         ///
         /// @return Whether or not the two wrappers contain the same allocator.
         ///
-        bool operator==(const AllocatorWrapper& in_allocatorWrapper) noexcept
+        bool operator==(const AllocatorWrapper& allocatorWrapper) noexcept
         { 
-            return (&m_allocator == &in_allocatorWrapper.get_allocator());
+            return (&m_allocator == &allocatorWrapper.get_allocator());
         }
 
-        /// @param in_allocatorWrapper
+        /// @param allocatorWrapper
         ///     The wrapper to compare
         ///
         /// @return Whether or not the two wrappers contain different allocators.
         ///
-        bool operator!=(const AllocatorWrapper& in_allocatorWrapper) noexcept
+        bool operator!=(const AllocatorWrapper& allocatorWrapper) noexcept
         { 
-            return !operator==(in_allocatorWrapper);
+            return !operator==(allocatorWrapper);
         }
 
     private:

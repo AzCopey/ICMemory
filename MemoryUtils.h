@@ -38,130 +38,130 @@ namespace IC
         /// Aligns the given pointer to the given alignment. The alignment should be a power
         /// of two.
         ///
-        /// @param in_value
+        /// @param value
         ///     The value to align.
-        /// @param in_alignment
+        /// @param alignment
         ///     The alignment.
         ///
         /// @return The aligned pointer.
         ///
-        template <typename TValueType, typename TAlignmentType> TValueType* align(TValueType* in_value, TAlignmentType in_alignment)
+        template <typename TValueType, typename TAlignmentType> TValueType* Align(TValueType* value, TAlignmentType alignment)
         {
             static_assert(std::is_integral<TAlignmentType>::value, "Alignment must be integral type.");
             static_assert(std::is_unsigned<TAlignmentType>::value, "Alignment must be unsigned.");
 
-            std::uintptr_t value = reinterpret_cast<std::uintptr_t>(in_value);
-            std::uintptr_t alignment = static_cast<std::uintptr_t>(in_alignment);
+            std::uintptr_t valueIntPtr = reinterpret_cast<std::uintptr_t>(value);
+            std::uintptr_t alignmentIntPtr = static_cast<std::uintptr_t>(alignment);
 
-            return reinterpret_cast<TValueType*>((value + alignment - 1) & ~(alignment - 1));
+            return reinterpret_cast<TValueType*>((valueIntPtr + alignmentIntPtr - 1) & ~(alignmentIntPtr - 1));
         }
 
         /// Aligns the given integer to the given alignment. The alignment should be a power
         /// of two.
         ///
-        /// @param in_value
+        /// @param value
         ///     The value to align.
-        /// @param in_alignment
+        /// @param alignment
         ///     The alignment.
         ///
         /// @return The aligned integer.
         ///
-        template <typename TValueType, typename TAlignmentType> TValueType align(TValueType in_value, TAlignmentType in_alignment)
+        template <typename TValueType, typename TAlignmentType> TValueType Align(TValueType value, TAlignmentType alignment)
         {
             static_assert(std::is_integral<TValueType>::value, "Value must be integral type.");
             static_assert(std::is_unsigned<TValueType>::value, "Value must be unsigned.");
             static_assert(std::is_integral<TAlignmentType>::value, "Alignment must be integral type.");
             static_assert(std::is_unsigned<TAlignmentType>::value, "Alignment must be unsigned.");
 
-            std::uintptr_t value = static_cast<std::uintptr_t>(in_value);
-            std::uintptr_t alignment = static_cast<std::uintptr_t>(in_alignment);
+            std::uintptr_t valueIntPtr = static_cast<std::uintptr_t>(value);
+            std::uintptr_t alignmentIntPtr = static_cast<std::uintptr_t>(alignment);
 
-            return static_cast<TValueType>((value + alignment - 1) & ~(alignment - 1));
+            return static_cast<TValueType>((valueIntPtr + alignmentIntPtr - 1) & ~(alignmentIntPtr - 1));
         }
 
-        /// @param in_value
+        /// @param value
         ///     The value.
-        /// @param in_alignment
+        /// @param alignment
         ///     The alignment.
         ///
         /// @return Whether or not the given integer is aligned.
         ///
-        template <typename TValueType, typename TAlignmentType> TValueType isAligned(TValueType in_value, TAlignmentType in_alignment)
+        template <typename TValueType, typename TAlignmentType> TValueType IsAligned(TValueType value, TAlignmentType alignment)
         {
             static_assert(std::is_integral<TAlignmentType>::value, "Alignment must be integral type.");
             static_assert(std::is_unsigned<TAlignmentType>::value, "Alignment must be unsigned.");
 
-            return static_cast<TValueType>((static_cast<TAlignmentType>(in_value) & (in_alignment - 1)) == 0);
+            return static_cast<TValueType>((static_cast<TAlignmentType>(value) & (alignment - 1)) == 0);
         }
 
-        /// @param in_value
+        /// @param value
         ///     The value to check.
         ///
         /// @return Whether or not the given integer is a power of two.
         ///
-        template <typename TType> constexpr bool isPowerOfTwo(TType in_value)
+        template <typename TType> constexpr bool IsPowerOfTwo(TType value)
         {
             static_assert(std::is_integral<TType>::value, "Value must be integral type.");
             static_assert(std::is_unsigned<TType>::value, "Value must be unsigned.");
 
-            return (in_value > 0) && ((in_value & (~in_value + 1)) == in_value);
+            return (value > 0) && ((value & (~value + 1)) == value);
         }
 
-        /// @param in_value
+        /// @param value
         ///     The value.
         ///
         /// @return The next power ot two on from the given value. This only supports 32-bit values.
         ///
-        template <typename TType> TType nextPowerofTwo(TType in_value)
+        template <typename TType> TType NextPowerofTwo(TType value)
         {
             static_assert(std::is_integral<TType>::value, "Value must be integral type.");
             static_assert(std::is_unsigned<TType>::value, "Value must be unsigned.");
 
-            in_value--;
-            in_value |= in_value >> 1;
-            in_value |= in_value >> 2;
-            in_value |= in_value >> 4;
-            in_value |= in_value >> 8;
-            in_value |= in_value >> 16;
-            in_value++;
+            value--;
+            value |= value >> 1;
+            value |= value >> 2;
+            value |= value >> 4;
+            value |= value >> 8;
+            value |= value >> 16;
+            value++;
 
-            return in_value;
+            return value;
         }
 
-        /// @param in_value
+        /// @param value
         ///     The value. Must be a power of two.
         ///
         /// @return The number of times 0x1 has to be shifted to get the given value. 
         ///
-        template <typename TType> std::size_t calcShift(TType in_value)
+        template <typename TType> std::size_t CalcShift(TType value)
         {
-            assert(isPowerOfTwo(in_value));
+            assert(IsPowerOfTwo(value));
 
             TType output = 0;
-            while (in_value > 1)
+            while (value > 1)
             {
                 output++;
-                in_value >>= 1;
+                value >>= 1;
             }
 
             return output;
         }
 
-        /// @param in_pointer
+        /// @param pointer
         ///     The pointer.
-        /// @param in_relativeTo
+        /// @param relativeTo
         ///     The pointer that the other is relative to. Must have a lower memory address
         ///     than the value.
         ///
         /// @return The offset in bytes between the two pointers. 
         ///
-        template <typename TTypeA, typename TTypeB> std::uintptr_t getPointerOffset(TTypeA* in_pointer, TTypeB* in_relativeTo)
+        template <typename TTypeA, typename TTypeB> std::uintptr_t GetPointerOffset(TTypeA* pointer, TTypeB* relativeTo)
         {
-            auto pointer = reinterpret_cast<std::uintptr_t>(in_pointer);
-            auto relativeTo = reinterpret_cast<std::uintptr_t>(in_relativeTo);
+            auto pointerInt = reinterpret_cast<std::uintptr_t>(pointer);
+            auto relativeToInt = reinterpret_cast<std::uintptr_t>(relativeTo);
 
-            assert(pointer >= relativeTo);
-            return (pointer - relativeTo);
+            assert(pointerInt >= relativeToInt);
+            return (pointerInt - relativeToInt);
         }
     }
 }

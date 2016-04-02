@@ -36,32 +36,32 @@ namespace IC
     /// given constructor parameters. This follows the make_* convention set in
     /// the standard library.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator from which to allocate the requested type.
-    /// @param in_constructorArgs
+    /// @param constructorArgs
     ///     The arguments for the constructor if appropriate.
     ///
     /// @return A shared pointer to the allocated instance.
     ///
-    template <typename TType, typename... TConstructorArgs> SharedPtr<TType> makeShared(BuddyAllocator& in_allocator, TConstructorArgs&&... in_constructorArgs) noexcept
+    template <typename TType, typename... TConstructorArgs> SharedPtr<TType> MakeShared(BuddyAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept
     {
-        return makeUnique<TType>(in_allocator, std::forward<TConstructorArgs>(in_constructorArgs)...);
+        return MakeUnique<TType>(allocator, std::forward<TConstructorArgs>(constructorArgs)...);
     }
 
     /// Allocates a new shared pointer from the given Linear Allocator with the
     /// given constructor parameters. This follows the make_* convention set in
     /// the standard library.
     ///
-    /// @param in_allocator
+    /// @param allocator
     ///     The allocator from which to allocate the requested type.
-    /// @param in_constructorArgs
+    /// @param constructorArgs
     ///     The arguments for the constructor if appropriate.
     ///
     /// @return A shared pointer to the allocated instance.
     ///
-    template <typename TType, typename... TConstructorArgs> SharedPtr<TType> makeShared(LinearAllocator& in_allocator, TConstructorArgs&&... in_constructorArgs) noexcept
+    template <typename TType, typename... TConstructorArgs> SharedPtr<TType> MakeShared(LinearAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept
     {
-        return makeUnique<TType>(in_allocator, std::forward<TConstructorArgs>(in_constructorArgs)...);
+        return MakeUnique<TType>(allocator, std::forward<TConstructorArgs>(constructorArgs)...);
     }
 }
 
