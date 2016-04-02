@@ -26,6 +26,7 @@
 #define _ICMEMORY_FRAMEALLOCATOR_H_
 
 #include "ForwardDeclarations.h"
+#include "IAllocator.h"
 
 #include <cstdint>
 #include <functional>
@@ -45,7 +46,7 @@ namespace IC
     /// Note that this is not thread-safe and should not be accessed from multiple
     /// threads at the same time.
     ///
-    class FrameAllocator final
+    class FrameAllocator final : public IAllocator
     {
     public:
         /// Initialises a new Frame Allocator with the given page size and backed by the given Buddy
@@ -60,16 +61,16 @@ namespace IC
 
         /// This thread-safe.
         ///
-        /// @return The size of the buffer. 
-        ///
-        std::size_t getPageSize() const noexcept { return m_pageSize; }
-
-        /// This thread-safe.
-        ///
         /// @return The maximum allocation size from this allocator. This will always be 
         /// the size of a single page.
         ///
-        std::size_t getMaxAllocationSize() const noexcept { return getPageSize(); }
+        std::size_t getMaxAllocationSize() const noexcept override { return getPageSize(); }
+
+        /// This thread-safe.
+        ///
+        /// @return The size of the buffer. 
+        ///
+        std::size_t getPageSize() const noexcept { return m_pageSize; }
 
         /// Allocates a new block of memory of the requested size.
         ///
@@ -78,7 +79,7 @@ namespace IC
         ///
         /// @return The allocated memory.
         ///
-        void* allocate(std::size_t in_allocationSize) noexcept;
+        void* allocate(std::size_t in_allocationSize) noexcept override;
 
         /// Decriments the allocation count. This is checked when resetting to ensure that all previously
         /// allocated memory has been deallocated.
@@ -86,7 +87,7 @@ namespace IC
         /// @param in_pointer
         ///     The pointer to deallocate.
         ///
-        void deallocate(void* in_pointer) noexcept;
+        void deallocate(void* in_pointer) noexcept override;
 
         /// Ends the current "frame", resetting the buffer and allowing all previously allocated
         /// memory to be reused. Before reset() is called, all previously allocated UniquePtrs

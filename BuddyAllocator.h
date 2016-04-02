@@ -26,6 +26,7 @@
 #define _ICMEMORY_BUDDYALLOCATOR_H_
 
 #include "ForwardDeclarations.h"
+#include "IAllocator.h"
 
 #include <cstdint>
 #include <memory>
@@ -54,7 +55,7 @@ namespace IC
     ///
     /// The buddy allocator is thread-safe, however it requires locking to acheive this.
     ///
-    class BuddyAllocator final
+    class BuddyAllocator final : public IAllocator
     {
     public:
         /// Constructs a new allocator of the given size.
@@ -68,6 +69,13 @@ namespace IC
 
         /// This thread-safe.
         ///
+        /// @return The maximum allocation size from this allocator. This will always be 
+        /// half the size of the full buffer.
+        ///
+        std::size_t getMaxAllocationSize() const noexcept override { return getBufferSize() / 2; }
+
+        /// This thread-safe.
+        ///
         /// @return The size of the buffer. 
         ///
         std::size_t getBufferSize() const noexcept { return m_bufferSize; }
@@ -77,13 +85,6 @@ namespace IC
         /// @return The minimum block size of the buffer.
         ///
         std::size_t getMinBlockSize() const noexcept { return m_minBlockSize; }
-
-        /// This thread-safe.
-        ///
-        /// @return The maximum allocation size from this allocator. This will always be 
-        /// half the size of the full buffer.
-        ///
-        std::size_t getMaxAllocationSize() const noexcept { return getBufferSize() / 2; }
 
         /// Allocates a new block of memory of the requested size. When the memory allocated
         /// is no longer required it must be returned to the allocator by calling deallocate().
@@ -95,7 +96,7 @@ namespace IC
         ///
         /// @return The allocated memory.
         ///
-        void* allocate(std::size_t in_allocationSize) noexcept;
+        void* allocate(std::size_t in_allocationSize) noexcept override;
 
         /// Deallocates the given memory, returning the memory block to the free list. If
         /// appropriate the block will be re-merged with its buddy.
@@ -105,7 +106,7 @@ namespace IC
         /// @param in_pointer
         ///     The memory which is to be freed.
         ///
-        void deallocate(void* in_pointer) noexcept;
+        void deallocate(void* in_pointer) noexcept override;
 
     private:
         /// Encapsulates functionality required for navigating the free list table.

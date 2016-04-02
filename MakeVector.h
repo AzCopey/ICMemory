@@ -28,16 +28,21 @@
 #include "ForwardDeclarations.h"
 
 #include "BuddyAllocator.h"
-#include "StdAllocator.h"
+#include "AllocatorWrapper.h"
 
 namespace IC
 {
-    /// TODO
+    /// Creates a new vector which uses the given allocator for all memory 
+    /// allocations.
+    ///
+    /// @param in_allocator
+    ///     The allocator which should be used.
+    ///
+    /// @return The new vector.
     ///
     template <typename TType> Vector<TType> makeVector(BuddyAllocator& in_allocator) noexcept
     {
-        StdAllocator<TType, BuddyAllocator> sdkAllocator(in_allocator);
-        return IC::Vector<TType>(sdkAllocator);
+        return IC::Vector<TType>(AllocatorWrapper<TType>(&in_allocator));
     }
 }
 
