@@ -29,7 +29,7 @@
 
 #include "AllocatorWrapper.h"
 #include "BuddyAllocator.h"
-#include "FrameAllocator.h"
+#include "LinearAllocator.h"
 
 #include <string>
 
@@ -53,7 +53,7 @@ namespace IC
     ///
     /// @return The new string.
     ///
-    String makeString(FrameAllocator& in_allocator) noexcept;
+    String makeString(LinearAllocator& in_allocator) noexcept;
 
     /// Creates a new string from the given C string. The given allocator is used for all 
     /// memory allocations.
@@ -77,7 +77,7 @@ namespace IC
     ///
     /// @return The new string.
     ///
-    String makeString(FrameAllocator& in_allocator, const char* in_cString) noexcept;
+    String makeString(LinearAllocator& in_allocator, const char* in_cString) noexcept;
 
     /// Creates a new string from the buffer. The given allocator is used for all 
     /// memory allocations.
@@ -105,7 +105,7 @@ namespace IC
     ///
     /// @return The new string.
     ///
-    String makeString(FrameAllocator& in_allocator, const char* in_buffer, std::size_t in_bufferSize) noexcept;
+    String makeString(LinearAllocator& in_allocator, const char* in_buffer, std::size_t in_bufferSize) noexcept;
 
     /// Creates a new string from a std::string. The given allocator is used for all  
     /// memory allocations.
@@ -129,7 +129,7 @@ namespace IC
     ///
     /// @return The new string.
     ///
-    String makeString(FrameAllocator& in_allocator, const std::string& in_toCopy) noexcept;
+    String makeString(LinearAllocator& in_allocator, const std::string& in_toCopy) noexcept;
 
     /// Creates a new string from the given range. The given allocator is used for all 
     /// memory allocations.
@@ -160,7 +160,7 @@ namespace IC
     ///
     /// @return The new string.
     ///
-    template <typename TIteratorType> String makeString(FrameAllocator& in_allocator, const TIteratorType& in_first, const TIteratorType& in_last) noexcept
+    template <typename TIteratorType> String makeString(LinearAllocator& in_allocator, const TIteratorType& in_first, const TIteratorType& in_last) noexcept
     {
         return String(in_first, in_last, AllocatorWrapper<char>(&in_allocator));
     }

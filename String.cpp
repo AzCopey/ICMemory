@@ -33,7 +33,7 @@ namespace IC
     }
 
     //------------------------------------------------------------------------------
-    String makeString(FrameAllocator& in_allocator) noexcept
+    String makeString(LinearAllocator& in_allocator) noexcept
     {
         return String(AllocatorWrapper<char>(&in_allocator));
     }
@@ -45,7 +45,7 @@ namespace IC
     }
 
     //------------------------------------------------------------------------------
-    String makeString(FrameAllocator& in_allocator, const char* in_cString) noexcept
+    String makeString(LinearAllocator& in_allocator, const char* in_cString) noexcept
     {
         return String(in_cString, AllocatorWrapper<char>(&in_allocator));
     }
@@ -57,7 +57,7 @@ namespace IC
     }
 
     //------------------------------------------------------------------------------
-    String makeString(FrameAllocator& in_allocator, const char* in_buffer, std::size_t in_bufferSize) noexcept
+    String makeString(LinearAllocator& in_allocator, const char* in_buffer, std::size_t in_bufferSize) noexcept
     {
         return String(in_buffer, in_bufferSize, AllocatorWrapper<char>(&in_allocator));
     }
@@ -69,7 +69,7 @@ namespace IC
     }
 
     //------------------------------------------------------------------------------
-    String makeString(FrameAllocator& in_allocator, const std::string& in_toCopy) noexcept
+    String makeString(LinearAllocator& in_allocator, const std::string& in_toCopy) noexcept
     {
         return String(in_toCopy.c_str(), in_toCopy.size(), AllocatorWrapper<char>(&in_allocator));
     }

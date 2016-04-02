@@ -28,7 +28,7 @@
 #include "ForwardDeclarations.h"
 
 #include "BuddyAllocator.h"
-#include "FrameAllocator.h"
+#include "LinearAllocator.h"
 
 namespace IC
 {
@@ -48,7 +48,7 @@ namespace IC
         return makeUnique<TType>(in_allocator, std::forward<TConstructorArgs>(in_constructorArgs)...);
     }
 
-    /// Allocates a new shared pointer from the given Frame Allocator with the
+    /// Allocates a new shared pointer from the given Linear Allocator with the
     /// given constructor parameters. This follows the make_* convention set in
     /// the standard library.
     ///
@@ -59,7 +59,7 @@ namespace IC
     ///
     /// @return A shared pointer to the allocated instance.
     ///
-    template <typename TType, typename... TConstructorArgs> SharedPtr<TType> makeShared(FrameAllocator& in_allocator, TConstructorArgs&&... in_constructorArgs) noexcept
+    template <typename TType, typename... TConstructorArgs> SharedPtr<TType> makeShared(LinearAllocator& in_allocator, TConstructorArgs&&... in_constructorArgs) noexcept
     {
         return makeUnique<TType>(in_allocator, std::forward<TConstructorArgs>(in_constructorArgs)...);
     }

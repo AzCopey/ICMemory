@@ -22,8 +22,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_FRAMEALLOCATOR_H_
-#define _ICMEMORY_FRAMEALLOCATOR_H_
+#ifndef _ICMEMORY_LinearAllocator_H_
+#define _ICMEMORY_LinearAllocator_H_
 
 #include "ForwardDeclarations.h"
 #include "IAllocator.h"
@@ -34,22 +34,22 @@
 
 namespace IC
 {
-    /// A paged frame allocator. Within a single page all allocations are allocated
+    /// A paged Linear Allocator. Within a single page all allocations are allocated
     /// linearly. If a requested allocation will not fit in the current page, a new
     /// page is allocated. It is not possible to allocate a buffer large than the
-    /// size of a single page. Allocated memory is not available for reuse until the
-    /// start of the next "frame" - i.e after reset() has been called.
+    /// size of a single page. Allocated memory is not available for reuse until
+    /// after reset() has been called.
     ///
-    /// A FrameAllocator is backed by a BuddyAllocator, from which pages will be
+    /// A LinearAllocator is backed by a BuddyAllocator, from which pages will be
     /// allocated.
     ///
     /// Note that this is not thread-safe and should not be accessed from multiple
     /// threads at the same time.
     ///
-    class FrameAllocator final : public IAllocator
+    class LinearAllocator final : public IAllocator
     {
     public:
-        /// Initialises a new Frame Allocator with the given page size and backed by the given Buddy
+        /// Initialises a new Linear Allocator with the given page size and backed by the given Buddy
         /// Allocator.
         ///
         /// @param in_buddyAllocator
@@ -57,7 +57,7 @@ namespace IC
         /// @param in_pageSize
         ///     The size of each page. Although not required, ideally pages should be powers of two.
         /// 
-        FrameAllocator(BuddyAllocator& in_buddyAllocator, std::size_t in_pageSize) noexcept;
+        LinearAllocator(BuddyAllocator& in_buddyAllocator, std::size_t in_pageSize) noexcept;
 
         /// This thread-safe.
         ///
@@ -89,9 +89,8 @@ namespace IC
         ///
         void deallocate(void* in_pointer) noexcept override;
 
-        /// Ends the current "frame", resetting the buffer and allowing all previously allocated
-        /// memory to be reused. Before reset() is called, all previously allocated UniquePtrs
-        /// should have been reset().
+        /// Resets the buffer, allowing all previously allocated memory to be reused. Deallocate() must
+        /// have been called for all allocated blocks prior to reset() being called.
         /// 
         void reset() noexcept;
 

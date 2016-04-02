@@ -34,7 +34,7 @@ namespace IC
 {
     class IAllocator;
     class BuddyAllocator;
-    class FrameAllocator;
+    class LinearAllocator;
     template <typename TValueType> class AllocatorWrapper;
 
     template <typename TType> using UniquePtr = std::unique_ptr<TType, std::function<void(typename std::remove_all_extents<TType>::type*)>>;

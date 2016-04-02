@@ -28,7 +28,7 @@
 #include "ForwardDeclarations.h"
 
 #include "BuddyAllocator.h"
-#include "FrameAllocator.h"
+#include "LinearAllocator.h"
 #include "AllocatorWrapper.h"
 
 namespace IC
@@ -54,7 +54,7 @@ namespace IC
     ///
     /// @return The new vector.
     ///
-    template <typename TType> Vector<TType> makeVector(FrameAllocator& in_allocator) noexcept
+    template <typename TType> Vector<TType> makeVector(LinearAllocator& in_allocator) noexcept
     {
         return IC::Vector<TType>(AllocatorWrapper<TType>(&in_allocator));
     }
@@ -88,7 +88,7 @@ namespace IC
     ///
     /// @return The new vector.
     ///
-    template <typename TValueType, typename TIteratorType> Vector<TValueType> makeVector(FrameAllocator& in_allocator, const TIteratorType& in_first, const TIteratorType& in_last) noexcept
+    template <typename TValueType, typename TIteratorType> Vector<TValueType> makeVector(LinearAllocator& in_allocator, const TIteratorType& in_first, const TIteratorType& in_last) noexcept
     {
         return IC::Vector<TValueType>(in_first, in_last, AllocatorWrapper<TValueType>(&in_allocator));
     }
@@ -118,7 +118,7 @@ namespace IC
     ///
     /// @return The new vector.
     ///
-    template <typename TType> Vector<TType> makeVector(FrameAllocator& in_allocator, const std::vector<TType>& in_toCopy) noexcept
+    template <typename TType> Vector<TType> makeVector(LinearAllocator& in_allocator, const std::vector<TType>& in_toCopy) noexcept
     {
         return IC::Vector<TType>(in_toCopy.begin(), in_toCopy.end(), AllocatorWrapper<TType>(&in_allocator));
     }

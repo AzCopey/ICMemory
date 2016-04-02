@@ -26,7 +26,7 @@
 #define _ICMEMORY_ICMEMORY_H_
 
 #include "BuddyAllocator.h"
-#include "FrameAllocator.h"
+#include "LinearAllocator.h"
 #include "SharedPtr.h"
 #include "String.h"
 #include "UniquePtr.h"

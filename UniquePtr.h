@@ -28,7 +28,7 @@
 #include "ForwardDeclarations.h"
 
 #include "BuddyAllocator.h"
-#include "FrameAllocator.h"
+#include "LinearAllocator.h"
 
 namespace IC
 {
@@ -54,7 +54,7 @@ namespace IC
         });
     }
 
-    /// Allocates a new unique pointer from the given Frame Allocator with the
+    /// Allocates a new unique pointer from the given Linear Allocator with the
     /// given constructor parameters. This follows the make_* convention set in
     /// the standard library.
     ///
@@ -65,7 +65,7 @@ namespace IC
     ///
     /// @return A unique pointer to the allocated instance.
     ///
-    template <typename TType, typename... TConstructorArgs> UniquePtr<TType> makeUnique(FrameAllocator& in_allocator, TConstructorArgs&&... in_constructorArgs) noexcept
+    template <typename TType, typename... TConstructorArgs> UniquePtr<TType> makeUnique(LinearAllocator& in_allocator, TConstructorArgs&&... in_constructorArgs) noexcept
     {
         void* memory = in_allocator.allocate(sizeof(TType));
         TType* object = new (memory) TType(std::forward<TConstructorArgs>(in_constructorArgs)...);
@@ -113,7 +113,7 @@ namespace IC
         });
     }
 
-    /// Allocates a new unique pointer to an array from the given Frame Allocator 
+    /// Allocates a new unique pointer to an array from the given Linear Allocator 
     /// with the given constructor parameters. This follows the make_* convention 
     /// set in the standard library. Note that, like new[], fundamental types  will 
     /// not be set to a default value. 
@@ -125,7 +125,7 @@ namespace IC
     ///
     /// @return A unique pointer to the allocated array.
     ///
-    template <typename TType> UniquePtr<TType[]> makeUniqueArray(FrameAllocator& in_allocator, std::size_t in_size) noexcept
+    template <typename TType> UniquePtr<TType[]> makeUniqueArray(LinearAllocator& in_allocator, std::size_t in_size) noexcept
     {
         auto array = reinterpret_cast<TType*>(in_allocator.allocate(sizeof(TType) * in_size));
         if (!std::is_fundamental<TType>::value)

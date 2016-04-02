@@ -22,7 +22,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "FrameAllocator.h"
+#include "LinearAllocator.h"
 
 #include "BuddyAllocator.h"
 #include "MemoryUtils.h"
@@ -33,13 +33,13 @@
 namespace IC
 {
     //------------------------------------------------------------------------------
-    FrameAllocator::FrameAllocator(BuddyAllocator& in_buddyAllocator, std::size_t in_pageSize) noexcept
+    LinearAllocator::LinearAllocator(BuddyAllocator& in_buddyAllocator, std::size_t in_pageSize) noexcept
         : m_pageSize(in_pageSize), m_buddyAllocator(in_buddyAllocator)
     {
     }
 
     //------------------------------------------------------------------------------
-    void* FrameAllocator::allocate(std::size_t in_allocationSize) noexcept
+    void* LinearAllocator::allocate(std::size_t in_allocationSize) noexcept
     {
         assert(in_allocationSize <= m_pageSize);
 
@@ -57,13 +57,13 @@ namespace IC
     }
 
     //------------------------------------------------------------------------------
-    void FrameAllocator::deallocate(void* in_pointer) noexcept
+    void LinearAllocator::deallocate(void* in_pointer) noexcept
     {
         --m_activeAllocationCount;
     }
 
     //------------------------------------------------------------------------------
-    void FrameAllocator::reset() noexcept
+    void LinearAllocator::reset() noexcept
     {
         assert(m_activeAllocationCount == 0);
 
@@ -73,7 +73,7 @@ namespace IC
     }
 
     //------------------------------------------------------------------------------
-    void FrameAllocator::createPage() noexcept
+    void LinearAllocator::createPage() noexcept
     {
         if (m_currentPage)
         {
