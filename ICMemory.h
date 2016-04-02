@@ -27,9 +27,9 @@
 
 #include "BuddyAllocator.h"
 #include "FrameAllocator.h"
-#include "MakeShared.h"
-#include "MakeString.h"
-#include "MakeUnique.h"
-#include "MakeVector.h"
+#include "SharedPtr.h"
+#include "String.h"
+#include "UniquePtr.h"
+#include "Vector.h"
 
 #endif

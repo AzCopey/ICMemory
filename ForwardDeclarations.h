@@ -25,15 +25,10 @@
 #ifndef _ICMEMORY_FORWARDDECLARATIONS_H_
 #define _ICMEMORY_FORWARDDECLARATIONS_H_
 
-#include <deque>
+#include <type_traits>
+
 #include <functional>
 #include <memory>
-#include <queue>
-#include <string>
-#include <type_traits>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
 
 namespace IC
 {
@@ -41,15 +36,9 @@ namespace IC
     class BuddyAllocator;
     class FrameAllocator;
     template <typename TValueType> class AllocatorWrapper;
+
     template <typename TType> using UniquePtr = std::unique_ptr<TType, std::function<void(typename std::remove_all_extents<TType>::type*)>>;
     template <typename TType> using SharedPtr = std::shared_ptr<TType>;
-    
-    using String = std::basic_string<char, std::char_traits<char>, AllocatorWrapper<char>>;
-    template <typename TType> using Deque = std::deque<TType, AllocatorWrapper<TType>>;
-    template <typename TType> using Vector = std::vector<TType, AllocatorWrapper<TType>>;
-    template <typename TType> using Queue = std::queue<TType, AllocatorWrapper<TType>>;
-    template <typename TType> using UnorderedMap = std::unordered_map<TType, AllocatorWrapper<TType>>;
-    template <typename TType> using UnorderedSet = std::unordered_set<TType, AllocatorWrapper<TType>>;
 }
 
 #endif

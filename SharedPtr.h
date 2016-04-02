@@ -1,4 +1,4 @@
-// Created by Ian Copland on 2016-01-23
+// Created by Ian Copland on 2016-02-06
 //
 // The MIT License(MIT)
 // 
@@ -22,13 +22,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_MAKESHARED_H_
-#define _ICMEMORY_MAKESHARED_H_
+#ifndef _ICMEMORY_SHAREDPTR_H_
+#define _ICMEMORY_SHAREDPTR_H_
 
 #include "ForwardDeclarations.h"
 
 #include "BuddyAllocator.h"
-#include "MakeUnique.h"
+#include "FrameAllocator.h"
 
 namespace IC
 {

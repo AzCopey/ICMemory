@@ -26,7 +26,7 @@
 
 #include "BuddyAllocator.h"
 #include "MemoryUtils.h"
-#include "MakeUnique.h"
+#include "UniquePtr.h"
 
 #include <cassert>
 
