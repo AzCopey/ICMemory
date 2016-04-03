@@ -22,8 +22,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_LinearAllocator_H_
-#define _ICMEMORY_LinearAllocator_H_
+#ifndef _ICMEMORY_LINEARALLOCATOR_H_
+#define _ICMEMORY_LINEARALLOCATOR_H_
 
 #include "ForwardDeclarations.h"
 #include "IAllocator.h"
