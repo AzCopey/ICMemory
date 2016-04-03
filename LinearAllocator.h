@@ -40,8 +40,8 @@ namespace IC
     /// size of a single page. Allocated memory is not available for reuse until
     /// after reset() has been called.
     ///
-    /// A LinearAllocator is backed by a BuddyAllocator, from which pages will be
-    /// allocated.
+    /// A LinearAllocator can be backed by a BuddyAllocator, from which pages will be
+    /// allocated, otherwise they are allocated from the free store.
     ///
     /// Note that this is not thread-safe and should not be accessed from multiple
     /// threads at the same time.
@@ -49,15 +49,29 @@ namespace IC
     class LinearAllocator final : public IAllocator
     {
     public:
+        static constexpr std::size_t k_defaultPageSize = 4 * 1024;
+
+        /// Initialises a new Linear Allocator with the given page size without a buddy allocator.
+        /// Pages will be allocated from the freestore.
+        ///
+        /// @param buddyAllocator
+        ///     The buddy allocator from which pages will be allocated.
+        /// @param pageSize
+        ///     Optional. The size of each page. Although not required, ideally pages should be powers
+        ///     of two.
+        /// 
+        LinearAllocator(std::size_t pageSize = k_defaultPageSize) noexcept;
+
         /// Initialises a new Linear Allocator with the given page size and backed by the given Buddy
         /// Allocator.
         ///
         /// @param buddyAllocator
         ///     The buddy allocator from which pages will be allocated.
         /// @param pageSize
-        ///     The size of each page. Although not required, ideally pages should be powers of two.
+        ///     Optional. The size of each page. Although not required, ideally pages should be powers 
+        ///     of two.
         /// 
-        LinearAllocator(BuddyAllocator& buddyAllocator, std::size_t pageSize) noexcept;
+        LinearAllocator(BuddyAllocator& buddyAllocator, std::size_t pageSize = k_defaultPageSize) noexcept;
 
         /// This thread-safe.
         ///
@@ -98,13 +112,17 @@ namespace IC
         /// Creates a new page to allocate from. If there is a current page prior to this being called
         /// it will be added to the previous pages list.
         ///
+        /// If the linear allocator was created using a buddy allocator then the page will be allocated
+        /// from it, otherwise it will be allocated from the freestore.
+        ///
         void CreatePage() noexcept;
 
         const std::size_t m_pageSize;
 
-        BuddyAllocator& m_buddyAllocator;
-        UniquePtr<std::uint8_t[]> m_currentPage;
-        std::vector<UniquePtr<std::uint8_t[]>> m_previousPages;
+        BuddyAllocator* m_buddyAllocator;
+
+        std::uint8_t* m_currentPage;
+        std::vector<std::uint8_t*> m_previousPages;
         std::uint8_t* m_nextPointer = nullptr;
         std::size_t m_activeAllocationCount = 0;
     };

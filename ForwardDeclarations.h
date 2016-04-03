@@ -36,9 +36,6 @@ namespace IC
     class BuddyAllocator;
     class LinearAllocator;
     template <typename TValueType> class AllocatorWrapper;
-
-    template <typename TType> using UniquePtr = std::unique_ptr<TType, std::function<void(typename std::remove_all_extents<TType>::type*)>>;
-    template <typename TType> using SharedPtr = std::shared_ptr<TType>;
 }
 
 #endif

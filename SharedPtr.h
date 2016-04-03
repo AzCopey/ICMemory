@@ -30,8 +30,12 @@
 #include "BuddyAllocator.h"
 #include "LinearAllocator.h"
 
+#include <memory>
+
 namespace IC
 {
+    template <typename TType> using SharedPtr = std::shared_ptr<TType>;
+
     /// Allocates a new shared pointer from the given Buddy Allocator with the
     /// given constructor parameters. This follows the make_* convention set in
     /// the standard library.

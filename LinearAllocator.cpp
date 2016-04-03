@@ -33,8 +33,14 @@
 namespace IC
 {
     //------------------------------------------------------------------------------
+    LinearAllocator::LinearAllocator(std::size_t pageSize) noexcept
+        : m_pageSize(pageSize)
+    {
+    }
+
+    //------------------------------------------------------------------------------
     LinearAllocator::LinearAllocator(BuddyAllocator& buddyAllocator, std::size_t pageSize) noexcept
-        : m_pageSize(pageSize), m_buddyAllocator(buddyAllocator)
+        : m_pageSize(pageSize), m_buddyAllocator(&buddyAllocator)
     {
     }
 
@@ -43,7 +49,7 @@ namespace IC
     {
         assert(allocationSize <= m_pageSize);
 
-        if (!m_currentPage || m_nextPointer + allocationSize > m_currentPage.get() + m_pageSize)
+        if (!m_currentPage || m_nextPointer + allocationSize > m_currentPage + m_pageSize)
         {
             CreatePage();
         }
@@ -67,9 +73,31 @@ namespace IC
     {
         assert(m_activeAllocationCount == 0);
 
-        m_previousPages.clear();
-        m_currentPage.reset();
-        m_nextPointer = nullptr;
+        if (m_currentPage)
+        {
+            if (m_buddyAllocator)
+            {
+                for (auto& page : m_previousPages)
+                {
+                    m_buddyAllocator->Deallocate(reinterpret_cast<void*>(page));
+                }
+
+                m_buddyAllocator->Deallocate(reinterpret_cast<void*>(m_currentPage));
+            }
+            else
+            {
+                for (auto& page : m_previousPages)
+                {
+                    delete[] page;
+                }
+
+                delete[] m_currentPage;
+            }
+
+            m_previousPages.clear();
+            m_currentPage = nullptr;
+            m_nextPointer = nullptr;
+        }
     }
 
     //------------------------------------------------------------------------------
@@ -77,10 +105,18 @@ namespace IC
     {
         if (m_currentPage)
         {
-            m_previousPages.push_back(std::move(m_currentPage));
+            m_previousPages.push_back(m_currentPage);
         }
 
-        m_currentPage = MakeUniqueArray<std::uint8_t>(m_buddyAllocator, m_pageSize);
-        m_nextPointer = MemoryUtils::Align(m_currentPage.get(), sizeof(std::intptr_t));
+        if (m_buddyAllocator)
+        {
+            m_currentPage = reinterpret_cast<std::uint8_t*>(m_buddyAllocator->Allocate(m_pageSize));
+        }
+        else
+        {
+            m_currentPage = new std::uint8_t[m_pageSize];
+        }
+
+        m_nextPointer = MemoryUtils::Align(m_currentPage, sizeof(std::intptr_t));
     }
 }
