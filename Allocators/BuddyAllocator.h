@@ -25,8 +25,6 @@
 #ifndef _ICMEMORY_BUDDYALLOCATOR_H_
 #define _ICMEMORY_BUDDYALLOCATOR_H_
 
-#include "ForwardDeclarations.h"
-
 #include "IAllocator.h"
 
 #include <cstdint>

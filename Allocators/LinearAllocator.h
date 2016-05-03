@@ -25,7 +25,6 @@
 #ifndef _ICMEMORY_LINEARALLOCATOR_H_
 #define _ICMEMORY_LINEARALLOCATOR_H_
 
-#include "ForwardDeclarations.h"
 #include "IAllocator.h"
 
 #include <cstdint>

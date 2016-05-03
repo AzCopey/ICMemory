@@ -25,10 +25,8 @@
 #ifndef _ICMEMORY_UNIQUEPTR_H_
 #define _ICMEMORY_UNIQUEPTR_H_
 
-#include "ForwardDeclarations.h"
-
-#include "BuddyAllocator.h"
-#include "LinearAllocator.h"
+#include "../Allocators/BuddyAllocator.h"
+#include "../Allocators/LinearAllocator.h"
 
 #include <functional>
 #include <memory>

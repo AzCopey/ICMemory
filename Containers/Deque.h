@@ -25,11 +25,10 @@
 #ifndef _ICMEMORY_DEQUE_H_
 #define _ICMEMORY_DEQUE_H_
 
-#include "ForwardDeclarations.h"
 
-#include "BuddyAllocator.h"
-#include "LinearAllocator.h"
-#include "AllocatorWrapper.h"
+#include "../Allocators/AllocatorWrapper.h"
+#include "../Allocators/BuddyAllocator.h"
+#include "../Allocators/LinearAllocator.h"
 
 #include <deque>
 

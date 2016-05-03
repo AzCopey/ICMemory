@@ -25,7 +25,7 @@
 #ifndef _ICMEMORY_IALLOCATOR_H_
 #define _ICMEMORY_IALLOCATOR_H_
 
-#include "ForwardDeclarations.h"
+#include "../ForwardDeclarations.h"
 
 #include <cstdint>
 

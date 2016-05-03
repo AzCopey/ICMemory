@@ -25,11 +25,9 @@
 #ifndef _ICMEMORY_STRING_H_
 #define _ICMEMORY_STRING_H_
 
-#include "ForwardDeclarations.h"
-
-#include "AllocatorWrapper.h"
-#include "BuddyAllocator.h"
-#include "LinearAllocator.h"
+#include "../Allocators/AllocatorWrapper.h"
+#include "../Allocators/BuddyAllocator.h"
+#include "../Allocators/LinearAllocator.h"
 
 #include <string>
 

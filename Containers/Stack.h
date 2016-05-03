@@ -22,44 +22,39 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_QUEUE_H_
-#define _ICMEMORY_QUEUE_H_
+#ifndef _ICMEMORY_STACK_H_
+#define _ICMEMORY_STACK_H_
 
-#include "ForwardDeclarations.h"
-
-#include "BuddyAllocator.h"
 #include "Deque.h"
-#include "LinearAllocator.h"
-#include "AllocatorWrapper.h"
 
-#include <queue>
+#include <stack>
 
 namespace IC
 {
-    template <typename TType> using Queue = std::queue<TType, Deque<TType>>;
+    template <typename TType> using Stack = std::stack<TType, Deque<TType>>;
 
-    /// Creates a new empty queue. The given allocator is used for all memory allocations.
+    /// Creates a new empty stack. The given allocator is used for all memory allocations.
     ///
     /// @param allocator
     ///     The allocator which should be used.
     ///
-    /// @return The new queue.
+    /// @return The new stack.
     ///
-    template <typename TType> Queue<TType> MakeQueue(BuddyAllocator& allocator) noexcept
+    template <typename TType> Stack<TType> MakeStack(BuddyAllocator& allocator) noexcept
     {
-        return IC::Queue<TType>(AllocatorWrapper<TType>(&allocator));
+        return IC::Stack<TType>(AllocatorWrapper<TType>(&allocator));
     }
 
-    /// Creates a new empty queue. The given allocator is used for all memory allocations.
+    /// Creates a new empty stack. The given allocator is used for all memory allocations.
     ///
     /// @param allocator
     ///     The allocator which should be used.
     ///
-    /// @return The new queue.
+    /// @return The new stack.
     ///
-    template <typename TType> Queue<TType> MakeQueue(LinearAllocator& allocator) noexcept
+    template <typename TType> Stack<TType> MakeStack(LinearAllocator& allocator) noexcept
     {
-        return IC::Queue<TType>(AllocatorWrapper<TType>(&allocator));
+        return IC::Stack<TType>(AllocatorWrapper<TType>(&allocator));
     }
 }
 

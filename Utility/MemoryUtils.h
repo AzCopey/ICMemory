@@ -25,7 +25,7 @@
 #ifndef _ICMEMORY_MEMORYUTILS_H_
 #define _ICMEMORY_MEMORYUTILS_H_
 
-#include "ForwardDeclarations.h"
+#include "../ForwardDeclarations.h"
 
 #include <cstdint>
 #include <cassert>

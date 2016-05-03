@@ -24,7 +24,7 @@
 
 #include "BuddyAllocator.h"
 
-#include "MemoryUtils.h"
+#include "../Utility/MemoryUtils.h"
 
 #include <cassert>
 
@@ -117,7 +117,7 @@ namespace IC
         ///
         constexpr std::size_t GetNumIndicesForLevel(std::size_t blockLevel) noexcept
         {
-            return (1 << blockLevel);
+            return (std::size_t(1) << blockLevel);
         }
     }
 
@@ -130,7 +130,7 @@ namespace IC
     {
         assert(MemoryUtils::IsPowerOfTwo(m_bufferSize));
         assert(MemoryUtils::IsPowerOfTwo(m_minBlockSize));
-        assert(m_minBlockSize > sizeof(std::uintptr_t) * 2);
+        assert(m_minBlockSize >= sizeof(std::uintptr_t) * 2);
         assert(m_numBlockLevels > 1);
         assert(m_headerSize < m_bufferSize);
 

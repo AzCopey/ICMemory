@@ -25,10 +25,9 @@
 #ifndef _ICMEMORY_FORWARDDECLARATIONS_H_
 #define _ICMEMORY_FORWARDDECLARATIONS_H_
 
-#include <type_traits>
-
 #include <functional>
 #include <memory>
+#include <type_traits>
 
 namespace IC
 {

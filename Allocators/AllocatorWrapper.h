@@ -25,7 +25,7 @@
 #ifndef _ICMEMORY_ALLOCATOR_H_
 #define _ICMEMORY_ALLOCATOR_H_
 
-#include "ForwardDeclarations.h"
+#include "../ForwardDeclarations.h"
 
 namespace IC
 {

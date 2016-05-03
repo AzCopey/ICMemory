@@ -25,10 +25,8 @@
 #ifndef _ICMEMORY_SHAREDPTR_H_
 #define _ICMEMORY_SHAREDPTR_H_
 
-#include "ForwardDeclarations.h"
-
-#include "BuddyAllocator.h"
-#include "LinearAllocator.h"
+#include "../Allocators/BuddyAllocator.h"
+#include "../Allocators/LinearAllocator.h"
 
 #include <memory>
 

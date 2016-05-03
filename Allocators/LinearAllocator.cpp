@@ -25,8 +25,7 @@
 #include "LinearAllocator.h"
 
 #include "BuddyAllocator.h"
-#include "MemoryUtils.h"
-#include "UniquePtr.h"
+#include "../Utility/MemoryUtils.h"
 
 #include <cassert>
 
