@@ -27,8 +27,7 @@
 
 
 #include "../Allocator/AllocatorWrapper.h"
-#include "../Allocator/BuddyAllocator.h"
-#include "../Allocator/LinearAllocator.h"
+#include "../Allocator/IAllocator.h"
 
 #include <deque>
 
@@ -43,16 +42,7 @@ namespace IC
     ///
     /// @return The new deque.
     ///
-	template <typename TType> Deque<TType> MakeDeque(BuddyAllocator& allocator) noexcept;
-
-    /// Creates a new empty deque. The given allocator is used for all memory allocations.
-    ///
-    /// @param allocator
-    ///     The allocator which should be used.
-    ///
-    /// @return The new deque.
-    ///
-	template <typename TType> Deque<TType> MakeDeque(LinearAllocator& allocator) noexcept;
+	template <typename TType> Deque<TType> MakeDeque(IAllocator& allocator) noexcept;
 
     /// Creates a new deque from the given range. The given allocator is used for all 
     /// memory allocations.
@@ -66,21 +56,7 @@ namespace IC
     ///
     /// @return The new deque.
     ///
-	template <typename TValueType, typename TIteratorType> Deque<TValueType> MakeDeque(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
-
-    /// Creates a new deque from the given range. The given allocator is used for all 
-    /// memory allocations.
-    ///
-    /// @param allocator
-    ///     The allocator which should be used.
-    /// @param first
-    ///     The iterator pointing to the start of the range.
-    /// @param last
-    ///     The iterator pointing to the end of the range.
-    ///
-    /// @return The new deque.
-    ///
-	template <typename TValueType, typename TIteratorType> Deque<TValueType> MakeDeque(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
+	template <typename TValueType, typename TIteratorType> Deque<TValueType> MakeDeque(IAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 
     /// Creates a new deque from the std::deque. The given allocator is used for all 
     /// memory allocations.
@@ -92,19 +68,7 @@ namespace IC
     ///
     /// @return The new deque.
     ///
-	template <typename TType> Deque<TType> MakeDeque(BuddyAllocator& allocator, const std::deque<TType>& toCopy) noexcept;
-
-    /// Creates a new deque from the std::deque. The given allocator is used for all 
-    /// memory allocations.
-    ///
-    /// @param allocator
-    ///     The allocator which should be used.
-    /// @param toCopy
-    ///     The std::deque which should be copied.
-    ///
-    /// @return The new deque.
-    ///
-	template <typename TType> Deque<TType> MakeDeque(LinearAllocator& allocator, const std::deque<TType>& toCopy) noexcept;
+	template <typename TType> Deque<TType> MakeDeque(IAllocator& allocator, const std::deque<TType>& toCopy) noexcept;
 }
 
 #include "DequeImpl.h"

@@ -40,16 +40,7 @@ namespace IC
     ///
     /// @return The new stack.
     ///
-	template <typename TType> Stack<TType> MakeStack(BuddyAllocator& allocator) noexcept;
-
-    /// Creates a new empty stack. The given allocator is used for all memory allocations.
-    ///
-    /// @param allocator
-    ///     The allocator which should be used.
-    ///
-    /// @return The new stack.
-    ///
-	template <typename TType> Stack<TType> MakeStack(LinearAllocator& allocator) noexcept;
+	template <typename TType> Stack<TType> MakeStack(IAllocator& allocator) noexcept;
 }
 
 #include "StackImpl.h"

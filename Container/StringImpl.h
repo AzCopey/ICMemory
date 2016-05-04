@@ -28,13 +28,7 @@
 namespace IC
 {
 	//------------------------------------------------------------------------------
-	template <typename TIteratorType> String MakeString(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
-	{
-		return String(first, last, AllocatorWrapper<char>(&allocator));
-	}
-
-	//------------------------------------------------------------------------------
-	template <typename TIteratorType> String MakeString(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
+	template <typename TIteratorType> String MakeString(IAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
 	{
 		return String(first, last, AllocatorWrapper<char>(&allocator));
 	}

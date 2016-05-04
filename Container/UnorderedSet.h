@@ -25,9 +25,8 @@
 #ifndef _ICMEMORY_CONTAINER_UNORDEREDSET_H_
 #define _ICMEMORY_CONTAINER_UNORDEREDSET_H_
 
-#include "../Allocator/BuddyAllocator.h"
-#include "../Allocator/LinearAllocator.h"
 #include "../Allocator/AllocatorWrapper.h"
+#include "../Allocator/IAllocator.h"
 
 #include <unordered_set>
 
@@ -42,16 +41,7 @@ namespace IC
     ///
     /// @return The new set.
     ///
-	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(BuddyAllocator& allocator) noexcept;
-
-    /// Creates a new empty set. The given allocator is used for all memory allocations.
-    ///
-    /// @param allocator
-    ///     The allocator which should be used.
-    ///
-    /// @return The new set.
-    ///
-	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(LinearAllocator& allocator) noexcept;
+	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(IAllocator& allocator) noexcept;
 
     /// Creates a new set from the given range. The given allocator is used for all 
     /// memory allocations.
@@ -65,21 +55,7 @@ namespace IC
     ///
     /// @return The new set.
     ///
-	template <typename TValueType, typename TIteratorType> UnorderedSet<TValueType> MakeUnorderedSet(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
-
-    /// Creates a new set from the given range. The given allocator is used for all 
-    /// memory allocations.
-    ///
-    /// @param allocator
-    ///     The allocator which should be used.
-    /// @param first
-    ///     The iterator pointing to the start of the range.
-    /// @param last
-    ///     The iterator pointing to the end of the range.
-    ///
-    /// @return The new set.
-    ///
-	template <typename TValueType, typename TIteratorType> UnorderedSet<TValueType> MakeUnorderedSet(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
+	template <typename TValueType, typename TIteratorType> UnorderedSet<TValueType> MakeUnorderedSet(IAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 
     /// Creates a new set from the std::set. The given allocator is used for all 
     /// memory allocations.
@@ -91,19 +67,7 @@ namespace IC
     ///
     /// @return The new set.
     ///
-	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(BuddyAllocator& allocator, const std::unordered_set<TType>& toCopy) noexcept;
-
-    /// Creates a new set from the std::unordered_set. The given allocator is used for all 
-    /// memory allocations.
-    ///
-    /// @param allocator
-    ///     The allocator which should be used.
-    /// @param toCopy
-    ///     The std::set which should be copied.
-    ///
-    /// @return The new set.
-    ///
-	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(LinearAllocator& allocator, const std::unordered_set<TType>& toCopy) noexcept;
+	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(IAllocator& allocator, const std::unordered_set<TType>& toCopy) noexcept;
 }
 
 #include "UnorderedSetImpl.h"

@@ -28,13 +28,7 @@
 namespace IC
 {
 	//------------------------------------------------------------------------------
-	template <typename TType> Stack<TType> MakeStack(BuddyAllocator& allocator) noexcept
-	{
-		return IC::Stack<TType>(AllocatorWrapper<TType>(&allocator));
-	}
-
-	//------------------------------------------------------------------------------
-	template <typename TType> Stack<TType> MakeStack(LinearAllocator& allocator) noexcept
+	template <typename TType> Stack<TType> MakeStack(IAllocator& allocator) noexcept
 	{
 		return IC::Stack<TType>(AllocatorWrapper<TType>(&allocator));
 	}

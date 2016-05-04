@@ -34,37 +34,13 @@ namespace IC
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TType> Vector<TType> MakeVector(BuddyAllocator& allocator) noexcept
-	{
-		return IC::Vector<TType>(AllocatorWrapper<TType>(&allocator));
-	}
-
-	//------------------------------------------------------------------------------
-	template <typename TType> Vector<TType> MakeVector(LinearAllocator& allocator) noexcept
-	{
-		return IC::Vector<TType>(AllocatorWrapper<TType>(&allocator));
-	}
-
-	//------------------------------------------------------------------------------
-	template <typename TValueType, typename TIteratorType> Vector<TValueType> MakeVector(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
+	template <typename TValueType, typename TIteratorType> Vector<TValueType> MakeVector(IAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
 	{
 		return IC::Vector<TValueType>(first, last, AllocatorWrapper<TValueType>(&allocator));
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TValueType, typename TIteratorType> Vector<TValueType> MakeVector(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
-	{
-		return IC::Vector<TValueType>(first, last, AllocatorWrapper<TValueType>(&allocator));
-	}
-
-	//------------------------------------------------------------------------------
-	template <typename TType> Vector<TType> MakeVector(BuddyAllocator& allocator, const std::vector<TType>& toCopy) noexcept
-	{
-		return IC::Vector<TType>(toCopy.begin(), toCopy.end(), AllocatorWrapper<TType>(&allocator));
-	}
-
-	//------------------------------------------------------------------------------
-	template <typename TType> Vector<TType> MakeVector(LinearAllocator& allocator, const std::vector<TType>& toCopy) noexcept
+	template <typename TType> Vector<TType> MakeVector(IAllocator& allocator, const std::vector<TType>& toCopy) noexcept
 	{
 		return IC::Vector<TType>(toCopy.begin(), toCopy.end(), AllocatorWrapper<TType>(&allocator));
 	}

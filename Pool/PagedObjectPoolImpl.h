@@ -25,8 +25,6 @@
 #ifndef _ICMEMORY_POOL_PAGEDOBJECTPOOLIMPL_H_
 #define _ICMEMORY_POOL_PAGEDOBJECTPOOLIMPL_H_
 
-
-
 namespace IC
 {
 	//------------------------------------------------------------------------------

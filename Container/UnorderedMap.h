@@ -25,9 +25,8 @@
 #ifndef _ICMEMORY_CONTAINER_UNORDEREDMAP_H_
 #define _ICMEMORY_CONTAINER_UNORDEREDMAP_H_
 
-#include "../Allocator/BuddyAllocator.h"
-#include "../Allocator/LinearAllocator.h"
 #include "../Allocator/AllocatorWrapper.h"
+#include "../Allocator/IAllocator.h"
 
 #include <unordered_map>
 
@@ -42,16 +41,7 @@ namespace IC
     ///
     /// @return The new map.
     ///
-	template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(BuddyAllocator& allocator) noexcept;
-
-    /// Creates a new empty map. The given allocator is used for all memory allocations.
-    ///
-    /// @param allocator
-    ///     The allocator which should be used.
-    ///
-    /// @return The new map.
-    ///
-	template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(LinearAllocator& allocator) noexcept;
+	template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(IAllocator& allocator) noexcept;
 
     /// Creates a new map from the given range. The given allocator is used for all 
     /// memory allocations.
@@ -65,21 +55,7 @@ namespace IC
     ///
     /// @return The new map.
     ///
-	template <typename TKey, typename TValue, typename TIteratorType> UnorderedMap<TKey, TValue> MakeUnorderedMap(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
-
-    /// Creates a new map from the given range. The given allocator is used for all 
-    /// memory allocations.
-    ///
-    /// @param allocator
-    ///     The allocator which should be used.
-    /// @param first
-    ///     The iterator pointing to the start of the range.
-    /// @param last
-    ///     The iterator pointing to the end of the range.
-    ///
-    /// @return The new map.
-    ///
-	template <typename TKey, typename TValue, typename TIteratorType> UnorderedMap<TKey, TValue> MakeUnorderedMap(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
+	template <typename TKey, typename TValue, typename TIteratorType> UnorderedMap<TKey, TValue> MakeUnorderedMap(IAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 
     /// Creates a new map from the std::map. The given allocator is used for all 
     /// memory allocations.
@@ -91,19 +67,7 @@ namespace IC
     ///
     /// @return The new map.
     ///
-	template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(BuddyAllocator& allocator, const std::unordered_map<TKey, TValue>& toCopy) noexcept;
-
-    /// Creates a new map from the std::unordered_map. The given allocator is used for all 
-    /// memory allocations.
-    ///
-    /// @param allocator
-    ///     The allocator which should be used.
-    /// @param toCopy
-    ///     The std::map which should be copied.
-    ///
-    /// @return The new map.
-    ///
-	template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(LinearAllocator& allocator, const std::unordered_map<TKey, TValue>& toCopy) noexcept;
+	template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(IAllocator& allocator, const std::unordered_map<TKey, TValue>& toCopy) noexcept;
 }
 
 #include "UnorderedMapImpl.h"

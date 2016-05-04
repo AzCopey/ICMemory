@@ -25,8 +25,7 @@
 #ifndef _ICMEMORY_CONTAINER_SHAREDPTR_H_
 #define _ICMEMORY_CONTAINER_SHAREDPTR_H_
 
-#include "../Allocator/BuddyAllocator.h"
-#include "../Allocator/LinearAllocator.h"
+#include "../Allocator/IAllocator.h"
 
 #include <memory>
 
@@ -34,9 +33,9 @@ namespace IC
 {
     template <typename TType> using SharedPtr = std::shared_ptr<TType>;
 
-    /// Allocates a new shared pointer from the given Buddy Allocator with the
-    /// given constructor parameters. This follows the make_* convention set in
-    /// the standard library.
+    /// Allocates a new shared pointer from the given Allocator with the given 
+	/// constructor parameters. This follows the make_* convention set in the 
+	/// standard library.
     ///
     /// @param allocator
     ///     The allocator from which to allocate the requested type.
@@ -45,20 +44,7 @@ namespace IC
     ///
     /// @return A shared pointer to the allocated instance.
     ///
-	template <typename TType, typename... TConstructorArgs> SharedPtr<TType> MakeShared(BuddyAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept;
-
-    /// Allocates a new shared pointer from the given Linear Allocator with the
-    /// given constructor parameters. This follows the make_* convention set in
-    /// the standard library.
-    ///
-    /// @param allocator
-    ///     The allocator from which to allocate the requested type.
-    /// @param constructorArgs
-    ///     The arguments for the constructor if appropriate.
-    ///
-    /// @return A shared pointer to the allocated instance.
-    ///
-	template <typename TType, typename... TConstructorArgs> SharedPtr<TType> MakeShared(LinearAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept;
+	template <typename TType, typename... TConstructorArgs> SharedPtr<TType> MakeShared(IAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept;
 }
 
 #include "SharedPtrImpl.h"

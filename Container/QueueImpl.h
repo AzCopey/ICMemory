@@ -28,13 +28,7 @@
 namespace IC
 {
 	//------------------------------------------------------------------------------
-	template <typename TType> Queue<TType> MakeQueue(BuddyAllocator& allocator) noexcept
-	{
-		return IC::Queue<TType>(AllocatorWrapper<TType>(&allocator));
-	}
-
-	//------------------------------------------------------------------------------
-	template <typename TType> Queue<TType> MakeQueue(LinearAllocator& allocator) noexcept
+	template <typename TType> Queue<TType> MakeQueue(IAllocator& allocator) noexcept
 	{
 		return IC::Queue<TType>(AllocatorWrapper<TType>(&allocator));
 	}

@@ -25,8 +25,7 @@
 #ifndef _ICMEMORY_CONTAINER_UNIQUEPTR_H_
 #define _ICMEMORY_CONTAINER_UNIQUEPTR_H_
 
-#include "../Allocator/BuddyAllocator.h"
-#include "../Allocator/LinearAllocator.h"
+#include "../Allocator/IAllocator.h"
 
 #include <functional>
 #include <memory>
@@ -35,40 +34,23 @@ namespace IC
 {
     template <typename TType> using UniquePtr = std::unique_ptr<TType, std::function<void(typename std::remove_all_extents<TType>::type*)>>;
 
-	///TODO
-	///
+    /// Allocates a new unique pointer from the given Allocator with the given 
+	/// constructor parameters. This follows the make_* convention set in the 
+	/// standard library.
+    ///
+    /// @param allocator
+    ///     The allocator from which to allocate the requested type.
+    /// @param constructorArgs
+    ///     The arguments for the constructor if appropriate.
+    ///
+    /// @return A unique pointer to the allocated instance.
+    ///
 	template <typename TType, typename... TConstructorArgs> UniquePtr<TType> MakeUnique(IAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept;
 
-    /// Allocates a new unique pointer from the given Buddy Allocator with the
-    /// given constructor parameters. This follows the make_* convention set in
-    /// the standard library.
-    ///
-    /// @param allocator
-    ///     The allocator from which to allocate the requested type.
-    /// @param constructorArgs
-    ///     The arguments for the constructor if appropriate.
-    ///
-    /// @return A unique pointer to the allocated instance.
-    ///
-	template <typename TType, typename... TConstructorArgs> UniquePtr<TType> MakeUnique(BuddyAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept;
-
-    /// Allocates a new unique pointer from the given Linear Allocator with the
-    /// given constructor parameters. This follows the make_* convention set in
-    /// the standard library.
-    ///
-    /// @param allocator
-    ///     The allocator from which to allocate the requested type.
-    /// @param constructorArgs
-    ///     The arguments for the constructor if appropriate.
-    ///
-    /// @return A unique pointer to the allocated instance.
-    ///
-	template <typename TType, typename... TConstructorArgs> UniquePtr<TType> MakeUnique(LinearAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept;
-
-    /// Allocates a new unique pointer to an array from the given Buddy Allocator 
-    /// with the given constructor parameters. This follows the make_* convention 
-    /// set in the standard library. Note that, like new[], fundamental types  will 
-    /// not be set to a default value. 
+    /// Allocates a new unique pointer to an array from the given Allocator with 
+	/// the given size. This follows the make_* convention  set in the standard 
+	/// library. Note that, like new[], fundamental types  will not be set to a 
+	/// default value. 
     ///
     /// @param allocator
     ///     The allocator from which to allocate the requested type.
@@ -77,21 +59,7 @@ namespace IC
     ///
     /// @return A unique pointer to the allocated array.
     ///
-	template <typename TType> UniquePtr<TType[]> MakeUniqueArray(BuddyAllocator& allocator, std::size_t size) noexcept;
-
-    /// Allocates a new unique pointer to an array from the given Linear Allocator 
-    /// with the given constructor parameters. This follows the make_* convention 
-    /// set in the standard library. Note that, like new[], fundamental types  will 
-    /// not be set to a default value. 
-    ///
-    /// @param allocator
-    ///     The allocator from which to allocate the requested type.
-    /// @param size
-    ///     The size of the array.
-    ///
-    /// @return A unique pointer to the allocated array.
-    ///
-	template <typename TType> UniquePtr<TType[]> MakeUniqueArray(LinearAllocator& allocator, std::size_t size) noexcept;
+	template <typename TType> UniquePtr<TType[]> MakeUniqueArray(IAllocator& allocator, std::size_t size) noexcept;
 }
 
 #include "UniquePtrImpl.h"

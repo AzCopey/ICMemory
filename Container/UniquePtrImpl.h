@@ -40,57 +40,7 @@ namespace IC
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TType, typename... TConstructorArgs> UniquePtr<TType> MakeUnique(BuddyAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept
-	{
-		void* memory = allocator.Allocate(sizeof(TType));
-		TType* object = new (memory) TType(std::forward<TConstructorArgs>(constructorArgs)...);
-		return UniquePtr<TType>(object, [&allocator](TType* object) noexcept -> void
-		{
-			object->~TType();
-			allocator.Deallocate(reinterpret_cast<void*>(object));
-		});
-	}
-
-	//------------------------------------------------------------------------------
-	template <typename TType, typename... TConstructorArgs> UniquePtr<TType> MakeUnique(LinearAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept
-	{
-		void* memory = allocator.Allocate(sizeof(TType));
-		TType* object = new (memory) TType(std::forward<TConstructorArgs>(constructorArgs)...);
-		return UniquePtr<TType>(object, [&allocator](TType* object) noexcept -> void
-		{
-			object->~TType();
-			allocator.Deallocate(reinterpret_cast<void*>(object));
-		});
-	}
-
-	//------------------------------------------------------------------------------
-	template <typename TType> UniquePtr<TType[]> MakeUniqueArray(BuddyAllocator& allocator, std::size_t size) noexcept
-	{
-		auto array = reinterpret_cast<TType*>(allocator.Allocate(sizeof(TType) * size));
-		if (!std::is_fundamental<TType>::value)
-		{
-			for (std::size_t i = 0; i < size; ++i)
-			{
-				new (array + i) TType();
-			}
-		}
-
-		return UniquePtr<TType[]>(array, [&allocator, size](TType* array) noexcept -> void
-		{
-			if (!std::is_fundamental<TType>::value)
-			{
-				for (std::size_t i = 0; i < size; ++i)
-				{
-					(array + i)->~TType();
-				}
-			}
-
-			allocator.Deallocate(reinterpret_cast<void*>(array));
-		});
-	}
-
-	//------------------------------------------------------------------------------
-	template <typename TType> UniquePtr<TType[]> MakeUniqueArray(LinearAllocator& allocator, std::size_t size) noexcept
+	template <typename TType> UniquePtr<TType[]> MakeUniqueArray(IAllocator& allocator, std::size_t size) noexcept
 	{
 		auto array = reinterpret_cast<TType*>(allocator.Allocate(sizeof(TType) * size));
 		if (!std::is_fundamental<TType>::value)

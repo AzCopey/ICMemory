@@ -27,49 +27,25 @@
 namespace IC
 {
     //------------------------------------------------------------------------------
-    String MakeString(BuddyAllocator& allocator) noexcept
+    String MakeString(IAllocator& allocator) noexcept
     {
         return String(AllocatorWrapper<char>(&allocator));
     }
 
     //------------------------------------------------------------------------------
-    String MakeString(LinearAllocator& allocator) noexcept
-    {
-        return String(AllocatorWrapper<char>(&allocator));
-    }
-
-    //------------------------------------------------------------------------------
-    String MakeString(BuddyAllocator& allocator, const char* cString) noexcept
+    String MakeString(IAllocator& allocator, const char* cString) noexcept
     {
         return String(cString, AllocatorWrapper<char>(&allocator));
     }
 
     //------------------------------------------------------------------------------
-    String MakeString(LinearAllocator& allocator, const char* cString) noexcept
-    {
-        return String(cString, AllocatorWrapper<char>(&allocator));
-    }
-
-    //------------------------------------------------------------------------------
-    String MakeString(BuddyAllocator& allocator, const char* buffer, std::size_t bufferSize) noexcept
+    String MakeString(IAllocator& allocator, const char* buffer, std::size_t bufferSize) noexcept
     {
         return String(buffer, bufferSize, AllocatorWrapper<char>(&allocator));
     }
 
     //------------------------------------------------------------------------------
-    String MakeString(LinearAllocator& allocator, const char* buffer, std::size_t bufferSize) noexcept
-    {
-        return String(buffer, bufferSize, AllocatorWrapper<char>(&allocator));
-    }
-
-    //------------------------------------------------------------------------------
-    String MakeString(BuddyAllocator& allocator, const std::string& toCopy) noexcept
-    {
-        return String(toCopy.c_str(), toCopy.size(), AllocatorWrapper<char>(&allocator));
-    }
-
-    //------------------------------------------------------------------------------
-    String MakeString(LinearAllocator& allocator, const std::string& toCopy) noexcept
+    String MakeString(IAllocator& allocator, const std::string& toCopy) noexcept
     {
         return String(toCopy.c_str(), toCopy.size(), AllocatorWrapper<char>(&allocator));
     }

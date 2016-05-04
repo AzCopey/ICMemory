@@ -40,16 +40,7 @@ namespace IC
     ///
     /// @return The new queue.
     ///
-	template <typename TType> Queue<TType> MakeQueue(BuddyAllocator& allocator) noexcept;
-
-    /// Creates a new empty queue. The given allocator is used for all memory allocations.
-    ///
-    /// @param allocator
-    ///     The allocator which should be used.
-    ///
-    /// @return The new queue.
-    ///
-	template <typename TType> Queue<TType> MakeQueue(LinearAllocator& allocator) noexcept;
+	template <typename TType> Queue<TType> MakeQueue(IAllocator& allocator) noexcept;
 }
 
 #include "QueueImpl.h"
