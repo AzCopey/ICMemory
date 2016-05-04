@@ -110,6 +110,11 @@ namespace IC
 		~BuddyAllocator() noexcept;
 
     private:
+		BuddyAllocator(BuddyAllocator&) = delete;
+		BuddyAllocator& operator=(BuddyAllocator&) = delete;
+		BuddyAllocator(BuddyAllocator&& toMove) = delete;
+		BuddyAllocator& operator=(BuddyAllocator&& toMove) = delete;
+
         /// Encapsulates functionality required for navigating the free list table.
         /// This allocates no memory, instead relying on the memory provided in the
         /// constructor. This allows the buddy allocator to store the free list inside

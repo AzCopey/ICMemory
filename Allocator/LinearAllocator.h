@@ -61,16 +61,16 @@ namespace IC
         /// 
         LinearAllocator(std::size_t pageSize = k_defaultPageSize) noexcept;
 
-        /// Initialises a new Linear Allocator with the given page size and backed by the given Buddy
-        /// Allocator.
-        ///
-        /// @param parentAllocator
-        ///     The allocator from which pages will be allocated.
-        /// @param pageSize
-        ///     Optional. The size of each page. Although not required, ideally pages should be powers 
-        ///     of two.
-        /// 
-        LinearAllocator(IAllocator& parentAllocator, std::size_t pageSize = k_defaultPageSize) noexcept;
+		/// Initialises a new Linear Allocator with the given page size and backed by the given Buddy
+		/// Allocator.
+		///
+		/// @param parentAllocator
+		///     The allocator from which pages will be allocated.
+		/// @param pageSize
+		///     Optional. The size of each page. Although not required, ideally pages should be powers 
+		///     of two.
+		/// 
+		LinearAllocator(IAllocator& parentAllocator, std::size_t pageSize = k_defaultPageSize) noexcept;
 
         /// This thread-safe.
         ///
@@ -110,6 +110,11 @@ namespace IC
 		~LinearAllocator() noexcept;
 
     private:
+		LinearAllocator(LinearAllocator&) = delete;
+		LinearAllocator& operator=(LinearAllocator&) = delete;
+		LinearAllocator(LinearAllocator&& toMove) = delete;
+		LinearAllocator& operator=(LinearAllocator&& toMove) = delete;
+
         /// Creates a new page to allocate from. If there is a current page prior to this being called
         /// it will be added to the previous pages list.
         ///
