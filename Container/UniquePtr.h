@@ -35,6 +35,10 @@ namespace IC
 {
     template <typename TType> using UniquePtr = std::unique_ptr<TType, std::function<void(typename std::remove_all_extents<TType>::type*)>>;
 
+	///TODO
+	///
+	template <typename TType, typename... TConstructorArgs> UniquePtr<TType> MakeUnique(IAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept;
+
     /// Allocates a new unique pointer from the given Buddy Allocator with the
     /// given constructor parameters. This follows the make_* convention set in
     /// the standard library.

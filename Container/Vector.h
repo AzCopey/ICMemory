@@ -35,6 +35,10 @@ namespace IC
 {
     template <typename TType> using Vector = std::vector<TType, AllocatorWrapper<TType>>;
 
+	/// TODO
+	///
+	template <typename TType> Vector<TType> MakeVector(IAllocator& allocator) noexcept;
+
     /// Creates a new empty vector. The given allocator is used for all memory allocations.
     ///
     /// @param allocator

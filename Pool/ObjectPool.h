@@ -25,7 +25,6 @@
 #ifndef _ICMEMORY_POOL_OBJECTPOOL_H_
 #define _ICMEMORY_POOL_OBJECTPOOL_H_
 
-#include "../ForwardDeclarations.h"
 #include "../Utility/MemoryUtils.h"
 #include "../Container/UniquePtr.h"
 
@@ -82,6 +81,8 @@ namespace IC
 		///  @param constructorArgs
 		///		The arguments for the constructor if appropriate.
 		///
+		/// @return The newly constructed object.
+		///
 		template <typename... TConstructorArgs> UniquePtr<TObjectType> Create(TConstructorArgs&&... constructorArgs) noexcept;
 
 		~ObjectPool() noexcept;
@@ -89,8 +90,8 @@ namespace IC
 	private:
 		ObjectPool(ObjectPool&) = delete;
 		ObjectPool& operator=(ObjectPool&) = delete;
-		ObjectPool(ObjectPool&& toMove) = delete;
-		ObjectPool& operator=(ObjectPool&& toMove) = delete;
+		ObjectPool(ObjectPool&&) = delete;
+		ObjectPool& operator=(ObjectPool&&) = delete;
 
 		/// A container for information on slots within the pool.
 		///

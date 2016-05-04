@@ -112,8 +112,8 @@ namespace IC
     private:
 		BuddyAllocator(BuddyAllocator&) = delete;
 		BuddyAllocator& operator=(BuddyAllocator&) = delete;
-		BuddyAllocator(BuddyAllocator&& toMove) = delete;
-		BuddyAllocator& operator=(BuddyAllocator&& toMove) = delete;
+		BuddyAllocator(BuddyAllocator&&) = delete;
+		BuddyAllocator& operator=(BuddyAllocator&&) = delete;
 
         /// Encapsulates functionality required for navigating the free list table.
         /// This allocates no memory, instead relying on the memory provided in the

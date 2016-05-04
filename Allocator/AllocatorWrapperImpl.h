@@ -93,9 +93,9 @@ namespace IC
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TValueType> void AllocatorWrapper<TValueType>::construct(pointer pointer, const TValueType& value) noexcept
+	template <typename TValueType> void AllocatorWrapper<TValueType>::construct(pointer pointer, TValueType&& value) noexcept
 	{
-		new (pointer) TValueType(value);
+		new (pointer) TValueType(std::forward<TValueType>(value));
 	}
 
 	//------------------------------------------------------------------------------

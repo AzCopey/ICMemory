@@ -112,8 +112,8 @@ namespace IC
     private:
 		LinearAllocator(LinearAllocator&) = delete;
 		LinearAllocator& operator=(LinearAllocator&) = delete;
-		LinearAllocator(LinearAllocator&& toMove) = delete;
-		LinearAllocator& operator=(LinearAllocator&& toMove) = delete;
+		LinearAllocator(LinearAllocator&&) = delete;
+		LinearAllocator& operator=(LinearAllocator&&) = delete;
 
         /// Creates a new page to allocate from. If there is a current page prior to this being called
         /// it will be added to the previous pages list.

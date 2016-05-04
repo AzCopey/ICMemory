@@ -37,5 +37,6 @@
 #include "Container/UnorderedMap.h"
 #include "Container/Vector.h"
 #include "Pool/ObjectPool.h"
+#include "Pool/PagedObjectPool.h"
 
 #endif

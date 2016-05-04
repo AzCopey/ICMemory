@@ -36,6 +36,7 @@ namespace IC
     class LinearAllocator;
     template <typename TValueType> class AllocatorWrapper;
 	template <typename TObject> class ObjectPool;
+	template <typename TObject> class PagedObjectPool;
 }
 
 #endif

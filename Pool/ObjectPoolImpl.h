@@ -45,6 +45,8 @@ namespace IC
 	template <typename TObjectType> ObjectPool<TObjectType>::ObjectPool(std::size_t numObjects) noexcept
 		: m_numObjects(numObjects), m_alignedObjectSize(CalcAlignedObjectSize<TObjectType>()), m_bufferSize(m_numObjects * m_alignedObjectSize)
 	{
+		assert(m_numObjects > 0);
+
 		m_buffer = new std::int8_t[m_bufferSize];
 
 		InitFreeSlotList();
@@ -53,6 +55,8 @@ namespace IC
 	template <typename TObjectType> ObjectPool<TObjectType>::ObjectPool(IAllocator& allocator, std::size_t objectsPerPage) noexcept
 		: m_numObjects(objectsPerPage), m_alignedObjectSize(CalcAlignedObjectSize<TObjectType>()), m_bufferSize(m_numObjects * m_alignedObjectSize), m_allocator(&allocator)
 	{
+		assert(m_numObjects > 0);
+
 		m_buffer = m_allocator->Allocate(m_bufferSize);
 
 		InitFreeSlotList();

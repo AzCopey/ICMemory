@@ -109,14 +109,14 @@ namespace IC
         ///
 		size_type max_size() const noexcept;
 
-        /// Calls the constructor on the object at the given memory address.
-        ///
-        /// @param pointer
-        ///     The memory address.
-        /// @param value
-        ///     The value to construct the object with.
-        ///
-		void construct(pointer pointer, const TValueType& value) noexcept;
+		/// Calls the constructor on the object at the given memory address.
+		///
+		/// @param pointer
+		///     The memory address.
+		/// @param value
+		///     The value to construct the object with.
+		///
+		void construct(pointer pointer, TValueType&& value) noexcept;
 
         /// Calls the destructor on the object at the given memory address.
         ///

@@ -28,6 +28,18 @@
 namespace IC
 {
 	//------------------------------------------------------------------------------
+	template <typename TType, typename... TConstructorArgs> UniquePtr<TType> MakeUnique(IAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept
+	{
+		void* memory = allocator.Allocate(sizeof(TType));
+		TType* object = new (memory) TType(std::forward<TConstructorArgs>(constructorArgs)...);
+		return UniquePtr<TType>(object, [&allocator](TType* object) noexcept -> void
+		{
+			object->~TType();
+			allocator.Deallocate(reinterpret_cast<void*>(object));
+		});
+	}
+
+	//------------------------------------------------------------------------------
 	template <typename TType, typename... TConstructorArgs> UniquePtr<TType> MakeUnique(BuddyAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept
 	{
 		void* memory = allocator.Allocate(sizeof(TType));

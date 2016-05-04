@@ -28,6 +28,12 @@
 namespace IC
 {
 	//------------------------------------------------------------------------------
+	template <typename TType> Vector<TType> MakeVector(IAllocator& allocator) noexcept
+	{
+		return IC::Vector<TType>(AllocatorWrapper<TType>(&allocator));
+	}
+
+	//------------------------------------------------------------------------------
 	template <typename TType> Vector<TType> MakeVector(BuddyAllocator& allocator) noexcept
 	{
 		return IC::Vector<TType>(AllocatorWrapper<TType>(&allocator));
