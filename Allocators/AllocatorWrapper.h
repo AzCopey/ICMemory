@@ -59,10 +59,7 @@ namespace IC
         /// @param allocator
         ///     The allocator which should be wrapped.
         ///
-        AllocatorWrapper(IAllocator* allocator) noexcept
-            : m_allocator(allocator)
-        {
-        }
+		AllocatorWrapper(IAllocator* allocator) noexcept;
 
         /// Constructors a new wrapper using the allocator contained by the given
         /// wrapper.
@@ -70,10 +67,7 @@ namespace IC
         /// @param allocator
         ///     The allocator which should be wrapped.
         ///
-        AllocatorWrapper(const AllocatorWrapper& allocatorWrapper) noexcept
-            : m_allocator(allocatorWrapper.get_allocator())
-        {
-        }
+		AllocatorWrapper(const AllocatorWrapper& allocatorWrapper) noexcept;
 
         /// Constructors a new wrapper using the allocator contained by the given
         /// wrapper.
@@ -81,24 +75,15 @@ namespace IC
         /// @param allocator
         ///     The allocator which should be wrapped.
         ///
-        template <class TOtherType> AllocatorWrapper(const AllocatorWrapper<TOtherType>& allocatorWrapper) noexcept
-            : m_allocator(allocatorWrapper.get_allocator())
-        {
-        }
+		template <class TOtherType> AllocatorWrapper(const AllocatorWrapper<TOtherType>& allocatorWrapper) noexcept;
 #
         /// @return The address of the given reference.
         ///
-        pointer address(reference ref) const noexcept 
-        { 
-            return &ref; 
-        }
+		pointer address(reference ref) const noexcept;
 
         /// @return The address of the given reference.
         ///
-        const_pointer address(const_reference ref) const noexcept 
-        { 
-            return &ref; 
-        }
+		const_pointer address(const_reference ref) const noexcept;
 
         /// Allocates a series of ValueType objects from the wrapped allocator.
         ///
@@ -107,10 +92,7 @@ namespace IC
         /// @param hint
         ///     Unused in this implementation. Should be left null.
         ///
-        pointer allocate(size_type count, std::allocator<void>::const_pointer hint = nullptr) noexcept
-        {
-            return reinterpret_cast<TValueType*>(m_allocator->Allocate(sizeof(TValueType) * count));
-        }
+		pointer allocate(size_type count, std::allocator<void>::const_pointer hint = nullptr) noexcept;
 
         /// Deallocates the memory block previously allocated though allocate.
         /// The count must be identical to that provided to allocator otherwise the
@@ -121,17 +103,11 @@ namespace IC
         /// @param count
         ///     The number of objects in the original allocation.
         ///
-        void deallocate(pointer pointer, size_type count) noexcept
-        {
-            m_allocator->Deallocate(reinterpret_cast<void*>(pointer));
-        }
+		void deallocate(pointer pointer, size_type count) noexcept;
 
         /// @return The max size the contained allocator can allocate in a single block.
         ///
-        size_type max_size() const noexcept
-        {
-            return m_allocator->GetMaxAllocationSize();
-        }
+		size_type max_size() const noexcept;
 
         /// Calls the constructor on the object at the given memory address.
         ///
@@ -140,65 +116,35 @@ namespace IC
         /// @param value
         ///     The value to construct the object with.
         ///
-        void construct(pointer pointer, const TValueType& value) noexcept
-        {
-            new (pointer) TValueType(value);
-        }
+		void construct(pointer pointer, const TValueType& value) noexcept;
 
         /// Calls the destructor on the object at the given memory address.
         ///
-        void destroy(pointer pointer) noexcept
-        {
-            pointer->~TValueType();
-        }
+		void destroy(pointer pointer) noexcept;
 
         /// @return The contained allocator.
         ///
-        IAllocator* get_allocator() const noexcept
-        {
-            return m_allocator;
-        }
+		IAllocator* get_allocator() const noexcept;
 
         /// @param allocatorWrapper
         ///     The wrapper to compare
         ///
         /// @return Whether or not the two wrappers contain the same allocator.
         ///
-        bool operator==(const AllocatorWrapper& allocatorWrapper) noexcept
-        { 
-            return (&m_allocator == &allocatorWrapper.get_allocator());
-        }
+		bool operator==(const AllocatorWrapper& allocatorWrapper) noexcept;
 
         /// @param allocatorWrapper
         ///     The wrapper to compare
         ///
         /// @return Whether or not the two wrappers contain different allocators.
         ///
-        bool operator!=(const AllocatorWrapper& allocatorWrapper) noexcept
-        { 
-            return !operator==(allocatorWrapper);
-        }
+		bool operator!=(const AllocatorWrapper& allocatorWrapper) noexcept;
 
     private:
         IAllocator* m_allocator;
     };
-
-    /// Void specialisation of the AllocatorWrapper.
-    ///
-    template<> class AllocatorWrapper<void>
-    {
-    public:
-        using pointer = void*;
-        using const_pointer = const void*;
-        using value_type = void;
-
-        /// Void specialisation of rebind.
-        ///
-        template <class TOtherType> struct rebind
-        {
-            using other = AllocatorWrapper<TOtherType>;
-        };
-    };
 }
+
+#include "AllocatorWrapperImpl.h"
 
 #endif
