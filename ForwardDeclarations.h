@@ -35,6 +35,7 @@ namespace IC
     class BuddyAllocator;
     class LinearAllocator;
     template <typename TValueType> class AllocatorWrapper;
+	template <typename TObject> class ObjectPool;
 }
 
 #endif
