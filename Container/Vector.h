@@ -22,38 +22,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_UNORDEREDMAP_H_
-#define _ICMEMORY_UNORDEREDMAP_H_
+#ifndef _ICMEMORY_CONTAINER_VECTOR_H_
+#define _ICMEMORY_CONTAINER_VECTOR_H_
 
-#include "../Allocators/BuddyAllocator.h"
-#include "../Allocators/LinearAllocator.h"
-#include "../Allocators/AllocatorWrapper.h"
+#include "../Allocator/BuddyAllocator.h"
+#include "../Allocator/LinearAllocator.h"
+#include "../Allocator/AllocatorWrapper.h"
 
-#include <unordered_map>
+#include <vector>
 
 namespace IC
 {
-    template <typename TKey, typename TValue> using UnorderedMap = std::unordered_map<TKey, TValue, std::hash<TKey>, std::equal_to<TKey>, AllocatorWrapper<std::pair<TKey, TValue>>>;
+    template <typename TType> using Vector = std::vector<TType, AllocatorWrapper<TType>>;
 
-    /// Creates a new empty map. The given allocator is used for all memory allocations.
+    /// Creates a new empty vector. The given allocator is used for all memory allocations.
     ///
     /// @param allocator
     ///     The allocator which should be used.
     ///
-    /// @return The new map.
+    /// @return The new vector.
     ///
-	template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(BuddyAllocator& allocator) noexcept;
+	template <typename TType> Vector<TType> MakeVector(BuddyAllocator& allocator) noexcept;
 
-    /// Creates a new empty map. The given allocator is used for all memory allocations.
+    /// Creates a new empty vector. The given allocator is used for all memory allocations.
     ///
     /// @param allocator
     ///     The allocator which should be used.
     ///
-    /// @return The new map.
+    /// @return The new vector.
     ///
-	template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(LinearAllocator& allocator) noexcept;
+	template <typename TType> Vector<TType> MakeVector(LinearAllocator& allocator) noexcept;
 
-    /// Creates a new map from the given range. The given allocator is used for all 
+    /// Creates a new vector from the given range. The given allocator is used for all 
     /// memory allocations.
     ///
     /// @param allocator
@@ -63,11 +63,11 @@ namespace IC
     /// @param last
     ///     The iterator pointing to the end of the range.
     ///
-    /// @return The new map.
+    /// @return The new vector.
     ///
-	template <typename TKey, typename TValue, typename TIteratorType> UnorderedMap<TKey, TValue> MakeUnorderedMap(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
+	template <typename TValueType, typename TIteratorType> Vector<TValueType> MakeVector(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 
-    /// Creates a new map from the given range. The given allocator is used for all 
+    /// Creates a new vector from the given range. The given allocator is used for all 
     /// memory allocations.
     ///
     /// @param allocator
@@ -77,35 +77,35 @@ namespace IC
     /// @param last
     ///     The iterator pointing to the end of the range.
     ///
-    /// @return The new map.
+    /// @return The new vector.
     ///
-	template <typename TKey, typename TValue, typename TIteratorType> UnorderedMap<TKey, TValue> MakeUnorderedMap(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
+	template <typename TValueType, typename TIteratorType> Vector<TValueType> MakeVector(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 
-    /// Creates a new map from the std::map. The given allocator is used for all 
+    /// Creates a new vector from the std::vector. The given allocator is used for all 
     /// memory allocations.
     ///
     /// @param allocator
     ///     The allocator which should be used.
     /// @param toCopy
-    ///     The std::map which should be copied.
+    ///     The std::vector which should be copied.
     ///
-    /// @return The new map.
+    /// @return The new vector.
     ///
-	template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(BuddyAllocator& allocator, const std::unordered_map<TKey, TValue>& toCopy) noexcept;
+	template <typename TType> Vector<TType> MakeVector(BuddyAllocator& allocator, const std::vector<TType>& toCopy) noexcept;
 
-    /// Creates a new map from the std::unordered_map. The given allocator is used for all 
+    /// Creates a new vector from the std::vector. The given allocator is used for all 
     /// memory allocations.
     ///
     /// @param allocator
     ///     The allocator which should be used.
     /// @param toCopy
-    ///     The std::map which should be copied.
+    ///     The std::vector which should be copied.
     ///
-    /// @return The new map.
+    /// @return The new vector.
     ///
-	template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(LinearAllocator& allocator, const std::unordered_map<TKey, TValue>& toCopy) noexcept;
+	template <typename TType> Vector<TType> MakeVector(LinearAllocator& allocator, const std::vector<TType>& toCopy) noexcept;
 }
 
-#include "UnorderedMapImpl.h"
+#include "VectorImpl.h"
 
 #endif

@@ -22,11 +22,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_SHAREDPTR_H_
-#define _ICMEMORY_SHAREDPTR_H_
+#ifndef _ICMEMORY_CONTAINER_SHAREDPTR_H_
+#define _ICMEMORY_CONTAINER_SHAREDPTR_H_
 
-#include "../Allocators/BuddyAllocator.h"
-#include "../Allocators/LinearAllocator.h"
+#include "../Allocator/BuddyAllocator.h"
+#include "../Allocator/LinearAllocator.h"
 
 #include <memory>
 

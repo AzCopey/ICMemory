@@ -1,4 +1,4 @@
-// Created by Ian Copland on 2016-02-06
+// Created by Ian Copland on 2016-05-04
 //
 // The MIT License(MIT)
 // 
@@ -22,36 +22,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_STACK_H_
-#define _ICMEMORY_STACK_H_
-
-#include "Deque.h"
-
-#include <stack>
+#ifndef _ICMEMORY_CONTAINER_STACKIMPL_H_
+#define _ICMEMORY_CONTAINER_STACKIMPL_H_
 
 namespace IC
 {
-    template <typename TType> using Stack = std::stack<TType, Deque<TType>>;
+	//------------------------------------------------------------------------------
+	template <typename TType> Stack<TType> MakeStack(BuddyAllocator& allocator) noexcept
+	{
+		return IC::Stack<TType>(AllocatorWrapper<TType>(&allocator));
+	}
 
-    /// Creates a new empty stack. The given allocator is used for all memory allocations.
-    ///
-    /// @param allocator
-    ///     The allocator which should be used.
-    ///
-    /// @return The new stack.
-    ///
-	template <typename TType> Stack<TType> MakeStack(BuddyAllocator& allocator) noexcept;
-
-    /// Creates a new empty stack. The given allocator is used for all memory allocations.
-    ///
-    /// @param allocator
-    ///     The allocator which should be used.
-    ///
-    /// @return The new stack.
-    ///
-	template <typename TType> Stack<TType> MakeStack(LinearAllocator& allocator) noexcept;
+	//------------------------------------------------------------------------------
+	template <typename TType> Stack<TType> MakeStack(LinearAllocator& allocator) noexcept
+	{
+		return IC::Stack<TType>(AllocatorWrapper<TType>(&allocator));
+	}
 }
-
-#include "StackImpl.h"
 
 #endif

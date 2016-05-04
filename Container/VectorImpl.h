@@ -22,45 +22,45 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_DEQUEIMPL_H_
-#define _ICMEMORY_DEQUEIMPL_H_
+#ifndef _ICMEMORY_CONTAINER_VECTORIMPL_H_
+#define _ICMEMORY_CONTAINER_VECTORIMPL_H_
 
 namespace IC
 {
 	//------------------------------------------------------------------------------
-	template <typename TType> Deque<TType> MakeDeque(BuddyAllocator& allocator) noexcept
+	template <typename TType> Vector<TType> MakeVector(BuddyAllocator& allocator) noexcept
 	{
-		return IC::Deque<TType>(AllocatorWrapper<TType>(&allocator));
+		return IC::Vector<TType>(AllocatorWrapper<TType>(&allocator));
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TType> Deque<TType> MakeDeque(LinearAllocator& allocator) noexcept
+	template <typename TType> Vector<TType> MakeVector(LinearAllocator& allocator) noexcept
 	{
-		return IC::Deque<TType>(AllocatorWrapper<TType>(&allocator));
+		return IC::Vector<TType>(AllocatorWrapper<TType>(&allocator));
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TValueType, typename TIteratorType> Deque<TValueType> MakeDeque(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
+	template <typename TValueType, typename TIteratorType> Vector<TValueType> MakeVector(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
 	{
-		return IC::Deque<TValueType>(first, last, AllocatorWrapper<TValueType>(&allocator));
+		return IC::Vector<TValueType>(first, last, AllocatorWrapper<TValueType>(&allocator));
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TValueType, typename TIteratorType> Deque<TValueType> MakeDeque(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
+	template <typename TValueType, typename TIteratorType> Vector<TValueType> MakeVector(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
 	{
-		return IC::Deque<TValueType>(first, last, AllocatorWrapper<TValueType>(&allocator));
+		return IC::Vector<TValueType>(first, last, AllocatorWrapper<TValueType>(&allocator));
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TType> Deque<TType> MakeDeque(BuddyAllocator& allocator, const std::deque<TType>& toCopy) noexcept
+	template <typename TType> Vector<TType> MakeVector(BuddyAllocator& allocator, const std::vector<TType>& toCopy) noexcept
 	{
-		return IC::Deque<TType>(toCopy.begin(), toCopy.end(), AllocatorWrapper<TType>(&allocator));
+		return IC::Vector<TType>(toCopy.begin(), toCopy.end(), AllocatorWrapper<TType>(&allocator));
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TType> Deque<TType> MakeDeque(LinearAllocator& allocator, const std::deque<TType>& toCopy) noexcept
+	template <typename TType> Vector<TType> MakeVector(LinearAllocator& allocator, const std::vector<TType>& toCopy) noexcept
 	{
-		return IC::Deque<TType>(toCopy.begin(), toCopy.end(), AllocatorWrapper<TType>(&allocator));
+		return IC::Vector<TType>(toCopy.begin(), toCopy.end(), AllocatorWrapper<TType>(&allocator));
 	}
 }
 

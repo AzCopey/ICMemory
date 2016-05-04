@@ -22,8 +22,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_LINEARALLOCATOR_H_
-#define _ICMEMORY_LINEARALLOCATOR_H_
+#ifndef _ICMEMORY_ALLOCATOR_LINEARALLOCATOR_H_
+#define _ICMEMORY_ALLOCATOR_LINEARALLOCATOR_H_
 
 #include "IAllocator.h"
 
@@ -64,13 +64,13 @@ namespace IC
         /// Initialises a new Linear Allocator with the given page size and backed by the given Buddy
         /// Allocator.
         ///
-        /// @param buddyAllocator
-        ///     The buddy allocator from which pages will be allocated.
+        /// @param parentAllocator
+        ///     The allocator from which pages will be allocated.
         /// @param pageSize
         ///     Optional. The size of each page. Although not required, ideally pages should be powers 
         ///     of two.
         /// 
-        LinearAllocator(BuddyAllocator& buddyAllocator, std::size_t pageSize = k_defaultPageSize) noexcept;
+        LinearAllocator(IAllocator& parentAllocator, std::size_t pageSize = k_defaultPageSize) noexcept;
 
         /// This thread-safe.
         ///
@@ -120,7 +120,7 @@ namespace IC
 
         const std::size_t m_pageSize;
 
-        BuddyAllocator* m_buddyAllocator;
+        IAllocator* m_parentAllocator;
 
         std::uint8_t* m_currentPage;
         std::vector<std::uint8_t*> m_previousPages;

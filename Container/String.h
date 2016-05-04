@@ -22,12 +22,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_STRING_H_
-#define _ICMEMORY_STRING_H_
+#ifndef _ICMEMORY_CONTAINER_STRING_H_
+#define _ICMEMORY_CONTAINER_STRING_H_
 
-#include "../Allocators/AllocatorWrapper.h"
-#include "../Allocators/BuddyAllocator.h"
-#include "../Allocators/LinearAllocator.h"
+#include "../Allocator/AllocatorWrapper.h"
+#include "../Allocator/BuddyAllocator.h"
+#include "../Allocator/LinearAllocator.h"
 
 #include <string>
 

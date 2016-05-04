@@ -22,21 +22,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_STACKIMPL_H_
-#define _ICMEMORY_STACKIMPL_H_
+#ifndef _ICMEMORY_CONTAINER_STRINGIMPL_H_
+#define _ICMEMORY_CONTAINER_STRINGIMPL_H_
 
 namespace IC
 {
 	//------------------------------------------------------------------------------
-	template <typename TType> Stack<TType> MakeStack(BuddyAllocator& allocator) noexcept
+	template <typename TIteratorType> String MakeString(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
 	{
-		return IC::Stack<TType>(AllocatorWrapper<TType>(&allocator));
+		return String(first, last, AllocatorWrapper<char>(&allocator));
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TType> Stack<TType> MakeStack(LinearAllocator& allocator) noexcept
+	template <typename TIteratorType> String MakeString(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
 	{
-		return IC::Stack<TType>(AllocatorWrapper<TType>(&allocator));
+		return String(first, last, AllocatorWrapper<char>(&allocator));
 	}
 }
 

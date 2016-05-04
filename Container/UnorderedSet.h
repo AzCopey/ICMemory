@@ -22,39 +22,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_DEQUE_H_
-#define _ICMEMORY_DEQUE_H_
+#ifndef _ICMEMORY_CONTAINER_UNORDEREDSET_H_
+#define _ICMEMORY_CONTAINER_UNORDEREDSET_H_
 
+#include "../Allocator/BuddyAllocator.h"
+#include "../Allocator/LinearAllocator.h"
+#include "../Allocator/AllocatorWrapper.h"
 
-#include "../Allocators/AllocatorWrapper.h"
-#include "../Allocators/BuddyAllocator.h"
-#include "../Allocators/LinearAllocator.h"
-
-#include <deque>
+#include <unordered_set>
 
 namespace IC
 {
-    template <typename TType> using Deque = std::deque<TType, AllocatorWrapper<TType>>;
+    template <typename TType> using UnorderedSet = std::unordered_set<TType, std::hash<TType>, std::equal_to<TType>, AllocatorWrapper<TType>>;
 
-    /// Creates a new empty deque. The given allocator is used for all memory allocations.
+    /// Creates a new empty set. The given allocator is used for all memory allocations.
     ///
     /// @param allocator
     ///     The allocator which should be used.
     ///
-    /// @return The new deque.
+    /// @return The new set.
     ///
-	template <typename TType> Deque<TType> MakeDeque(BuddyAllocator& allocator) noexcept;
+	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(BuddyAllocator& allocator) noexcept;
 
-    /// Creates a new empty deque. The given allocator is used for all memory allocations.
+    /// Creates a new empty set. The given allocator is used for all memory allocations.
     ///
     /// @param allocator
     ///     The allocator which should be used.
     ///
-    /// @return The new deque.
+    /// @return The new set.
     ///
-	template <typename TType> Deque<TType> MakeDeque(LinearAllocator& allocator) noexcept;
+	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(LinearAllocator& allocator) noexcept;
 
-    /// Creates a new deque from the given range. The given allocator is used for all 
+    /// Creates a new set from the given range. The given allocator is used for all 
     /// memory allocations.
     ///
     /// @param allocator
@@ -64,11 +63,11 @@ namespace IC
     /// @param last
     ///     The iterator pointing to the end of the range.
     ///
-    /// @return The new deque.
+    /// @return The new set.
     ///
-	template <typename TValueType, typename TIteratorType> Deque<TValueType> MakeDeque(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
+	template <typename TValueType, typename TIteratorType> UnorderedSet<TValueType> MakeUnorderedSet(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 
-    /// Creates a new deque from the given range. The given allocator is used for all 
+    /// Creates a new set from the given range. The given allocator is used for all 
     /// memory allocations.
     ///
     /// @param allocator
@@ -78,35 +77,35 @@ namespace IC
     /// @param last
     ///     The iterator pointing to the end of the range.
     ///
-    /// @return The new deque.
+    /// @return The new set.
     ///
-	template <typename TValueType, typename TIteratorType> Deque<TValueType> MakeDeque(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
+	template <typename TValueType, typename TIteratorType> UnorderedSet<TValueType> MakeUnorderedSet(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 
-    /// Creates a new deque from the std::deque. The given allocator is used for all 
+    /// Creates a new set from the std::set. The given allocator is used for all 
     /// memory allocations.
     ///
     /// @param allocator
     ///     The allocator which should be used.
     /// @param toCopy
-    ///     The std::deque which should be copied.
+    ///     The std::set which should be copied.
     ///
-    /// @return The new deque.
+    /// @return The new set.
     ///
-	template <typename TType> Deque<TType> MakeDeque(BuddyAllocator& allocator, const std::deque<TType>& toCopy) noexcept;
+	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(BuddyAllocator& allocator, const std::unordered_set<TType>& toCopy) noexcept;
 
-    /// Creates a new deque from the std::deque. The given allocator is used for all 
+    /// Creates a new set from the std::unordered_set. The given allocator is used for all 
     /// memory allocations.
     ///
     /// @param allocator
     ///     The allocator which should be used.
     /// @param toCopy
-    ///     The std::deque which should be copied.
+    ///     The std::set which should be copied.
     ///
-    /// @return The new deque.
+    /// @return The new set.
     ///
-	template <typename TType> Deque<TType> MakeDeque(LinearAllocator& allocator, const std::deque<TType>& toCopy) noexcept;
+	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(LinearAllocator& allocator, const std::unordered_set<TType>& toCopy) noexcept;
 }
 
-#include "DequeImpl.h"
+#include "UnorderedSetImpl.h"
 
 #endif

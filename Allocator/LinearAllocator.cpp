@@ -24,7 +24,6 @@
 
 #include "LinearAllocator.h"
 
-#include "BuddyAllocator.h"
 #include "../Utility/MemoryUtils.h"
 
 #include <cassert>
@@ -38,8 +37,8 @@ namespace IC
     }
 
     //------------------------------------------------------------------------------
-    LinearAllocator::LinearAllocator(BuddyAllocator& buddyAllocator, std::size_t pageSize) noexcept
-        : m_pageSize(pageSize), m_buddyAllocator(&buddyAllocator)
+    LinearAllocator::LinearAllocator(IAllocator& parentAllocator, std::size_t pageSize) noexcept
+        : m_pageSize(pageSize), m_parentAllocator(&parentAllocator)
     {
     }
 
@@ -74,14 +73,14 @@ namespace IC
 
         if (m_currentPage)
         {
-            if (m_buddyAllocator)
+            if (m_parentAllocator)
             {
                 for (auto& page : m_previousPages)
                 {
-                    m_buddyAllocator->Deallocate(reinterpret_cast<void*>(page));
+					m_parentAllocator->Deallocate(reinterpret_cast<void*>(page));
                 }
 
-                m_buddyAllocator->Deallocate(reinterpret_cast<void*>(m_currentPage));
+				m_parentAllocator->Deallocate(reinterpret_cast<void*>(m_currentPage));
             }
             else
             {
@@ -107,9 +106,9 @@ namespace IC
             m_previousPages.push_back(m_currentPage);
         }
 
-        if (m_buddyAllocator)
+        if (m_parentAllocator)
         {
-            m_currentPage = reinterpret_cast<std::uint8_t*>(m_buddyAllocator->Allocate(m_pageSize));
+            m_currentPage = reinterpret_cast<std::uint8_t*>(m_parentAllocator->Allocate(m_pageSize));
         }
         else
         {

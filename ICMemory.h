@@ -25,16 +25,16 @@
 #ifndef _ICMEMORY_ICMEMORY_H_
 #define _ICMEMORY_ICMEMORY_H_
 
-#include "Allocators/BuddyAllocator.h"
-#include "Allocators/LinearAllocator.h"
-#include "Containers/Deque.h"
-#include "Containers/Queue.h"
-#include "Containers/SharedPtr.h"
-#include "Containers/String.h"
-#include "Containers/Stack.h"
-#include "Containers/UniquePtr.h"
-#include "Containers/UnorderedSet.h"
-#include "Containers/UnorderedMap.h"
-#include "Containers/Vector.h"
+#include "Allocator/BuddyAllocator.h"
+#include "Allocator/LinearAllocator.h"
+#include "Container/Deque.h"
+#include "Container/Queue.h"
+#include "Container/SharedPtr.h"
+#include "Container/String.h"
+#include "Container/Stack.h"
+#include "Container/UniquePtr.h"
+#include "Container/UnorderedSet.h"
+#include "Container/UnorderedMap.h"
+#include "Container/Vector.h"
 
 #endif

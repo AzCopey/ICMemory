@@ -1,4 +1,4 @@
-// Created by Ian Copland on 2016-05-04
+// Created by Ian Copland on 2016-02-06
 //
 // The MIT License(MIT)
 // 
@@ -22,22 +22,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_STRINGIMPL_H_
-#define _ICMEMORY_STRINGIMPL_H_
+#ifndef _ICMEMORY_CONTAINER_STACK_H_
+#define _ICMEMORY_CONTAINER_STACK_H_
+
+#include "Deque.h"
+
+#include <stack>
 
 namespace IC
 {
-	//------------------------------------------------------------------------------
-	template <typename TIteratorType> String MakeString(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
-	{
-		return String(first, last, AllocatorWrapper<char>(&allocator));
-	}
+    template <typename TType> using Stack = std::stack<TType, Deque<TType>>;
 
-	//------------------------------------------------------------------------------
-	template <typename TIteratorType> String MakeString(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
-	{
-		return String(first, last, AllocatorWrapper<char>(&allocator));
-	}
+    /// Creates a new empty stack. The given allocator is used for all memory allocations.
+    ///
+    /// @param allocator
+    ///     The allocator which should be used.
+    ///
+    /// @return The new stack.
+    ///
+	template <typename TType> Stack<TType> MakeStack(BuddyAllocator& allocator) noexcept;
+
+    /// Creates a new empty stack. The given allocator is used for all memory allocations.
+    ///
+    /// @param allocator
+    ///     The allocator which should be used.
+    ///
+    /// @return The new stack.
+    ///
+	template <typename TType> Stack<TType> MakeStack(LinearAllocator& allocator) noexcept;
 }
+
+#include "StackImpl.h"
 
 #endif

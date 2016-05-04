@@ -22,38 +22,39 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_VECTOR_H_
-#define _ICMEMORY_VECTOR_H_
+#ifndef _ICMEMORY_CONTAINER_DEQUE_H_
+#define _ICMEMORY_CONTAINER_DEQUE_H_
 
-#include "../Allocators/BuddyAllocator.h"
-#include "../Allocators/LinearAllocator.h"
-#include "../Allocators/AllocatorWrapper.h"
 
-#include <vector>
+#include "../Allocator/AllocatorWrapper.h"
+#include "../Allocator/BuddyAllocator.h"
+#include "../Allocator/LinearAllocator.h"
+
+#include <deque>
 
 namespace IC
 {
-    template <typename TType> using Vector = std::vector<TType, AllocatorWrapper<TType>>;
+    template <typename TType> using Deque = std::deque<TType, AllocatorWrapper<TType>>;
 
-    /// Creates a new empty vector. The given allocator is used for all memory allocations.
+    /// Creates a new empty deque. The given allocator is used for all memory allocations.
     ///
     /// @param allocator
     ///     The allocator which should be used.
     ///
-    /// @return The new vector.
+    /// @return The new deque.
     ///
-	template <typename TType> Vector<TType> MakeVector(BuddyAllocator& allocator) noexcept;
+	template <typename TType> Deque<TType> MakeDeque(BuddyAllocator& allocator) noexcept;
 
-    /// Creates a new empty vector. The given allocator is used for all memory allocations.
+    /// Creates a new empty deque. The given allocator is used for all memory allocations.
     ///
     /// @param allocator
     ///     The allocator which should be used.
     ///
-    /// @return The new vector.
+    /// @return The new deque.
     ///
-	template <typename TType> Vector<TType> MakeVector(LinearAllocator& allocator) noexcept;
+	template <typename TType> Deque<TType> MakeDeque(LinearAllocator& allocator) noexcept;
 
-    /// Creates a new vector from the given range. The given allocator is used for all 
+    /// Creates a new deque from the given range. The given allocator is used for all 
     /// memory allocations.
     ///
     /// @param allocator
@@ -63,11 +64,11 @@ namespace IC
     /// @param last
     ///     The iterator pointing to the end of the range.
     ///
-    /// @return The new vector.
+    /// @return The new deque.
     ///
-	template <typename TValueType, typename TIteratorType> Vector<TValueType> MakeVector(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
+	template <typename TValueType, typename TIteratorType> Deque<TValueType> MakeDeque(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 
-    /// Creates a new vector from the given range. The given allocator is used for all 
+    /// Creates a new deque from the given range. The given allocator is used for all 
     /// memory allocations.
     ///
     /// @param allocator
@@ -77,35 +78,35 @@ namespace IC
     /// @param last
     ///     The iterator pointing to the end of the range.
     ///
-    /// @return The new vector.
+    /// @return The new deque.
     ///
-	template <typename TValueType, typename TIteratorType> Vector<TValueType> MakeVector(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
+	template <typename TValueType, typename TIteratorType> Deque<TValueType> MakeDeque(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 
-    /// Creates a new vector from the std::vector. The given allocator is used for all 
+    /// Creates a new deque from the std::deque. The given allocator is used for all 
     /// memory allocations.
     ///
     /// @param allocator
     ///     The allocator which should be used.
     /// @param toCopy
-    ///     The std::vector which should be copied.
+    ///     The std::deque which should be copied.
     ///
-    /// @return The new vector.
+    /// @return The new deque.
     ///
-	template <typename TType> Vector<TType> MakeVector(BuddyAllocator& allocator, const std::vector<TType>& toCopy) noexcept;
+	template <typename TType> Deque<TType> MakeDeque(BuddyAllocator& allocator, const std::deque<TType>& toCopy) noexcept;
 
-    /// Creates a new vector from the std::vector. The given allocator is used for all 
+    /// Creates a new deque from the std::deque. The given allocator is used for all 
     /// memory allocations.
     ///
     /// @param allocator
     ///     The allocator which should be used.
     /// @param toCopy
-    ///     The std::vector which should be copied.
+    ///     The std::deque which should be copied.
     ///
-    /// @return The new vector.
+    /// @return The new deque.
     ///
-	template <typename TType> Vector<TType> MakeVector(LinearAllocator& allocator, const std::vector<TType>& toCopy) noexcept;
+	template <typename TType> Deque<TType> MakeDeque(LinearAllocator& allocator, const std::deque<TType>& toCopy) noexcept;
 }
 
-#include "VectorImpl.h"
+#include "DequeImpl.h"
 
 #endif

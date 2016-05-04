@@ -22,21 +22,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_QUEUEIMPL_H_
-#define _ICMEMORY_QUEUEIMPL_H_
+#ifndef _ICMEMORY_CONTAINER_SHAREDPTRIMPL_H_
+#define _ICMEMORY_CONTAINER_SHAREDPTRIMPL_H_
 
 namespace IC
 {
 	//------------------------------------------------------------------------------
-	template <typename TType> Queue<TType> MakeQueue(BuddyAllocator& allocator) noexcept
+	template <typename TType, typename... TConstructorArgs> SharedPtr<TType> MakeShared(BuddyAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept
 	{
-		return IC::Queue<TType>(AllocatorWrapper<TType>(&allocator));
+		return MakeUnique<TType>(allocator, std::forward<TConstructorArgs>(constructorArgs)...);
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TType> Queue<TType> MakeQueue(LinearAllocator& allocator) noexcept
+	template <typename TType, typename... TConstructorArgs> SharedPtr<TType> MakeShared(LinearAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept
 	{
-		return IC::Queue<TType>(AllocatorWrapper<TType>(&allocator));
+		return MakeUnique<TType>(allocator, std::forward<TConstructorArgs>(constructorArgs)...);
 	}
 }
 

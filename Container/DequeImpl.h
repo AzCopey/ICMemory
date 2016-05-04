@@ -22,45 +22,45 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_UNORDEREDSETIMPL_H_
-#define _ICMEMORY_UNORDEREDSETIMPL_H_
+#ifndef _ICMEMORY_CONTAINER_DEQUEIMPL_H_
+#define _ICMEMORY_CONTAINER_DEQUEIMPL_H_
 
 namespace IC
 {
 	//------------------------------------------------------------------------------
-	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(BuddyAllocator& allocator) noexcept
+	template <typename TType> Deque<TType> MakeDeque(BuddyAllocator& allocator) noexcept
 	{
-		return IC::UnorderedSet<TType>(AllocatorWrapper<TType>(&allocator));
+		return IC::Deque<TType>(AllocatorWrapper<TType>(&allocator));
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(LinearAllocator& allocator) noexcept
+	template <typename TType> Deque<TType> MakeDeque(LinearAllocator& allocator) noexcept
 	{
-		return IC::UnorderedSet<TType>(AllocatorWrapper<TType>(&allocator));
+		return IC::Deque<TType>(AllocatorWrapper<TType>(&allocator));
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TValueType, typename TIteratorType> UnorderedSet<TValueType> MakeUnorderedSet(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
+	template <typename TValueType, typename TIteratorType> Deque<TValueType> MakeDeque(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
 	{
-		return IC::UnorderedSet<TValueType>(first, last, 0, IC::UnorderedSet<TValueType>::hasher(), IC::UnorderedSet<TValueType>::key_equal(), AllocatorWrapper<TValueType>(&allocator));
+		return IC::Deque<TValueType>(first, last, AllocatorWrapper<TValueType>(&allocator));
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TValueType, typename TIteratorType> UnorderedSet<TValueType> MakeUnorderedSet(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
+	template <typename TValueType, typename TIteratorType> Deque<TValueType> MakeDeque(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
 	{
-		return IC::UnorderedSet<TValueType>(first, last, 0, IC::UnorderedSet<TValueType>::hasher(), IC::UnorderedSet<TValueType>::key_equal(), AllocatorWrapper<TValueType>(&allocator));
+		return IC::Deque<TValueType>(first, last, AllocatorWrapper<TValueType>(&allocator));
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(BuddyAllocator& allocator, const std::unordered_set<TType>& toCopy) noexcept
+	template <typename TType> Deque<TType> MakeDeque(BuddyAllocator& allocator, const std::deque<TType>& toCopy) noexcept
 	{
-		return IC::MakeUnorderedSet<TType>(allocator, toCopy.begin(), toCopy.end());
+		return IC::Deque<TType>(toCopy.begin(), toCopy.end(), AllocatorWrapper<TType>(&allocator));
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(LinearAllocator& allocator, const std::unordered_set<TType>& toCopy) noexcept
+	template <typename TType> Deque<TType> MakeDeque(LinearAllocator& allocator, const std::deque<TType>& toCopy) noexcept
 	{
-		return IC::MakeUnorderedSet<TType>(allocator, toCopy.begin(), toCopy.end());
+		return IC::Deque<TType>(toCopy.begin(), toCopy.end(), AllocatorWrapper<TType>(&allocator));
 	}
 }
 

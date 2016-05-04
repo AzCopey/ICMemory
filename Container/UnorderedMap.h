@@ -22,38 +22,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_UNORDEREDSET_H_
-#define _ICMEMORY_UNORDEREDSET_H_
+#ifndef _ICMEMORY_CONTAINER_UNORDEREDMAP_H_
+#define _ICMEMORY_CONTAINER_UNORDEREDMAP_H_
 
-#include "../Allocators/BuddyAllocator.h"
-#include "../Allocators/LinearAllocator.h"
-#include "../Allocators/AllocatorWrapper.h"
+#include "../Allocator/BuddyAllocator.h"
+#include "../Allocator/LinearAllocator.h"
+#include "../Allocator/AllocatorWrapper.h"
 
-#include <unordered_set>
+#include <unordered_map>
 
 namespace IC
 {
-    template <typename TType> using UnorderedSet = std::unordered_set<TType, std::hash<TType>, std::equal_to<TType>, AllocatorWrapper<TType>>;
+    template <typename TKey, typename TValue> using UnorderedMap = std::unordered_map<TKey, TValue, std::hash<TKey>, std::equal_to<TKey>, AllocatorWrapper<std::pair<TKey, TValue>>>;
 
-    /// Creates a new empty set. The given allocator is used for all memory allocations.
+    /// Creates a new empty map. The given allocator is used for all memory allocations.
     ///
     /// @param allocator
     ///     The allocator which should be used.
     ///
-    /// @return The new set.
+    /// @return The new map.
     ///
-	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(BuddyAllocator& allocator) noexcept;
+	template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(BuddyAllocator& allocator) noexcept;
 
-    /// Creates a new empty set. The given allocator is used for all memory allocations.
+    /// Creates a new empty map. The given allocator is used for all memory allocations.
     ///
     /// @param allocator
     ///     The allocator which should be used.
     ///
-    /// @return The new set.
+    /// @return The new map.
     ///
-	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(LinearAllocator& allocator) noexcept;
+	template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(LinearAllocator& allocator) noexcept;
 
-    /// Creates a new set from the given range. The given allocator is used for all 
+    /// Creates a new map from the given range. The given allocator is used for all 
     /// memory allocations.
     ///
     /// @param allocator
@@ -63,11 +63,11 @@ namespace IC
     /// @param last
     ///     The iterator pointing to the end of the range.
     ///
-    /// @return The new set.
+    /// @return The new map.
     ///
-	template <typename TValueType, typename TIteratorType> UnorderedSet<TValueType> MakeUnorderedSet(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
+	template <typename TKey, typename TValue, typename TIteratorType> UnorderedMap<TKey, TValue> MakeUnorderedMap(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 
-    /// Creates a new set from the given range. The given allocator is used for all 
+    /// Creates a new map from the given range. The given allocator is used for all 
     /// memory allocations.
     ///
     /// @param allocator
@@ -77,35 +77,35 @@ namespace IC
     /// @param last
     ///     The iterator pointing to the end of the range.
     ///
-    /// @return The new set.
+    /// @return The new map.
     ///
-	template <typename TValueType, typename TIteratorType> UnorderedSet<TValueType> MakeUnorderedSet(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
+	template <typename TKey, typename TValue, typename TIteratorType> UnorderedMap<TKey, TValue> MakeUnorderedMap(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 
-    /// Creates a new set from the std::set. The given allocator is used for all 
+    /// Creates a new map from the std::map. The given allocator is used for all 
     /// memory allocations.
     ///
     /// @param allocator
     ///     The allocator which should be used.
     /// @param toCopy
-    ///     The std::set which should be copied.
+    ///     The std::map which should be copied.
     ///
-    /// @return The new set.
+    /// @return The new map.
     ///
-	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(BuddyAllocator& allocator, const std::unordered_set<TType>& toCopy) noexcept;
+	template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(BuddyAllocator& allocator, const std::unordered_map<TKey, TValue>& toCopy) noexcept;
 
-    /// Creates a new set from the std::unordered_set. The given allocator is used for all 
+    /// Creates a new map from the std::unordered_map. The given allocator is used for all 
     /// memory allocations.
     ///
     /// @param allocator
     ///     The allocator which should be used.
     /// @param toCopy
-    ///     The std::set which should be copied.
+    ///     The std::map which should be copied.
     ///
-    /// @return The new set.
+    /// @return The new map.
     ///
-	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(LinearAllocator& allocator, const std::unordered_set<TType>& toCopy) noexcept;
+	template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(LinearAllocator& allocator, const std::unordered_map<TKey, TValue>& toCopy) noexcept;
 }
 
-#include "UnorderedSetImpl.h"
+#include "UnorderedMapImpl.h"
 
 #endif
