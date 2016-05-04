@@ -31,12 +31,13 @@
 
 namespace IC
 {
+	template <typename TValueType> class AllocatorWrapper;
     class IAllocator;
     class BuddyAllocator;
     class LinearAllocator;
-    template <typename TValueType> class AllocatorWrapper;
 	template <typename TObject> class ObjectPool;
 	template <typename TObject> class PagedObjectPool;
+	class SmallObjectPool;
 }
 
 #endif

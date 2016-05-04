@@ -1,4 +1,4 @@
-// Created by Ian Copland on 2016-01-18
+// Created by Ian Copland on 2016-05-04
 //
 // The MIT License(MIT)
 // 
@@ -22,22 +22,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_ICMEMORY_H_
-#define _ICMEMORY_ICMEMORY_H_
+#ifndef _ICMEMORY_POOL_SMALLOBJECTPOOLIMPL_H_
+#define _ICMEMORY_POOL_SMALLOBJECTPOOLIMPL_H_
 
-#include "Allocator/BuddyAllocator.h"
-#include "Allocator/LinearAllocator.h"
-#include "Container/Deque.h"
-#include "Container/Queue.h"
-#include "Container/SharedPtr.h"
-#include "Container/String.h"
-#include "Container/Stack.h"
-#include "Container/UniquePtr.h"
-#include "Container/UnorderedSet.h"
-#include "Container/UnorderedMap.h"
-#include "Container/Vector.h"
-#include "Pool/ObjectPool.h"
-#include "Pool/PagedObjectPool.h"
-#include "Pool/SmallObjectPool.h"
+namespace IC
+{
+	//------------------------------------------------------------------------------
+	SmallObjectPool::SmallObjectPool() noexcept
+	{
+		//TODO:
+	}
+
+	//------------------------------------------------------------------------------
+	SmallObjectPool::SmallObjectPool(IAllocator& allocator) noexcept
+	{
+		//TODO:
+	}
+
+	//------------------------------------------------------------------------------
+	template <typename TObjectType, typename... TConstructorArgs> UniquePtr<TObjectType> SmallObjectPool::Create(TConstructorArgs&&... constructorArgs) noexcept
+	{
+		//TODO:
+
+		return nullptr;
+	}
+}
 
 #endif
