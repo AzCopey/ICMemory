@@ -42,10 +42,7 @@ namespace IC
     ///
     /// @return The new vector.
     ///
-    template <typename TType> Vector<TType> MakeVector(BuddyAllocator& allocator) noexcept
-    {
-        return IC::Vector<TType>(AllocatorWrapper<TType>(&allocator));
-    }
+	template <typename TType> Vector<TType> MakeVector(BuddyAllocator& allocator) noexcept;
 
     /// Creates a new empty vector. The given allocator is used for all memory allocations.
     ///
@@ -54,10 +51,7 @@ namespace IC
     ///
     /// @return The new vector.
     ///
-    template <typename TType> Vector<TType> MakeVector(LinearAllocator& allocator) noexcept
-    {
-        return IC::Vector<TType>(AllocatorWrapper<TType>(&allocator));
-    }
+	template <typename TType> Vector<TType> MakeVector(LinearAllocator& allocator) noexcept;
 
     /// Creates a new vector from the given range. The given allocator is used for all 
     /// memory allocations.
@@ -71,10 +65,7 @@ namespace IC
     ///
     /// @return The new vector.
     ///
-    template <typename TValueType, typename TIteratorType> Vector<TValueType> MakeVector(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
-    {
-        return IC::Vector<TValueType>(first, last, AllocatorWrapper<TValueType>(&allocator));
-    }
+	template <typename TValueType, typename TIteratorType> Vector<TValueType> MakeVector(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 
     /// Creates a new vector from the given range. The given allocator is used for all 
     /// memory allocations.
@@ -88,10 +79,7 @@ namespace IC
     ///
     /// @return The new vector.
     ///
-    template <typename TValueType, typename TIteratorType> Vector<TValueType> MakeVector(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
-    {
-        return IC::Vector<TValueType>(first, last, AllocatorWrapper<TValueType>(&allocator));
-    }
+	template <typename TValueType, typename TIteratorType> Vector<TValueType> MakeVector(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 
     /// Creates a new vector from the std::vector. The given allocator is used for all 
     /// memory allocations.
@@ -103,10 +91,7 @@ namespace IC
     ///
     /// @return The new vector.
     ///
-    template <typename TType> Vector<TType> MakeVector(BuddyAllocator& allocator, const std::vector<TType>& toCopy) noexcept
-    {
-        return IC::Vector<TType>(toCopy.begin(), toCopy.end(), AllocatorWrapper<TType>(&allocator));
-    }
+	template <typename TType> Vector<TType> MakeVector(BuddyAllocator& allocator, const std::vector<TType>& toCopy) noexcept;
 
     /// Creates a new vector from the std::vector. The given allocator is used for all 
     /// memory allocations.
@@ -118,10 +103,9 @@ namespace IC
     ///
     /// @return The new vector.
     ///
-    template <typename TType> Vector<TType> MakeVector(LinearAllocator& allocator, const std::vector<TType>& toCopy) noexcept
-    {
-        return IC::Vector<TType>(toCopy.begin(), toCopy.end(), AllocatorWrapper<TType>(&allocator));
-    }
+	template <typename TType> Vector<TType> MakeVector(LinearAllocator& allocator, const std::vector<TType>& toCopy) noexcept;
 }
+
+#include "VectorImpl.h"
 
 #endif

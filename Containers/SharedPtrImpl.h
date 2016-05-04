@@ -1,4 +1,4 @@
-// Created by Ian Copland on 2016-02-06
+// Created by Ian Copland on 2016-05-04
 //
 // The MIT License(MIT)
 // 
@@ -22,36 +22,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_QUEUE_H_
-#define _ICMEMORY_QUEUE_H_
-
-#include "Deque.h"
-
-#include <queue>
+#ifndef _ICMEMORY_SHAREDPTRIMPL_H_
+#define _ICMEMORY_SHAREDPTRIMPL_H_
 
 namespace IC
 {
-    template <typename TType> using Queue = std::queue<TType, Deque<TType>>;
+	//------------------------------------------------------------------------------
+	template <typename TType, typename... TConstructorArgs> SharedPtr<TType> MakeShared(BuddyAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept
+	{
+		return MakeUnique<TType>(allocator, std::forward<TConstructorArgs>(constructorArgs)...);
+	}
 
-    /// Creates a new empty queue. The given allocator is used for all memory allocations.
-    ///
-    /// @param allocator
-    ///     The allocator which should be used.
-    ///
-    /// @return The new queue.
-    ///
-	template <typename TType> Queue<TType> MakeQueue(BuddyAllocator& allocator) noexcept;
-
-    /// Creates a new empty queue. The given allocator is used for all memory allocations.
-    ///
-    /// @param allocator
-    ///     The allocator which should be used.
-    ///
-    /// @return The new queue.
-    ///
-	template <typename TType> Queue<TType> MakeQueue(LinearAllocator& allocator) noexcept;
+	//------------------------------------------------------------------------------
+	template <typename TType, typename... TConstructorArgs> SharedPtr<TType> MakeShared(LinearAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept
+	{
+		return MakeUnique<TType>(allocator, std::forward<TConstructorArgs>(constructorArgs)...);
+	}
 }
-
-#include "QueueImpl.h"
 
 #endif

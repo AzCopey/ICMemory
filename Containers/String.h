@@ -141,10 +141,7 @@ namespace IC
     ///
     /// @return The new string.
     ///
-    template <typename TIteratorType> String MakeString(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
-    {
-        return String(first, last, AllocatorWrapper<char>(&allocator));
-    }
+	template <typename TIteratorType> String MakeString(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 
     /// Creates a new string from the given range. The given allocator is used for all 
     /// memory allocations.
@@ -158,10 +155,9 @@ namespace IC
     ///
     /// @return The new string.
     ///
-    template <typename TIteratorType> String MakeString(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
-    {
-        return String(first, last, AllocatorWrapper<char>(&allocator));
-    }
+	template <typename TIteratorType> String MakeString(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 }
+
+#include "StringImpl.h"
 
 #endif

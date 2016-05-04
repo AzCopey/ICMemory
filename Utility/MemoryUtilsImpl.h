@@ -1,8 +1,8 @@
-// Created by Ian Copland on 2015-09-19
+// Created by Ian Copland on 2016-05-03
 //
 // The MIT License(MIT)
 // 
-// Copyright(c) 2015 Ian Copland
+// Copyright(c) 2016 Ian Copland
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files(the "Software"), to deal

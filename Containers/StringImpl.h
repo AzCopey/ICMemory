@@ -1,4 +1,4 @@
-// Created by Ian Copland on 2016-02-06
+// Created by Ian Copland on 2016-05-04
 //
 // The MIT License(MIT)
 // 
@@ -22,36 +22,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_QUEUE_H_
-#define _ICMEMORY_QUEUE_H_
-
-#include "Deque.h"
-
-#include <queue>
+#ifndef _ICMEMORY_STRINGIMPL_H_
+#define _ICMEMORY_STRINGIMPL_H_
 
 namespace IC
 {
-    template <typename TType> using Queue = std::queue<TType, Deque<TType>>;
+	//------------------------------------------------------------------------------
+	template <typename TIteratorType> String MakeString(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
+	{
+		return String(first, last, AllocatorWrapper<char>(&allocator));
+	}
 
-    /// Creates a new empty queue. The given allocator is used for all memory allocations.
-    ///
-    /// @param allocator
-    ///     The allocator which should be used.
-    ///
-    /// @return The new queue.
-    ///
-	template <typename TType> Queue<TType> MakeQueue(BuddyAllocator& allocator) noexcept;
-
-    /// Creates a new empty queue. The given allocator is used for all memory allocations.
-    ///
-    /// @param allocator
-    ///     The allocator which should be used.
-    ///
-    /// @return The new queue.
-    ///
-	template <typename TType> Queue<TType> MakeQueue(LinearAllocator& allocator) noexcept;
+	//------------------------------------------------------------------------------
+	template <typename TIteratorType> String MakeString(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
+	{
+		return String(first, last, AllocatorWrapper<char>(&allocator));
+	}
 }
-
-#include "QueueImpl.h"
 
 #endif

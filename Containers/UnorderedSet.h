@@ -42,10 +42,7 @@ namespace IC
     ///
     /// @return The new set.
     ///
-    template <typename TType> UnorderedSet<TType> MakeUnorderedSet(BuddyAllocator& allocator) noexcept
-    {
-        return IC::UnorderedSet<TType>(AllocatorWrapper<TType>(&allocator));
-    }
+	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(BuddyAllocator& allocator) noexcept;
 
     /// Creates a new empty set. The given allocator is used for all memory allocations.
     ///
@@ -54,10 +51,7 @@ namespace IC
     ///
     /// @return The new set.
     ///
-    template <typename TType> UnorderedSet<TType> MakeUnorderedSet(LinearAllocator& allocator) noexcept
-    {
-        return IC::UnorderedSet<TType>(AllocatorWrapper<TType>(&allocator));
-    }
+	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(LinearAllocator& allocator) noexcept;
 
     /// Creates a new set from the given range. The given allocator is used for all 
     /// memory allocations.
@@ -71,10 +65,7 @@ namespace IC
     ///
     /// @return The new set.
     ///
-    template <typename TValueType, typename TIteratorType> UnorderedSet<TValueType> MakeUnorderedSet(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
-    {
-        return IC::UnorderedSet<TValueType>(first, last, 0, IC::UnorderedSet<TValueType>::hasher(), IC::UnorderedSet<TValueType>::key_equal(), AllocatorWrapper<TValueType>(&allocator));
-    }
+	template <typename TValueType, typename TIteratorType> UnorderedSet<TValueType> MakeUnorderedSet(BuddyAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 
     /// Creates a new set from the given range. The given allocator is used for all 
     /// memory allocations.
@@ -88,10 +79,7 @@ namespace IC
     ///
     /// @return The new set.
     ///
-    template <typename TValueType, typename TIteratorType> UnorderedSet<TValueType> MakeUnorderedSet(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
-    {
-        return IC::UnorderedSet<TValueType>(first, last, 0, IC::UnorderedSet<TValueType>::hasher(), IC::UnorderedSet<TValueType>::key_equal(), AllocatorWrapper<TValueType>(&allocator));
-    }
+	template <typename TValueType, typename TIteratorType> UnorderedSet<TValueType> MakeUnorderedSet(LinearAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 
     /// Creates a new set from the std::set. The given allocator is used for all 
     /// memory allocations.
@@ -103,10 +91,7 @@ namespace IC
     ///
     /// @return The new set.
     ///
-    template <typename TType> UnorderedSet<TType> MakeUnorderedSet(BuddyAllocator& allocator, const std::unordered_set<TType>& toCopy) noexcept
-    {
-        return IC::MakeUnorderedSet<TType>(allocator, toCopy.begin(), toCopy.end());
-    }
+	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(BuddyAllocator& allocator, const std::unordered_set<TType>& toCopy) noexcept;
 
     /// Creates a new set from the std::unordered_set. The given allocator is used for all 
     /// memory allocations.
@@ -118,10 +103,9 @@ namespace IC
     ///
     /// @return The new set.
     ///
-    template <typename TType> UnorderedSet<TType> MakeUnorderedSet(LinearAllocator& allocator, const std::unordered_set<TType>& toCopy) noexcept
-    {
-        return IC::MakeUnorderedSet<TType>(allocator, toCopy.begin(), toCopy.end());
-    }
+	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(LinearAllocator& allocator, const std::unordered_set<TType>& toCopy) noexcept;
 }
+
+#include "UnorderedSetImpl.h"
 
 #endif

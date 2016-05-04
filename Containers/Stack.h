@@ -40,10 +40,7 @@ namespace IC
     ///
     /// @return The new stack.
     ///
-    template <typename TType> Stack<TType> MakeStack(BuddyAllocator& allocator) noexcept
-    {
-        return IC::Stack<TType>(AllocatorWrapper<TType>(&allocator));
-    }
+	template <typename TType> Stack<TType> MakeStack(BuddyAllocator& allocator) noexcept;
 
     /// Creates a new empty stack. The given allocator is used for all memory allocations.
     ///
@@ -52,10 +49,9 @@ namespace IC
     ///
     /// @return The new stack.
     ///
-    template <typename TType> Stack<TType> MakeStack(LinearAllocator& allocator) noexcept
-    {
-        return IC::Stack<TType>(AllocatorWrapper<TType>(&allocator));
-    }
+	template <typename TType> Stack<TType> MakeStack(LinearAllocator& allocator) noexcept;
 }
+
+#include "StackImpl.h"
 
 #endif

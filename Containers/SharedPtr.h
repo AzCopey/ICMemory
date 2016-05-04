@@ -45,10 +45,7 @@ namespace IC
     ///
     /// @return A shared pointer to the allocated instance.
     ///
-    template <typename TType, typename... TConstructorArgs> SharedPtr<TType> MakeShared(BuddyAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept
-    {
-        return MakeUnique<TType>(allocator, std::forward<TConstructorArgs>(constructorArgs)...);
-    }
+	template <typename TType, typename... TConstructorArgs> SharedPtr<TType> MakeShared(BuddyAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept;
 
     /// Allocates a new shared pointer from the given Linear Allocator with the
     /// given constructor parameters. This follows the make_* convention set in
@@ -61,10 +58,9 @@ namespace IC
     ///
     /// @return A shared pointer to the allocated instance.
     ///
-    template <typename TType, typename... TConstructorArgs> SharedPtr<TType> MakeShared(LinearAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept
-    {
-        return MakeUnique<TType>(allocator, std::forward<TConstructorArgs>(constructorArgs)...);
-    }
+	template <typename TType, typename... TConstructorArgs> SharedPtr<TType> MakeShared(LinearAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept;
 }
+
+#include "SharedPtrImpl.h"
 
 #endif
