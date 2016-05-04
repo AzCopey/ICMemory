@@ -107,6 +107,8 @@ namespace IC
         ///
         void Deallocate(void* pointer) noexcept override;
 
+		~BuddyAllocator() noexcept;
+
     private:
         /// Encapsulates functionality required for navigating the free list table.
         /// This allocates no memory, instead relying on the memory provided in the
@@ -468,6 +470,8 @@ namespace IC
         SplitTable m_splitTable;
 
         std::mutex m_mutex;
+
+		std::size_t m_allocationCount;
     };
 }
 

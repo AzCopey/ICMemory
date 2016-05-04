@@ -150,7 +150,7 @@ namespace IC
 
         std::unique_lock<std::mutex> lock(m_mutex);
 
-        auto block = m_freeListTable.GetStart(level);
+		auto block = m_freeListTable.GetStart(level);
         if (!block)
         {
             SplitBlock(level - 1);
@@ -163,6 +163,8 @@ namespace IC
 
         auto blockIndex = GetBlockIndex(level, block);
         m_allocatedTable.ToggleAllocatedFlag(level, blockIndex);
+
+		++m_allocationCount;
 
         return block;
     }
@@ -185,6 +187,8 @@ namespace IC
         std::size_t parentLevel = level - 1;
         std::size_t parentIndex = GetParentBlockIndex(level, index);
         TryMergeBlock(parentLevel, parentIndex);
+
+		--m_allocationCount;
     }
 
     //------------------------------------------------------------------------------
@@ -557,4 +561,10 @@ namespace IC
             reinterpret_cast<std::uint8_t*>(m_splitTable)[bufferByteIndex] &= ~(1 << bufferBitIndex);
         }
     }
+
+	//------------------------------------------------------------------------------
+	BuddyAllocator::~BuddyAllocator() noexcept
+	{
+		assert(m_allocationCount == 0);
+	}
 }

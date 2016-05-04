@@ -107,6 +107,8 @@ namespace IC
         /// 
         void Reset() noexcept;
 
+		~LinearAllocator() noexcept;
+
     private:
         /// Creates a new page to allocate from. If there is a current page prior to this being called
         /// it will be added to the previous pages list.
@@ -123,7 +125,8 @@ namespace IC
         std::uint8_t* m_currentPage;
         std::vector<std::uint8_t*> m_previousPages;
         std::uint8_t* m_nextPointer = nullptr;
-        std::size_t m_activeAllocationCount = 0;
+
+		std::size_t m_activeAllocationCount = 0;
     };
 }
 

@@ -56,7 +56,7 @@ namespace IC
         std::uint8_t* output = m_nextPointer;
         m_nextPointer = MemoryUtils::Align(m_nextPointer + allocationSize, sizeof(std::intptr_t));
 
-        ++m_activeAllocationCount;
+		++m_activeAllocationCount;
 
         return output;
     }
@@ -64,7 +64,7 @@ namespace IC
     //------------------------------------------------------------------------------
     void LinearAllocator::Deallocate(void* pointer) noexcept
     {
-        --m_activeAllocationCount;
+		--m_activeAllocationCount;
     }
 
     //------------------------------------------------------------------------------
@@ -118,4 +118,10 @@ namespace IC
 
         m_nextPointer = MemoryUtils::Align(m_currentPage, sizeof(std::intptr_t));
     }
+
+	//------------------------------------------------------------------------------
+	LinearAllocator::~LinearAllocator() noexcept
+	{
+		Reset();
+	}
 }
