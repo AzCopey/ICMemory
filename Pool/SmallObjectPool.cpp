@@ -1,4 +1,4 @@
-// Created by Ian Copland on 2016-01-18
+// Created by Ian Copland on 2016-05-05
 //
 // The MIT License(MIT)
 // 
@@ -22,18 +22,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _ICMEMORY_FORWARDDECLARATIONS_H_
-#define _ICMEMORY_FORWARDDECLARATIONS_H_
+#include "SmallObjectPool.h"
 
 namespace IC
 {
-	template <typename TValueType> class AllocatorWrapper;
-    class IAllocator;
-    class BuddyAllocator;
-    class LinearAllocator;
-	template <typename TObject> class ObjectPool;
-	template <typename TObject> class PagedObjectPool;
-	class SmallObjectPool;
-}
+	//------------------------------------------------------------------------------
+	SmallObjectPool::SmallObjectPool(std::size_t pageSize) noexcept
+		: m_pageSize(pageSize), m_level1Pool(m_pageSize / k_level1DataSize), m_level2Pool(m_pageSize / k_level2DataSize), m_level3Pool(m_pageSize / k_level3DataSize), m_level4Pool(m_pageSize / k_level4DataSize)
+	{
+	}
 
-#endif
+	//------------------------------------------------------------------------------
+	SmallObjectPool::SmallObjectPool(IAllocator& allocator, std::size_t pageSize) noexcept
+		: m_pageSize(pageSize), m_level1Pool(allocator, m_pageSize / k_level1DataSize), m_level2Pool(allocator, m_pageSize / k_level2DataSize), m_level3Pool(allocator, m_pageSize / k_level3DataSize),
+		m_level4Pool(allocator, m_pageSize / k_level4DataSize)
+	{
+	}
+}

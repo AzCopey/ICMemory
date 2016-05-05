@@ -66,6 +66,8 @@ namespace IC
 		///
 		PagedObjectPool(IAllocator& allocator, std::size_t numObjectsPerPage = k_defaultNumObjectsPerPage) noexcept;
 
+		/// This is thread safe. 
+		///
 		/// @return The number of objects in each page.
 		///
 		std::size_t GetNumObjectsPerPage() const noexcept { return m_numObjectsPerPage; }

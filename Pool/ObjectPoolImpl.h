@@ -25,6 +25,8 @@
 #ifndef _ICMEMORY_POOL_OBJECTPOOLIMPL_H_
 #define _ICMEMORY_POOL_OBJECTPOOLIMPL_H_
 
+#include <algorithm>
+
 namespace IC
 {
 	namespace

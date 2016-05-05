@@ -27,8 +27,6 @@
 
 #include "IAllocator.h"
 
-#include <cstdint>
-#include <functional>
 #include <vector>
 
 namespace IC

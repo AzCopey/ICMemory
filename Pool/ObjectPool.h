@@ -29,8 +29,6 @@
 #include "../Container/UniquePtr.h"
 
 #include <cstdint>
-#include <functional>
-#include <vector>
 
 namespace IC
 {
@@ -63,6 +61,8 @@ namespace IC
 		///
 		ObjectPool(IAllocator& allocator, std::size_t numObjects) noexcept;
 		
+		/// This is thread safe.
+		///
 		/// @return The number of objects in the pool.
 		///
 		std::size_t GetNumObjects() const noexcept { return m_numObjects; }

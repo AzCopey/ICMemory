@@ -28,23 +28,43 @@
 namespace IC
 {
 	//------------------------------------------------------------------------------
-	SmallObjectPool::SmallObjectPool() noexcept
-	{
-		//TODO:
-	}
-
-	//------------------------------------------------------------------------------
-	SmallObjectPool::SmallObjectPool(IAllocator& allocator) noexcept
-	{
-		//TODO:
-	}
-
-	//------------------------------------------------------------------------------
 	template <typename TObjectType, typename... TConstructorArgs> UniquePtr<TObjectType> SmallObjectPool::Create(TConstructorArgs&&... constructorArgs) noexcept
 	{
-		//TODO:
+		assert(sizeof(TObjectType) <= GetMaxObjectSize());
 
-		return nullptr;
+		if (sizeof(TObjectType) <= k_level1DataSize)
+		{
+			return CreateFromPool<TObjectType>(m_level1Pool, std::forward<TConstructorArgs>(constructorArgs)...);
+		}
+		else if (sizeof(TObjectType) <= k_level2DataSize)
+		{
+			return CreateFromPool<TObjectType>(m_level2Pool, std::forward<TConstructorArgs>(constructorArgs)...);
+		}
+		else if (sizeof(TObjectType) <= k_level3DataSize)
+		{
+			return CreateFromPool<TObjectType>(m_level3Pool, std::forward<TConstructorArgs>(constructorArgs)...);
+		}
+		else
+		{
+			return CreateFromPool<TObjectType>(m_level4Pool, std::forward<TConstructorArgs>(constructorArgs)...);
+		}
+	}
+
+	//------------------------------------------------------------------------------
+	template <typename TObjectType, int TBlockSize, typename... TConstructorArgs> 
+	UniquePtr<TObjectType> SmallObjectPool::CreateFromPool(PagedObjectPool<DataBlock<TBlockSize>>& pool, TConstructorArgs&&... constructorArgs) const noexcept
+	{
+		auto data = pool.Create();
+		auto deleter = data.get_deleter();
+		void* rawData = data.release();
+
+		TObjectType* newObject = new (rawData) TObjectType(std::forward<TConstructorArgs>(constructorArgs)...);
+
+		return UniquePtr<TObjectType>(newObject, [=](TObjectType* objectForDeallocation) noexcept -> void
+		{
+			objectForDeallocation->~TObjectType();
+			deleter(reinterpret_cast<DataBlock<TBlockSize>*>(objectForDeallocation));
+		});
 	}
 }
 

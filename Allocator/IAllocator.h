@@ -27,6 +27,7 @@
 
 #include "../ForwardDeclarations.h"
 
+#include <cstddef>
 #include <cstdint>
 
 namespace IC

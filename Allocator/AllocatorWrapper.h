@@ -27,6 +27,9 @@
 
 #include "../ForwardDeclarations.h"
 
+#include <cstddef>
+#include <memory>
+
 namespace IC
 {
     /// A wrapper arround a IC::IAllocator which can be used by the standard library
