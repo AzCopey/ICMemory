@@ -34,11 +34,11 @@ namespace IC
 	class IAllocator;
     class LinearAllocator;
 	class PagedBlockAllocator;
+	class SmallObjectAllocator;
 
 	// Pool
 	template <typename TObject> class ObjectPool;
 	template <typename TObject> class PagedObjectPool;
-	class SmallObjectPool;
 }
 
 #endif

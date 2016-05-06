@@ -29,6 +29,7 @@
 #include "Allocator/BuddyAllocator.h"
 #include "Allocator/LinearAllocator.h"
 #include "Allocator/PagedBlockAllocator.h"
+#include "Allocator/SmallObjectAllocator.h"
 #include "Container/Deque.h"
 #include "Container/Queue.h"
 #include "Container/SharedPtr.h"
@@ -40,6 +41,5 @@
 #include "Container/Vector.h"
 #include "Pool/ObjectPool.h"
 #include "Pool/PagedObjectPool.h"
-#include "Pool/SmallObjectPool.h"
 
 #endif
