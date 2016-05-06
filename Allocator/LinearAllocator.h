@@ -37,7 +37,7 @@ namespace IC
     /// size of a single page. Allocated memory is not available for reuse until
     /// after reset() has been called.
     ///
-    /// A LinearAllocator can be backed by a BuddyAllocator, from which pages will be
+    /// A LinearAllocator can be backed by other allocator types, from which pages will be
     /// allocated, otherwise they are allocated from the free store.
     ///
     /// Note that this is not thread-safe and should not be accessed from multiple

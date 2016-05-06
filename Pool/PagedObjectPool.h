@@ -25,8 +25,7 @@
 #ifndef _ICMEMORY_POOL_PAGEDOBJECTPOOL_H_
 #define _ICMEMORY_POOL_PAGEDOBJECTPOOL_H_
 
-#include "ObjectPool.h"
-#include "../Container/Vector.h"
+#include "../Allocator/PagedBlockAllocator.h"
 
 namespace IC
 {
@@ -41,7 +40,7 @@ namespace IC
 	/// This is not thread-safe and should not be accessed from multiple threads at
 	/// the same time.
 	///
-	template <typename TObjectType> class PagedObjectPool final
+	template <typename TObject> class PagedObjectPool final
 	{
 	public:
 		static constexpr std::size_t k_defaultNumObjectsPerPage = 128;
@@ -80,9 +79,7 @@ namespace IC
 		///
 		/// @return The newly constructed object.
 		///
-		template <typename... TConstructorArgs> UniquePtr<TObjectType> Create(TConstructorArgs&&... constructorArgs) noexcept;
-
-		~PagedObjectPool() noexcept;
+		template <typename... TConstructorArgs> UniquePtr<TObject> Create(TConstructorArgs&&... constructorArgs) noexcept;
 
 	private:
 		PagedObjectPool(PagedObjectPool&) = delete;
@@ -90,15 +87,7 @@ namespace IC
 		PagedObjectPool(PagedObjectPool&&) = delete;
 		PagedObjectPool& operator=(PagedObjectPool&&) = delete;
 
-		const std::size_t m_numObjectsPerPage;
-
-		IAllocator* m_allocator = nullptr;
-
-		union
-		{
-			std::vector<std::unique_ptr<ObjectPool<TObjectType>>> m_freeStorePools;
-			Vector<UniquePtr<ObjectPool<TObjectType>>> m_allocatorPools;
-		};
+		PagedBlockAllocator m_pagedBlockAllocator;
 	};
 }
 

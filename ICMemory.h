@@ -28,6 +28,7 @@
 #include "Allocator/BlockAllocator.h"
 #include "Allocator/BuddyAllocator.h"
 #include "Allocator/LinearAllocator.h"
+#include "Allocator/PagedBlockAllocator.h"
 #include "Container/Deque.h"
 #include "Container/Queue.h"
 #include "Container/SharedPtr.h"

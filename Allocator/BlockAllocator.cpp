@@ -43,12 +43,12 @@ namespace IC
 
 	//------------------------------------------------------------------------------
 	BlockAllocator::BlockAllocator(IAllocator& parentAllocator, std::size_t blockSize, std::size_t numBlocks) noexcept		
-		: m_blockSize(blockSize), m_numBlocks(numBlocks), m_bufferSize(m_blockSize * m_numBlocks), m_allocator(&parentAllocator)
+		: m_blockSize(blockSize), m_numBlocks(numBlocks), m_bufferSize(m_blockSize * m_numBlocks), m_parentAllocator(&parentAllocator)
 	{
 		assert(MemoryUtils::IsAligned(blockSize, sizeof(std::intptr_t)));
 		assert(blockSize >= sizeof(FreeBlock));
 
-		m_buffer = m_allocator->Allocate(m_bufferSize);
+		m_buffer = m_parentAllocator->Allocate(m_bufferSize);
 
 		InitFreeBlockList();
 	}
@@ -75,8 +75,7 @@ namespace IC
 	//------------------------------------------------------------------------------
 	void BlockAllocator::Deallocate(void* pointer) noexcept
 	{
-		assert(pointer >= m_buffer);
-		assert(MemoryUtils::GetPointerOffset(pointer, m_buffer) < m_bufferSize);
+		assert(ContainsBlock(pointer));
 
 		auto next = m_freeBlockList;
 		m_freeBlockList = reinterpret_cast<FreeBlock*>(pointer);
@@ -84,6 +83,12 @@ namespace IC
 		m_freeBlockList->m_previous = nullptr;
 
 		--m_numAllocatedBlocks;
+	}
+
+	//------------------------------------------------------------------------------
+	bool BlockAllocator::ContainsBlock(void* block) noexcept
+	{
+		return (block >= m_buffer && block < reinterpret_cast<std::uint8_t*>(m_buffer) + m_bufferSize);
 	}
 
 	//------------------------------------------------------------------------------
@@ -112,9 +117,9 @@ namespace IC
 	{
 		assert(m_numAllocatedBlocks == 0);
 
-		if (m_allocator)
+		if (m_parentAllocator)
 		{
-			m_allocator->Deallocate(m_buffer);
+			m_parentAllocator->Deallocate(m_buffer);
 		}
 		else
 		{

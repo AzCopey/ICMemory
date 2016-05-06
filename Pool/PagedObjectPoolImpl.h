@@ -25,63 +25,33 @@
 #ifndef _ICMEMORY_POOL_PAGEDOBJECTPOOLIMPL_H_
 #define _ICMEMORY_POOL_PAGEDOBJECTPOOLIMPL_H_
 
+#include "../Utility/MemoryUtils.h"
+
 namespace IC
 {
 	//------------------------------------------------------------------------------
-	template <typename TObjectType> PagedObjectPool<TObjectType>::PagedObjectPool(std::size_t numObjectsPerPage) noexcept
-		: m_numObjectsPerPage(numObjectsPerPage), m_freeStorePools()
+	template <typename TObject> PagedObjectPool<TObject>::PagedObjectPool(std::size_t numObjectsPerPage) noexcept
+		: m_pagedBlockAllocator(MemoryUtils::GetBlockSize<TObject>(), numObjectsPerPage)
 	{
-		m_freeStorePools.push_back(std::unique_ptr<ObjectPool<TObjectType>>(new ObjectPool<TObjectType>(m_numObjectsPerPage)));
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TObjectType> PagedObjectPool<TObjectType>::PagedObjectPool(IAllocator& allocator, std::size_t numObjectsPerPage) noexcept
-		: m_numObjectsPerPage(numObjectsPerPage), m_allocator(&allocator), m_allocatorPools(MakeVector<UniquePtr<ObjectPool<TObjectType>>>(*m_allocator))
+	template <typename TObject> PagedObjectPool<TObject>::PagedObjectPool(IAllocator& allocator, std::size_t numObjectsPerPage) noexcept
+		: m_pagedBlockAllocator(allocator, MemoryUtils::GetBlockSize<TObject>(), numObjectsPerPage)
 	{
-		m_allocatorPools.push_back(MakeUnique<ObjectPool<TObjectType>>(*m_allocator, *m_allocator, m_numObjectsPerPage));
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TObjectType> template <typename... TConstructorArgs> UniquePtr<TObjectType> PagedObjectPool<TObjectType>::Create(TConstructorArgs&&... constructorArgs) noexcept
+	template <typename TObject> template <typename... TConstructorArgs> UniquePtr<TObject> PagedObjectPool<TObject>::Create(TConstructorArgs&&... constructorArgs) noexcept
 	{
-		if (m_allocator)
-		{
-			for (const auto& pool : m_allocatorPools)
-			{
-				if (pool->GetNumFreeObjects() > 0)
-				{
-					return pool->Create(std::forward<TConstructorArgs>(constructorArgs)...);
-				}
-			}
+		void* memory = m_pagedBlockAllocator.Allocate(sizeof(TObject));
+		TObject* newObject = new (memory) TObject(std::forward<TConstructorArgs>(constructorArgs)...);
 
-			m_allocatorPools.push_back(MakeUnique<ObjectPool<TObjectType>>(*m_allocator, *m_allocator, m_numObjectsPerPage));
-			return m_allocatorPools.back()->Create(std::forward<TConstructorArgs>(constructorArgs)...);
-		}
-		else
+		return UniquePtr<TObject>(newObject, [=](TObject* objectForDeallocation) noexcept -> void
 		{
-			for (const auto& pool : m_freeStorePools)
-			{
-				if (pool->GetNumFreeObjects() > 0)
-				{
-					return pool->Create(std::forward<TConstructorArgs>(constructorArgs)...);
-				}
-			}
-
-			m_freeStorePools.push_back(std::unique_ptr<ObjectPool<TObjectType>>(new ObjectPool<TObjectType>(m_numObjectsPerPage)));
-			return m_freeStorePools.back()->Create(std::forward<TConstructorArgs>(constructorArgs)...);
-		}
-	}
-
-	template <typename TObjectType> PagedObjectPool<TObjectType>::~PagedObjectPool() noexcept
-	{
-		if (m_allocator)
-		{
-			m_allocatorPools.~vector();
-		}
-		else
-		{
-			m_freeStorePools.~vector();
-		}
+			objectForDeallocation->~TObject();
+			m_pagedBlockAllocator.Deallocate(reinterpret_cast<void*>(objectForDeallocation));
+		});
 	}
 }
 

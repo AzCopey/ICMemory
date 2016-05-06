@@ -31,47 +31,94 @@
 
 namespace IC
 {
-	/// An allocator which allocates fixed size memory blocks from a fixed size 
-	/// buffer.
+	/// An allocator which allocates fixed size memory blocks from a fixed size buffer.
+	/// Allocations of a bigger size than that of a single block are not possible.
+	///
+	/// A BlockAllocator can be backed by other allocator types, from which the block
+	/// buffer will be allocated, otherwise it is allocated from the free store.
+	///
+	/// Note that this is not thread-safe and should not be accessed from multiple
+	/// threads at the same time.
 	///
 	class BlockAllocator final : public IAllocator
 	{
 	public:
-		/// TODO
+		/// Creates a new BlockAllocator with a buffer allocated from the free store.
+		///
+		/// @param blockSize
+		///		The size of each block in the allocator. The block size must be multiple
+		///		of the size of a pointer, at at least twice the size of a pointer.
+		/// @param numBlocks
+		///		The number of blocks available to the block allocator.
 		/// 
 		BlockAllocator(std::size_t blockSize, std::size_t numBlocks) noexcept;
 
-		/// TODO
+		/// Creates a new BlockAllocator with a buffer allocated from the given allocator.
+		///
+		/// @param allocator
+		///		The allocator from which to allocate the block buffer.
+		/// @param blockSize
+		///		The size of each block in the allocator. The block size must be multiple
+		///		of the size of a pointer, at at least twice the size of a pointer.
+		/// @param numBlocks
+		///		The number of blocks available to the block allocator.
 		/// 
 		BlockAllocator(IAllocator& parentAllocator, std::size_t blockSize, std::size_t numBlocks) noexcept;
 
-		/// TODO
+		/// This is thread safe.
+		///
+		/// @return The maximum allocation size from this allocator. Will be the size of a 
+		/// single block.
 		///
 		std::size_t GetMaxAllocationSize() const noexcept override { return GetBlockSize(); }
 
-		/// TODO
+		/// This is thread-safe.
+		///
+		/// @return The size of each block in the buffer.
 		///
 		std::size_t GetBlockSize() const noexcept { return m_blockSize; }
 
-		/// TODO
+		/// This is thread-safe.
+		///
+		/// @return The total number of blocks available to the allocator.
 		///
 		std::size_t GetNumBlocks() const noexcept { return m_numBlocks; }
 
-		/// TODO
-		///
-		std::size_t GetNumFreeBlocks() const noexcept { return GetNumBlocks() - GetNumAllocatedBlocks(); }
-
-		/// TODO
+		/// @return The current number of allocated blocks in the allocator.
 		///
 		std::size_t GetNumAllocatedBlocks() const noexcept { return m_numAllocatedBlocks; }
 
-		/// TODO
+		/// @return The current number of free blocks in the allocator.
+		///
+		std::size_t GetNumFreeBlocks() const noexcept { return GetNumBlocks() - GetNumAllocatedBlocks(); }
+
+		/// Allocates a block from the allocator. The allocation size must be smaller than 
+		/// that of a block, otherwise this will assert. If there are no free blocks in the
+		/// buffer then this will assert.
+		///
+		/// @param allocationSize
+		///		The size of allocation required.
+		///
+		/// @return The block of memory.
 		///
 		void* Allocate(std::size_t allocationSize) noexcept override;
 
-		/// TODO
+		/// Deallocates the given block, freeing it for reuse.
+		///
+		/// @param pointer
+		///		The pointer which should be deallocated.
 		///
 		void Deallocate(void* pointer) noexcept override;
+
+		/// Evaluates whether or not the given block pointer was allocated from this block
+		/// allocator.
+		///
+		/// @param block
+		///		The block pointer.
+		///
+		/// @return Whether or not the block was allocated from this allocator.
+		///
+		bool ContainsBlock(void* block) noexcept;
 
 		~BlockAllocator() noexcept;
 
@@ -98,7 +145,7 @@ namespace IC
 		const std::size_t m_numBlocks;
 		const std::size_t m_bufferSize;
 
-		IAllocator* m_allocator = nullptr;
+		IAllocator* m_parentAllocator = nullptr;
 
 		void* m_buffer = nullptr;
 		FreeBlock* m_freeBlockList = nullptr;

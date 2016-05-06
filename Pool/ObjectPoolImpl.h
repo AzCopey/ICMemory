@@ -29,26 +29,14 @@
 
 namespace IC
 {
-	namespace
-	{
-		/// Calculates the size of block required for the given object type
-		///
-		/// @return The block size.
-		///
-		template <typename TObject> constexpr std::size_t GetBlockSize()
-		{
-			return std::max(sizeof(std::intptr_t) * 2, MemoryUtils::Align(sizeof(TObject), sizeof(std::intptr_t)));
-		}
-	}
-
 	//------------------------------------------------------------------------------
 	template <typename TObject> ObjectPool<TObject>::ObjectPool(std::size_t numObjects) noexcept
-		: m_blockAllocator(GetBlockSize<TObject>(), numObjects)
+		: m_blockAllocator(MemoryUtils::GetBlockSize<TObject>(), numObjects)
 	{
 	}
 	//------------------------------------------------------------------------------
 	template <typename TObject> ObjectPool<TObject>::ObjectPool(IAllocator& allocator, std::size_t numObjects) noexcept
-		: m_blockAllocator(allocator, GetBlockSize<TObject>(), numObjects)
+		: m_blockAllocator(allocator, MemoryUtils::GetBlockSize<TObject>(), numObjects)
 	{
 	}
 
