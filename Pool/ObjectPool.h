@@ -25,6 +25,7 @@
 #ifndef _ICMEMORY_POOL_OBJECTPOOL_H_
 #define _ICMEMORY_POOL_OBJECTPOOL_H_
 
+#include "../Allocator/BlockAllocator.h"
 #include "../Utility/MemoryUtils.h"
 #include "../Container/UniquePtr.h"
 
@@ -40,7 +41,7 @@ namespace IC
 	/// This is not thread-safe and should not be accessed from multiple threads at
 	/// the same time.
 	///
-	template <typename TObjectType> class ObjectPool final
+	template <typename TObject> class ObjectPool final
 	{
 	public:
 		/// Creates a new object pool containing the given number of objects. The
@@ -65,15 +66,15 @@ namespace IC
 		///
 		/// @return The number of objects in the pool.
 		///
-		std::size_t GetNumObjects() const noexcept { return m_numObjects; }
+		std::size_t GetNumObjects() const noexcept { return m_blockAllocator.GetNumBlocks(); }
 
 		/// @return The number of objects in the pool which are not yet allocated.
 		///
-		std::size_t GetNumAllocatedObjects() const noexcept { return m_numAllocatedObjects; }
+		std::size_t GetNumAllocatedObjects() const noexcept { return m_blockAllocator.GetNumAllocatedBlocks(); }
 
 		/// @return The number of objects in the pool which are not yet allocated.
 		///
-		std::size_t GetNumFreeObjects() const noexcept { return GetNumObjects() - GetNumAllocatedObjects(); }
+		std::size_t GetNumFreeObjects() const noexcept { return m_blockAllocator.GetNumFreeBlocks(); }
 
 		/// Creates a new object from the pool. If there are no free objects left
 		/// in the pool then this will assert.
@@ -83,9 +84,7 @@ namespace IC
 		///
 		/// @return The newly constructed object.
 		///
-		template <typename... TConstructorArgs> UniquePtr<TObjectType> Create(TConstructorArgs&&... constructorArgs) noexcept;
-
-		~ObjectPool() noexcept;
+		template <typename... TConstructorArgs> UniquePtr<TObject> Create(TConstructorArgs&&... constructorArgs) noexcept;
 
 	private:
 		ObjectPool(ObjectPool&) = delete;
@@ -93,37 +92,7 @@ namespace IC
 		ObjectPool(ObjectPool&&) = delete;
 		ObjectPool& operator=(ObjectPool&&) = delete;
 
-		/// A container for information on slots within the pool.
-		///
-		struct Slot final
-		{
-			Slot* m_next = nullptr;
-			Slot* m_previous = nullptr;
-		};
-
-		/// Iterates over the memory buffer setting all slots to "free", and
-		/// storing the free slot list as an in-place doubly linked list.
-		///
-		void InitFreeSlotList() noexcept;
-
-		/// Takes the first item in the free slot list and returns it for use.
-		/// If there are no free slots then this will assert.
-		///
-		void* ClaimNextSlot() noexcept;
-
-		/// Returns the given buffer to the free slot list.
-		///
-		void ReleaseSlot(void* buffer) noexcept;
-
-		const std::size_t m_numObjects;
-		const std::size_t m_alignedObjectSize;
-		const std::size_t m_bufferSize;
-
-		IAllocator* m_allocator = nullptr;
-
-		void* m_buffer;
-		Slot* m_freeSlotList = nullptr;
-		std::size_t m_numAllocatedObjects = 0;
+		BlockAllocator m_blockAllocator;
 	};
 }
 

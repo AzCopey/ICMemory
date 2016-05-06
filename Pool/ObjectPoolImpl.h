@@ -31,118 +31,38 @@ namespace IC
 {
 	namespace
 	{
-		/// Calculates the size of an object, aligned to the size of a pointer. 
-		/// The minimum size is twice that of the size of a pointer, ensuring
-		/// slot data can be stored in free objects.
+		/// Calculates the size of block required for the given object type
 		///
-		/// @return The aligned object size.
+		/// @return The block size.
 		///
-		template <typename TObjectType> std::size_t CalcAlignedObjectSize()
+		template <typename TObject> constexpr std::size_t GetBlockSize()
 		{
-			return std::max(sizeof(std::intptr_t) * 2, MemoryUtils::Align(sizeof(TObjectType), sizeof(std::intptr_t)));
+			return std::max(sizeof(std::intptr_t) * 2, MemoryUtils::Align(sizeof(TObject), sizeof(std::intptr_t)));
 		}
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TObjectType> ObjectPool<TObjectType>::ObjectPool(std::size_t numObjects) noexcept
-		: m_numObjects(numObjects), m_alignedObjectSize(CalcAlignedObjectSize<TObjectType>()), m_bufferSize(m_numObjects * m_alignedObjectSize)
+	template <typename TObject> ObjectPool<TObject>::ObjectPool(std::size_t numObjects) noexcept
+		: m_blockAllocator(GetBlockSize<TObject>(), numObjects)
 	{
-		assert(m_numObjects > 0);
-
-		m_buffer = new std::int8_t[m_bufferSize];
-
-		InitFreeSlotList();
 	}
 	//------------------------------------------------------------------------------
-	template <typename TObjectType> ObjectPool<TObjectType>::ObjectPool(IAllocator& allocator, std::size_t objectsPerPage) noexcept
-		: m_numObjects(objectsPerPage), m_alignedObjectSize(CalcAlignedObjectSize<TObjectType>()), m_bufferSize(m_numObjects * m_alignedObjectSize), m_allocator(&allocator)
+	template <typename TObject> ObjectPool<TObject>::ObjectPool(IAllocator& allocator, std::size_t numObjects) noexcept
+		: m_blockAllocator(allocator, GetBlockSize<TObject>(), numObjects)
 	{
-		assert(m_numObjects > 0);
-
-		m_buffer = m_allocator->Allocate(m_bufferSize);
-
-		InitFreeSlotList();
 	}
 
 	//------------------------------------------------------------------------------
-	template <typename TObjectType> template <typename... TConstructorArgs> UniquePtr<TObjectType> ObjectPool<TObjectType>::Create(TConstructorArgs&&... constructorArgs) noexcept
+	template <typename TObject> template <typename... TConstructorArgs> UniquePtr<TObject> ObjectPool<TObject>::Create(TConstructorArgs&&... constructorArgs) noexcept
 	{
-		void* memory = ClaimNextSlot();
-		TObjectType* newObject = new (memory) TObjectType(std::forward<TConstructorArgs>(constructorArgs)...);
+		void* memory = m_blockAllocator.Allocate(sizeof(TObject));
+		TObject* newObject = new (memory) TObject(std::forward<TConstructorArgs>(constructorArgs)...);
 
-		return UniquePtr<TObjectType>(newObject, [=](TObjectType* objectForDeallocation) noexcept -> void
+		return UniquePtr<TObject>(newObject, [=](TObject* objectForDeallocation) noexcept -> void
 		{
-			objectForDeallocation->~TObjectType();
-			ReleaseSlot(reinterpret_cast<void*>(objectForDeallocation));
+			objectForDeallocation->~TObject();
+			m_blockAllocator.Deallocate(reinterpret_cast<void*>(objectForDeallocation));
 		});
-	}
-
-	//------------------------------------------------------------------------------
-	template <typename TObjectType> void ObjectPool<TObjectType>::InitFreeSlotList() noexcept
-	{
-		Slot* previous = nullptr;
-		for (std::size_t i = 0; i < m_numObjects; ++i)
-		{
-			auto current = reinterpret_cast<Slot*>(reinterpret_cast<std::int8_t*>(m_buffer) + m_alignedObjectSize * i);
-			current->m_next = nullptr;
-			current->m_previous = previous;
-
-			if (previous)
-			{
-				previous->m_next = current;
-			}
-
-			previous = current;
-		}
-
-		m_freeSlotList = reinterpret_cast<Slot*>(m_buffer);
-	}
-
-	//------------------------------------------------------------------------------
-	template <typename TObjectType> void* ObjectPool<TObjectType>::ClaimNextSlot() noexcept
-	{
-		assert(m_freeSlotList);
-
-		auto firstFree = m_freeSlotList;
-		m_freeSlotList = firstFree->m_next;
-
-		if (m_freeSlotList)
-		{
-			m_freeSlotList->m_previous = nullptr;
-		}
-
-		++m_numAllocatedObjects;
-
-		return firstFree;
-	}
-
-	//------------------------------------------------------------------------------
-	template <typename TObjectType> void ObjectPool<TObjectType>::ReleaseSlot(void* buffer) noexcept
-	{
-		assert(buffer >= m_buffer);
-		assert(MemoryUtils::GetPointerOffset(buffer, m_buffer) < m_bufferSize);
-
-		auto next = m_freeSlotList;
-		m_freeSlotList = reinterpret_cast<Slot*>(buffer);
-		m_freeSlotList->m_next = next;
-		m_freeSlotList->m_previous = nullptr;
-
-		--m_numAllocatedObjects;
-	}
-
-	//------------------------------------------------------------------------------
-	template <typename TObjectType> ObjectPool<TObjectType>::~ObjectPool() noexcept
-	{
-		assert(m_numAllocatedObjects == 0);
-
-		if (m_allocator)
-		{
-			m_allocator->Deallocate(m_buffer);
-		}
-		else
-		{
-			delete[] m_buffer;
-		}
 	}
 }
 

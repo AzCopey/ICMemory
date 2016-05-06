@@ -25,6 +25,7 @@
 #ifndef _ICMEMORY_ICMEMORY_H_
 #define _ICMEMORY_ICMEMORY_H_
 
+#include "Allocator/BlockAllocator.h"
 #include "Allocator/BuddyAllocator.h"
 #include "Allocator/LinearAllocator.h"
 #include "Container/Deque.h"
