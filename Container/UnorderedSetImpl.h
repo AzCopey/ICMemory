@@ -27,23 +27,23 @@
 
 namespace IC
 {
-	//------------------------------------------------------------------------------
-	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(IAllocator& allocator) noexcept
-	{
-		return IC::UnorderedSet<TType>(AllocatorWrapper<TType>(&allocator));
-	}
+    //------------------------------------------------------------------------------
+    template <typename TType> UnorderedSet<TType> MakeUnorderedSet(IAllocator& allocator) noexcept
+    {
+        return IC::UnorderedSet<TType>(AllocatorWrapper<TType>(&allocator));
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TValueType, typename TIteratorType> UnorderedSet<TValueType> MakeUnorderedSet(IAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
-	{
-		return IC::UnorderedSet<TValueType>(first, last, 0, IC::UnorderedSet<TValueType>::hasher(), IC::UnorderedSet<TValueType>::key_equal(), AllocatorWrapper<TValueType>(&allocator));
-	}
+    //------------------------------------------------------------------------------
+    template <typename TValueType, typename TIteratorType> UnorderedSet<TValueType> MakeUnorderedSet(IAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
+    {
+        return IC::UnorderedSet<TValueType>(first, last, 0, IC::UnorderedSet<TValueType>::hasher(), IC::UnorderedSet<TValueType>::key_equal(), AllocatorWrapper<TValueType>(&allocator));
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(IAllocator& allocator, const std::unordered_set<TType>& toCopy) noexcept
-	{
-		return IC::MakeUnorderedSet<TType>(allocator, toCopy.begin(), toCopy.end());
-	}
+    //------------------------------------------------------------------------------
+    template <typename TType> UnorderedSet<TType> MakeUnorderedSet(IAllocator& allocator, const std::unordered_set<TType>& toCopy) noexcept
+    {
+        return IC::MakeUnorderedSet<TType>(allocator, toCopy.begin(), toCopy.end());
+    }
 }
 
 #endif

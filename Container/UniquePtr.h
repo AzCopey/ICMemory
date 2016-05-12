@@ -35,8 +35,8 @@ namespace IC
     template <typename TType> using UniquePtr = std::unique_ptr<TType, std::function<void(typename std::remove_all_extents<TType>::type*)>>;
 
     /// Allocates a new unique pointer from the given Allocator with the given 
-	/// constructor parameters. This follows the make_* convention set in the 
-	/// standard library.
+    /// constructor parameters. This follows the make_* convention set in the 
+    /// standard library.
     ///
     /// @param allocator
     ///     The allocator from which to allocate the requested type.
@@ -45,12 +45,12 @@ namespace IC
     ///
     /// @return A unique pointer to the allocated instance.
     ///
-	template <typename TType, typename... TConstructorArgs> UniquePtr<TType> MakeUnique(IAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept;
+    template <typename TType, typename... TConstructorArgs> UniquePtr<TType> MakeUnique(IAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept;
 
     /// Allocates a new unique pointer to an array from the given Allocator with 
-	/// the given size. This follows the make_* convention  set in the standard 
-	/// library. Note that, like new[], fundamental types  will not be set to a 
-	/// default value. 
+    /// the given size. This follows the make_* convention  set in the standard 
+    /// library. Note that, like new[], fundamental types  will not be set to a 
+    /// default value. 
     ///
     /// @param allocator
     ///     The allocator from which to allocate the requested type.
@@ -59,7 +59,7 @@ namespace IC
     ///
     /// @return A unique pointer to the allocated array.
     ///
-	template <typename TType> UniquePtr<TType[]> MakeUniqueArray(IAllocator& allocator, std::size_t size) noexcept;
+    template <typename TType> UniquePtr<TType[]> MakeUniqueArray(IAllocator& allocator, std::size_t size) noexcept;
 }
 
 #include "UniquePtrImpl.h"

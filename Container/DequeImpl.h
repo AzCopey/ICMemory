@@ -27,23 +27,23 @@
 
 namespace IC
 {
-	//------------------------------------------------------------------------------
-	template <typename TType> Deque<TType> MakeDeque(IAllocator& allocator) noexcept
-	{
-		return IC::Deque<TType>(AllocatorWrapper<TType>(&allocator));
-	}
+    //------------------------------------------------------------------------------
+    template <typename TType> Deque<TType> MakeDeque(IAllocator& allocator) noexcept
+    {
+        return IC::Deque<TType>(AllocatorWrapper<TType>(&allocator));
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TValueType, typename TIteratorType> Deque<TValueType> MakeDeque(IAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
-	{
-		return IC::Deque<TValueType>(first, last, AllocatorWrapper<TValueType>(&allocator));
-	}
+    //------------------------------------------------------------------------------
+    template <typename TValueType, typename TIteratorType> Deque<TValueType> MakeDeque(IAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
+    {
+        return IC::Deque<TValueType>(first, last, AllocatorWrapper<TValueType>(&allocator));
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TType> Deque<TType> MakeDeque(IAllocator& allocator, const std::deque<TType>& toCopy) noexcept
-	{
-		return IC::Deque<TType>(toCopy.begin(), toCopy.end(), AllocatorWrapper<TType>(&allocator));
-	}
+    //------------------------------------------------------------------------------
+    template <typename TType> Deque<TType> MakeDeque(IAllocator& allocator, const std::deque<TType>& toCopy) noexcept
+    {
+        return IC::Deque<TType>(toCopy.begin(), toCopy.end(), AllocatorWrapper<TType>(&allocator));
+    }
 }
 
 #endif

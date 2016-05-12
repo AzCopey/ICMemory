@@ -27,23 +27,23 @@
 
 namespace IC
 {
-	//------------------------------------------------------------------------------
-	template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(IAllocator& allocator) noexcept
-	{
-		return IC::UnorderedMap<TKey, TValue>(AllocatorWrapper<std::pair<TKey, TValue>>(&allocator));
-	}
+    //------------------------------------------------------------------------------
+    template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(IAllocator& allocator) noexcept
+    {
+        return IC::UnorderedMap<TKey, TValue>(AllocatorWrapper<std::pair<TKey, TValue>>(&allocator));
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TKey, typename TValue, typename TIteratorType> UnorderedMap<TKey, TValue> MakeUnorderedMap(IAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
-	{
-		return IC::UnorderedMap<TKey, TValue>(first, last, 0, IC::UnorderedMap<TKey, TValue>::hasher(), IC::UnorderedMap<TKey, TValue>::key_equal(), AllocatorWrapper<std::pair<TKey, TValue>>(&allocator));
-	}
+    //------------------------------------------------------------------------------
+    template <typename TKey, typename TValue, typename TIteratorType> UnorderedMap<TKey, TValue> MakeUnorderedMap(IAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept
+    {
+        return IC::UnorderedMap<TKey, TValue>(first, last, 0, IC::UnorderedMap<TKey, TValue>::hasher(), IC::UnorderedMap<TKey, TValue>::key_equal(), AllocatorWrapper<std::pair<TKey, TValue>>(&allocator));
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(IAllocator& allocator, const std::unordered_map<TKey, TValue>& toCopy) noexcept
-	{
-		return IC::MakeUnorderedMap<TKey, TValue>(allocator, toCopy.begin(), toCopy.end());
-	}
+    //------------------------------------------------------------------------------
+    template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(IAllocator& allocator, const std::unordered_map<TKey, TValue>& toCopy) noexcept
+    {
+        return IC::MakeUnorderedMap<TKey, TValue>(allocator, toCopy.begin(), toCopy.end());
+    }
 }
 
 #endif

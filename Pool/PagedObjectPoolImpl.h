@@ -29,30 +29,30 @@
 
 namespace IC
 {
-	//------------------------------------------------------------------------------
-	template <typename TObject> PagedObjectPool<TObject>::PagedObjectPool(std::size_t numObjectsPerPage) noexcept
-		: m_pagedBlockAllocator(MemoryUtils::GetBlockSize<TObject>(), numObjectsPerPage)
-	{
-	}
+    //------------------------------------------------------------------------------
+    template <typename TObject> PagedObjectPool<TObject>::PagedObjectPool(std::size_t numObjectsPerPage) noexcept
+        : m_pagedBlockAllocator(MemoryUtils::GetBlockSize<TObject>(), numObjectsPerPage)
+    {
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TObject> PagedObjectPool<TObject>::PagedObjectPool(IAllocator& allocator, std::size_t numObjectsPerPage) noexcept
-		: m_pagedBlockAllocator(allocator, MemoryUtils::GetBlockSize<TObject>(), numObjectsPerPage)
-	{
-	}
+    //------------------------------------------------------------------------------
+    template <typename TObject> PagedObjectPool<TObject>::PagedObjectPool(IAllocator& allocator, std::size_t numObjectsPerPage) noexcept
+        : m_pagedBlockAllocator(allocator, MemoryUtils::GetBlockSize<TObject>(), numObjectsPerPage)
+    {
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TObject> template <typename... TConstructorArgs> UniquePtr<TObject> PagedObjectPool<TObject>::Create(TConstructorArgs&&... constructorArgs) noexcept
-	{
-		void* memory = m_pagedBlockAllocator.Allocate(sizeof(TObject));
-		TObject* newObject = new (memory) TObject(std::forward<TConstructorArgs>(constructorArgs)...);
+    //------------------------------------------------------------------------------
+    template <typename TObject> template <typename... TConstructorArgs> UniquePtr<TObject> PagedObjectPool<TObject>::Create(TConstructorArgs&&... constructorArgs) noexcept
+    {
+        void* memory = m_pagedBlockAllocator.Allocate(sizeof(TObject));
+        TObject* newObject = new (memory) TObject(std::forward<TConstructorArgs>(constructorArgs)...);
 
-		return UniquePtr<TObject>(newObject, [=](TObject* objectForDeallocation) noexcept -> void
-		{
-			objectForDeallocation->~TObject();
-			m_pagedBlockAllocator.Deallocate(reinterpret_cast<void*>(objectForDeallocation));
-		});
-	}
+        return UniquePtr<TObject>(newObject, [=](TObject* objectForDeallocation) noexcept -> void
+        {
+            objectForDeallocation->~TObject();
+            m_pagedBlockAllocator.Deallocate(reinterpret_cast<void*>(objectForDeallocation));
+        });
+    }
 }
 
 #endif

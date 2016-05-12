@@ -41,7 +41,7 @@ namespace IC
     ///
     /// @return The new map.
     ///
-	template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(IAllocator& allocator) noexcept;
+    template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(IAllocator& allocator) noexcept;
 
     /// Creates a new map from the given range. The given allocator is used for all 
     /// memory allocations.
@@ -55,7 +55,7 @@ namespace IC
     ///
     /// @return The new map.
     ///
-	template <typename TKey, typename TValue, typename TIteratorType> UnorderedMap<TKey, TValue> MakeUnorderedMap(IAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
+    template <typename TKey, typename TValue, typename TIteratorType> UnorderedMap<TKey, TValue> MakeUnorderedMap(IAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 
     /// Creates a new map from the std::map. The given allocator is used for all 
     /// memory allocations.
@@ -67,7 +67,7 @@ namespace IC
     ///
     /// @return The new map.
     ///
-	template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(IAllocator& allocator, const std::unordered_map<TKey, TValue>& toCopy) noexcept;
+    template <typename TKey, typename TValue> UnorderedMap<TKey, TValue> MakeUnorderedMap(IAllocator& allocator, const std::unordered_map<TKey, TValue>& toCopy) noexcept;
 }
 
 #include "UnorderedMapImpl.h"

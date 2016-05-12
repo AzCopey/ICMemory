@@ -27,19 +27,19 @@
 
 namespace IC
 {
-	// Allocator
-	template <typename TValueType> class AllocatorWrapper;
-	class BlockAllocator;
+    // Allocator
+    template <typename TValueType> class AllocatorWrapper;
+    class BlockAllocator;
     class BuddyAllocator;
-	class IAllocator;
+    class IAllocator;
     class LinearAllocator;
-	class PagedBlockAllocator;
-	class PagedLinearAllocator;
-	class SmallObjectAllocator;
+    class PagedBlockAllocator;
+    class PagedLinearAllocator;
+    class SmallObjectAllocator;
 
-	// Pool
-	template <typename TObject> class ObjectPool;
-	template <typename TObject> class PagedObjectPool;
+    // Pool
+    template <typename TObject> class ObjectPool;
+    template <typename TObject> class PagedObjectPool;
 }
 
 #endif

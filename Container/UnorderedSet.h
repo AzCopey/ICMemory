@@ -41,7 +41,7 @@ namespace IC
     ///
     /// @return The new set.
     ///
-	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(IAllocator& allocator) noexcept;
+    template <typename TType> UnorderedSet<TType> MakeUnorderedSet(IAllocator& allocator) noexcept;
 
     /// Creates a new set from the given range. The given allocator is used for all 
     /// memory allocations.
@@ -55,7 +55,7 @@ namespace IC
     ///
     /// @return The new set.
     ///
-	template <typename TValueType, typename TIteratorType> UnorderedSet<TValueType> MakeUnorderedSet(IAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
+    template <typename TValueType, typename TIteratorType> UnorderedSet<TValueType> MakeUnorderedSet(IAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 
     /// Creates a new set from the std::set. The given allocator is used for all 
     /// memory allocations.
@@ -67,7 +67,7 @@ namespace IC
     ///
     /// @return The new set.
     ///
-	template <typename TType> UnorderedSet<TType> MakeUnorderedSet(IAllocator& allocator, const std::unordered_set<TType>& toCopy) noexcept;
+    template <typename TType> UnorderedSet<TType> MakeUnorderedSet(IAllocator& allocator, const std::unordered_set<TType>& toCopy) noexcept;
 }
 
 #include "UnorderedSetImpl.h"

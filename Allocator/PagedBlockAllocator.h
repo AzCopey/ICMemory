@@ -31,98 +31,102 @@
 
 namespace IC
 {
-	/// A paged version of the PagedBlockAllocator. This allocates fixed size blocks of memory
-	/// from pages. If an allocation is requested when no pages have any free blocks then
-	/// a new page is allocated. Pages are not deallocated until the allocator is destroyed.
-	///
-	/// A PagedBlockAllocator can be backed by other allocator types, from which pages will 
-	/// be allocated, otherwise they are allocated from the free store.
-	///
-	/// Note that this is not thread-safe and should not be accessed from multiple
-	/// threads at the same time.
-	///
-	class PagedBlockAllocator final : public IAllocator
-	{
-	public:
-		/// Creates a new PagedBlockAllocator with pages allocated from the free store.
-		///
-		/// @param blockSize
-		///		The size of each block in the allocator. The block size must be multiple
-		///		of the size of a pointer, at at least twice the size of a pointer.
-		/// @param numBlocksPerPage
-		///		The number of blocks available in each page.
-		/// 
-		PagedBlockAllocator(std::size_t blockSize, std::size_t numBlocksPerPage) noexcept;
+    /// A paged version of the PagedBlockAllocator. This allocates fixed size blocks of memory
+    /// from pages. If an allocation is requested when no pages have any free blocks then
+    /// a new page is allocated. Pages are not deallocated until the allocator is destroyed.
+    ///
+    /// A PagedBlockAllocator can be backed by other allocator types, from which pages will 
+    /// be allocated, otherwise they are allocated from the free store.
+    ///
+    /// Note that this is not thread-safe and should not be accessed from multiple
+    /// threads at the same time.
+    ///
+    class PagedBlockAllocator final : public IAllocator
+    {
+    public:
+        /// Creates a new PagedBlockAllocator with pages allocated from the free store.
+        ///
+        /// @param blockSize
+        ///        The size of each block in the allocator. The block size must be multiple
+        ///        of the size of a pointer, at at least twice the size of a pointer.
+        /// @param numBlocksPerPage
+        ///        The number of blocks available in each page.
+        /// 
+        PagedBlockAllocator(std::size_t blockSize, std::size_t numBlocksPerPage) noexcept;
 
-		/// Creates a new PagedBlockAllocator with pages allocated from the given allocator.
-		///
-		/// @param allocator
-		///		The allocator from which to allocate pages.
-		/// @param blockSize
-		///		The size of each block in the allocator. The block size must be multiple
-		///		of the size of a pointer, at at least twice the size of a pointer.
-		/// @param numBlocksPerPage
-		///		The number of blocks available in each page.
-		/// 
-		PagedBlockAllocator(IAllocator& parentAllocator, std::size_t blockSize, std::size_t numBlocksPerPage) noexcept;
+        /// Creates a new PagedBlockAllocator with pages allocated from the given allocator.
+        ///
+        /// @param allocator
+        ///        The allocator from which to allocate pages.
+        /// @param blockSize
+        ///        The size of each block in the allocator. The block size must be multiple
+        ///        of the size of a pointer, at at least twice the size of a pointer.
+        /// @param numBlocksPerPage
+        ///        The number of blocks available in each page.
+        /// 
+        PagedBlockAllocator(IAllocator& parentAllocator, std::size_t blockSize, std::size_t numBlocksPerPage) noexcept;
 
-		/// This is thread safe.
-		///
-		/// @return The maximum allocation size from this allocator. Will be the size of a 
-		/// single block.
-		///
-		std::size_t GetMaxAllocationSize() const noexcept override { return GetBlockSize(); }
+        /// This is thread safe.
+        ///
+        /// @return The maximum allocation size from this allocator. Will be the size of a 
+        /// single block.
+        ///
+        std::size_t GetMaxAllocationSize() const noexcept override { return GetBlockSize(); }
 
-		/// This is thread-safe.
-		///
-		/// @return The size of each block in the allocator.
-		///
-		std::size_t GetBlockSize() const noexcept { return m_blockSize; }
+        /// This is thread-safe.
+        ///
+        /// @return The size of each block in the allocator.
+        ///
+        std::size_t GetBlockSize() const noexcept { return m_blockSize; }
 
-		/// This is thread-safe.
-		///
-		/// @return The total number of blocks available in each page.
-		///
-		std::size_t GetNumBlocksPerPage() const noexcept { return m_numBlocksPerPage; }
+        /// This is thread-safe.
+        ///
+        /// @return The total number of blocks available in each page.
+        ///
+        std::size_t GetNumBlocksPerPage() const noexcept { return m_numBlocksPerPage; }
 
-		/// Allocates a block from the allocator. The allocation size must be smaller than 
-		/// that of a block, otherwise this will assert. If there are no free blocks in any
-		/// available pages, then a new page will be allocated.
-		///
-		/// @param allocationSize
-		///		The size of allocation required.
-		///
-		/// @return The block of memory.
-		///
-		void* Allocate(std::size_t allocationSize) noexcept override;
+        /// @return The number of pages in the allocator.
+        ///
+        std::size_t GetNumPages() const noexcept;
 
-		/// Deallocates the given block, freeing it for reuse.
-		///
-		/// @param pointer
-		///		The pointer which should be deallocated.
-		///
-		void Deallocate(void* pointer) noexcept override;
+        /// Allocates a block from the allocator. The allocation size must be smaller than 
+        /// that of a block, otherwise this will assert. If there are no free blocks in any
+        /// available pages, then a new page will be allocated.
+        ///
+        /// @param allocationSize
+        ///        The size of allocation required.
+        ///
+        /// @return The block of memory.
+        ///
+        void* Allocate(std::size_t allocationSize) noexcept override;
 
-		~PagedBlockAllocator() noexcept;
+        /// Deallocates the given block, freeing it for reuse.
+        ///
+        /// @param pointer
+        ///        The pointer which should be deallocated.
+        ///
+        void Deallocate(void* pointer) noexcept override;
 
-	private:
-		PagedBlockAllocator(PagedBlockAllocator&) = delete;
-		PagedBlockAllocator& operator=(PagedBlockAllocator&) = delete;
-		PagedBlockAllocator(PagedBlockAllocator&&) = delete;
-		PagedBlockAllocator& operator=(PagedBlockAllocator&&) = delete;
+        ~PagedBlockAllocator() noexcept;
 
-		const std::size_t m_blockSize;
-		const std::size_t m_numBlocksPerPage;
-		const std::size_t m_pageSize;
+    private:
+        PagedBlockAllocator(PagedBlockAllocator&) = delete;
+        PagedBlockAllocator& operator=(PagedBlockAllocator&) = delete;
+        PagedBlockAllocator(PagedBlockAllocator&&) = delete;
+        PagedBlockAllocator& operator=(PagedBlockAllocator&&) = delete;
 
-		IAllocator* m_parentAllocator = nullptr;
+        const std::size_t m_blockSize;
+        const std::size_t m_numBlocksPerPage;
+        const std::size_t m_pageSize;
 
-		union
-		{
-			std::vector<std::unique_ptr<BlockAllocator>> m_freeStoreBlockAllocators;
-			Vector<UniquePtr<BlockAllocator>> m_parentAllocatorBlockAllocators;
-		};
-	};
+        IAllocator* m_parentAllocator = nullptr;
+
+        union
+        {
+            std::vector<std::unique_ptr<BlockAllocator>> m_freeStoreBlockAllocators;
+            Vector<UniquePtr<BlockAllocator>> m_parentAllocatorBlockAllocators;
+        };
+    };
 }
 
 #endif

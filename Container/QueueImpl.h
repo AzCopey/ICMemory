@@ -27,11 +27,11 @@
 
 namespace IC
 {
-	//------------------------------------------------------------------------------
-	template <typename TType> Queue<TType> MakeQueue(IAllocator& allocator) noexcept
-	{
-		return IC::Queue<TType>(AllocatorWrapper<TType>(&allocator));
-	}
+    //------------------------------------------------------------------------------
+    template <typename TType> Queue<TType> MakeQueue(IAllocator& allocator) noexcept
+    {
+        return IC::Queue<TType>(AllocatorWrapper<TType>(&allocator));
+    }
 }
 
 #endif

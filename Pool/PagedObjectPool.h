@@ -29,66 +29,66 @@
 
 namespace IC
 {
-	/// An object pool which consists of a series of pages. Each page is a memory
-	/// block which represents a contiquous list of objects. The pool initially
-	/// contains a single page; an additional page is allocated every time there
-	/// are no free objects in any of the existing pages. Once a page has been
-	/// created it will not be deallocated until the PagedObjectPool is destroyed.
-	///
-	/// The object pool can be backed by any of the allocators.
-	///
-	/// This is not thread-safe and should not be accessed from multiple threads at
-	/// the same time.
-	///
-	template <typename TObject> class PagedObjectPool final
-	{
-	public:
-		static constexpr std::size_t k_defaultNumObjectsPerPage = 128;
+    /// An object pool which consists of a series of pages. Each page is a memory
+    /// block which represents a contiquous list of objects. The pool initially
+    /// contains a single page; an additional page is allocated every time there
+    /// are no free objects in any of the existing pages. Once a page has been
+    /// created it will not be deallocated until the PagedObjectPool is destroyed.
+    ///
+    /// The object pool can be backed by any of the allocators.
+    ///
+    /// This is not thread-safe and should not be accessed from multiple threads at
+    /// the same time.
+    ///
+    template <typename TObject> class PagedObjectPool final
+    {
+    public:
+        static constexpr std::size_t k_defaultNumObjectsPerPage = 128;
 
-		/// Creates a new object pool containing the given number of objects in each
-		/// page. Memory used for the pool is allocated from the free store.
-		///
-		/// @param numObjectsPerPage
-		///		Optional. The number of objects in each page. Defaults to 
-		///		k_defaultNumObjectsPerPage.
-		///
-		PagedObjectPool(std::size_t numObjectsPerPage = k_defaultNumObjectsPerPage) noexcept;
+        /// Creates a new object pool containing the given number of objects in each
+        /// page. Memory used for the pool is allocated from the free store.
+        ///
+        /// @param numObjectsPerPage
+        ///        Optional. The number of objects in each page. Defaults to 
+        ///        k_defaultNumObjectsPerPage.
+        ///
+        PagedObjectPool(std::size_t numObjectsPerPage = k_defaultNumObjectsPerPage) noexcept;
 
-		/// Creates a new object pool containing the given number of objects in each
-		/// page. Memory used for the pool is allocated from the given allocator.
-		///
-		/// @param allocator
-		///		The allocator from which to allocate the memory block.
-		/// @param numObjectsPerPage
-		///		Optional. The number of objects in each page. Defaults to 
-		///		k_defaultNumObjectsPerPage.
-		///
-		PagedObjectPool(IAllocator& allocator, std::size_t numObjectsPerPage = k_defaultNumObjectsPerPage) noexcept;
+        /// Creates a new object pool containing the given number of objects in each
+        /// page. Memory used for the pool is allocated from the given allocator.
+        ///
+        /// @param allocator
+        ///        The allocator from which to allocate the memory block.
+        /// @param numObjectsPerPage
+        ///        Optional. The number of objects in each page. Defaults to 
+        ///        k_defaultNumObjectsPerPage.
+        ///
+        PagedObjectPool(IAllocator& allocator, std::size_t numObjectsPerPage = k_defaultNumObjectsPerPage) noexcept;
 
-		/// This is thread safe. 
-		///
-		/// @return The number of objects in each page.
-		///
-		std::size_t GetNumObjectsPerPage() const noexcept { return m_numObjectsPerPage; }
+        /// This is thread safe. 
+        ///
+        /// @return The number of objects in each page.
+        ///
+        std::size_t GetNumObjectsPerPage() const noexcept { return m_numObjectsPerPage; }
 
-		/// Creates a new object from the pool. If there are no free objects in any
-		/// of the current pages, a new page will be allocated.
-		///
-		///  @param constructorArgs
-		///		The arguments for the constructor if appropriate.
-		///
-		/// @return The newly constructed object.
-		///
-		template <typename... TConstructorArgs> UniquePtr<TObject> Create(TConstructorArgs&&... constructorArgs) noexcept;
+        /// Creates a new object from the pool. If there are no free objects in any
+        /// of the current pages, a new page will be allocated.
+        ///
+        ///  @param constructorArgs
+        ///        The arguments for the constructor if appropriate.
+        ///
+        /// @return The newly constructed object.
+        ///
+        template <typename... TConstructorArgs> UniquePtr<TObject> Create(TConstructorArgs&&... constructorArgs) noexcept;
 
-	private:
-		PagedObjectPool(PagedObjectPool&) = delete;
-		PagedObjectPool& operator=(PagedObjectPool&) = delete;
-		PagedObjectPool(PagedObjectPool&&) = delete;
-		PagedObjectPool& operator=(PagedObjectPool&&) = delete;
+    private:
+        PagedObjectPool(PagedObjectPool&) = delete;
+        PagedObjectPool& operator=(PagedObjectPool&) = delete;
+        PagedObjectPool(PagedObjectPool&&) = delete;
+        PagedObjectPool& operator=(PagedObjectPool&&) = delete;
 
-		PagedBlockAllocator m_pagedBlockAllocator;
-	};
+        PagedBlockAllocator m_pagedBlockAllocator;
+    };
 }
 
 #include "PagedObjectPoolImpl.h"

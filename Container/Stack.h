@@ -40,7 +40,7 @@ namespace IC
     ///
     /// @return The new stack.
     ///
-	template <typename TType> Stack<TType> MakeStack(IAllocator& allocator) noexcept;
+    template <typename TType> Stack<TType> MakeStack(IAllocator& allocator) noexcept;
 }
 
 #include "StackImpl.h"

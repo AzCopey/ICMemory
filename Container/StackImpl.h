@@ -27,11 +27,11 @@
 
 namespace IC
 {
-	//------------------------------------------------------------------------------
-	template <typename TType> Stack<TType> MakeStack(IAllocator& allocator) noexcept
-	{
-		return IC::Stack<TType>(AllocatorWrapper<TType>(&allocator));
-	}
+    //------------------------------------------------------------------------------
+    template <typename TType> Stack<TType> MakeStack(IAllocator& allocator) noexcept
+    {
+        return IC::Stack<TType>(AllocatorWrapper<TType>(&allocator));
+    }
 }
 
 #endif

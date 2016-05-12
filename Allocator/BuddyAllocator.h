@@ -60,7 +60,7 @@ namespace IC
         /// @param bufferSize
         ///     The size of the buffer. This must be a power of two.
         /// @param minBlockSize
-        ///	    The minimum block size. This must be a power of two.
+        ///        The minimum block size. This must be a power of two.
         ///
         BuddyAllocator(std::size_t bufferSize, std::size_t minBlockSize = 64) noexcept;
 
@@ -105,13 +105,13 @@ namespace IC
         ///
         void Deallocate(void* pointer) noexcept override;
 
-		~BuddyAllocator() noexcept;
+        ~BuddyAllocator() noexcept;
 
     private:
-		BuddyAllocator(BuddyAllocator&) = delete;
-		BuddyAllocator& operator=(BuddyAllocator&) = delete;
-		BuddyAllocator(BuddyAllocator&&) = delete;
-		BuddyAllocator& operator=(BuddyAllocator&&) = delete;
+        BuddyAllocator(BuddyAllocator&) = delete;
+        BuddyAllocator& operator=(BuddyAllocator&) = delete;
+        BuddyAllocator(BuddyAllocator&&) = delete;
+        BuddyAllocator& operator=(BuddyAllocator&&) = delete;
 
         /// Encapsulates functionality required for navigating the free list table.
         /// This allocates no memory, instead relying on the memory provided in the
@@ -474,7 +474,7 @@ namespace IC
 
         std::mutex m_mutex;
 
-		std::size_t m_allocationCount;
+        std::size_t m_allocationCount;
     };
 }
 

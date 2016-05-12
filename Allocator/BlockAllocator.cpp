@@ -29,101 +29,101 @@
 
 namespace IC
 {
-	//------------------------------------------------------------------------------
-	BlockAllocator::BlockAllocator(std::size_t blockSize, std::size_t numBlocks) noexcept
-		: m_blockSize(blockSize), m_numBlocks(numBlocks), m_bufferSize(m_blockSize * m_numBlocks)
-	{
-		assert(MemoryUtils::IsAligned(blockSize, sizeof(std::intptr_t)));
-		assert(blockSize >= sizeof(FreeBlock));
+    //------------------------------------------------------------------------------
+    BlockAllocator::BlockAllocator(std::size_t blockSize, std::size_t numBlocks) noexcept
+        : m_blockSize(blockSize), m_numBlocks(numBlocks), m_bufferSize(m_blockSize * m_numBlocks)
+    {
+        assert(MemoryUtils::IsAligned(blockSize, sizeof(std::intptr_t)));
+        assert(blockSize >= sizeof(FreeBlock));
 
-		m_buffer = new std::int8_t[m_bufferSize];
+        m_buffer = new std::int8_t[m_bufferSize];
 
-		InitFreeBlockList();
-	}
+        InitFreeBlockList();
+    }
 
-	//------------------------------------------------------------------------------
-	BlockAllocator::BlockAllocator(IAllocator& parentAllocator, std::size_t blockSize, std::size_t numBlocks) noexcept		
-		: m_blockSize(blockSize), m_numBlocks(numBlocks), m_bufferSize(m_blockSize * m_numBlocks), m_parentAllocator(&parentAllocator)
-	{
-		assert(MemoryUtils::IsAligned(blockSize, sizeof(std::intptr_t)));
-		assert(blockSize >= sizeof(FreeBlock));
+    //------------------------------------------------------------------------------
+    BlockAllocator::BlockAllocator(IAllocator& parentAllocator, std::size_t blockSize, std::size_t numBlocks) noexcept        
+        : m_blockSize(blockSize), m_numBlocks(numBlocks), m_bufferSize(m_blockSize * m_numBlocks), m_parentAllocator(&parentAllocator)
+    {
+        assert(MemoryUtils::IsAligned(blockSize, sizeof(std::intptr_t)));
+        assert(blockSize >= sizeof(FreeBlock));
 
-		m_buffer = m_parentAllocator->Allocate(m_bufferSize);
+        m_buffer = m_parentAllocator->Allocate(m_bufferSize);
 
-		InitFreeBlockList();
-	}
+        InitFreeBlockList();
+    }
 
-	//------------------------------------------------------------------------------
-	void* BlockAllocator::Allocate(std::size_t allocationSize) noexcept
-	{
-		assert(allocationSize <= m_blockSize);
-		assert(m_freeBlockList);
+    //------------------------------------------------------------------------------
+    void* BlockAllocator::Allocate(std::size_t allocationSize) noexcept
+    {
+        assert(allocationSize <= m_blockSize);
+        assert(m_freeBlockList);
 
-		auto block = m_freeBlockList;
-		m_freeBlockList = block->m_next;
+        auto block = m_freeBlockList;
+        m_freeBlockList = block->m_next;
 
-		if (m_freeBlockList)
-		{
-			m_freeBlockList->m_previous = nullptr;
-		}
+        if (m_freeBlockList)
+        {
+            m_freeBlockList->m_previous = nullptr;
+        }
 
-		++m_numAllocatedBlocks;
+        ++m_numAllocatedBlocks;
 
-		return block;
-	}
+        return block;
+    }
 
-	//------------------------------------------------------------------------------
-	void BlockAllocator::Deallocate(void* pointer) noexcept
-	{
-		assert(ContainsBlock(pointer));
+    //------------------------------------------------------------------------------
+    void BlockAllocator::Deallocate(void* pointer) noexcept
+    {
+        assert(ContainsBlock(pointer));
 
-		auto next = m_freeBlockList;
-		m_freeBlockList = reinterpret_cast<FreeBlock*>(pointer);
-		m_freeBlockList->m_next = next;
-		m_freeBlockList->m_previous = nullptr;
+        auto next = m_freeBlockList;
+        m_freeBlockList = reinterpret_cast<FreeBlock*>(pointer);
+        m_freeBlockList->m_next = next;
+        m_freeBlockList->m_previous = nullptr;
 
-		--m_numAllocatedBlocks;
-	}
+        --m_numAllocatedBlocks;
+    }
 
-	//------------------------------------------------------------------------------
-	bool BlockAllocator::ContainsBlock(void* block) noexcept
-	{
-		return (block >= m_buffer && block < reinterpret_cast<std::uint8_t*>(m_buffer) + m_bufferSize);
-	}
+    //------------------------------------------------------------------------------
+    bool BlockAllocator::ContainsBlock(void* block) noexcept
+    {
+        return (block >= m_buffer && block < reinterpret_cast<std::uint8_t*>(m_buffer) + m_bufferSize);
+    }
 
-	//------------------------------------------------------------------------------
-	void BlockAllocator::InitFreeBlockList() noexcept
-	{
-		FreeBlock* previous = nullptr;
-		for (std::size_t i = 0; i < m_numBlocks; ++i)
-		{
-			auto current = reinterpret_cast<FreeBlock*>(reinterpret_cast<std::int8_t*>(m_buffer) + m_blockSize * i);
-			current->m_next = nullptr;
-			current->m_previous = previous;
+    //------------------------------------------------------------------------------
+    void BlockAllocator::InitFreeBlockList() noexcept
+    {
+        FreeBlock* previous = nullptr;
+        for (std::size_t i = 0; i < m_numBlocks; ++i)
+        {
+            auto current = reinterpret_cast<FreeBlock*>(reinterpret_cast<std::int8_t*>(m_buffer) + m_blockSize * i);
+            current->m_next = nullptr;
+            current->m_previous = previous;
 
-			if (previous)
-			{
-				previous->m_next = current;
-			}
+            if (previous)
+            {
+                previous->m_next = current;
+            }
 
-			previous = current;
-		}
+            previous = current;
+        }
 
-		m_freeBlockList = reinterpret_cast<FreeBlock*>(m_buffer);
-	}
-	
-	//------------------------------------------------------------------------------
-	BlockAllocator::~BlockAllocator() noexcept
-	{
-		assert(m_numAllocatedBlocks == 0);
+        m_freeBlockList = reinterpret_cast<FreeBlock*>(m_buffer);
+    }
+    
+    //------------------------------------------------------------------------------
+    BlockAllocator::~BlockAllocator() noexcept
+    {
+        assert(m_numAllocatedBlocks == 0);
 
-		if (m_parentAllocator)
-		{
-			m_parentAllocator->Deallocate(m_buffer);
-		}
-		else
-		{
-			delete[] m_buffer;
-		}
-	}
+        if (m_parentAllocator)
+        {
+            m_parentAllocator->Deallocate(m_buffer);
+        }
+        else
+        {
+            delete[] m_buffer;
+        }
+    }
 }

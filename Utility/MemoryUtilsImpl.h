@@ -29,100 +29,100 @@
 
 namespace IC
 {
-	namespace MemoryUtils
-	{
-		//------------------------------------------------------------------------------
-		template <typename TValueType, typename TAlignmentType> TValueType* Align(TValueType* value, TAlignmentType alignment) noexcept
-		{
-			static_assert(std::is_integral<TAlignmentType>::value, "Alignment must be integral type.");
-			static_assert(std::is_unsigned<TAlignmentType>::value, "Alignment must be unsigned.");
+    namespace MemoryUtils
+    {
+        //------------------------------------------------------------------------------
+        template <typename TValueType, typename TAlignmentType> TValueType* Align(TValueType* value, TAlignmentType alignment) noexcept
+        {
+            static_assert(std::is_integral<TAlignmentType>::value, "Alignment must be integral type.");
+            static_assert(std::is_unsigned<TAlignmentType>::value, "Alignment must be unsigned.");
 
-			std::uintptr_t valueIntPtr = reinterpret_cast<std::uintptr_t>(value);
-			std::uintptr_t alignmentIntPtr = static_cast<std::uintptr_t>(alignment);
+            std::uintptr_t valueIntPtr = reinterpret_cast<std::uintptr_t>(value);
+            std::uintptr_t alignmentIntPtr = static_cast<std::uintptr_t>(alignment);
 
-			return reinterpret_cast<TValueType*>((valueIntPtr + alignmentIntPtr - 1) & ~(alignmentIntPtr - 1));
-		}
+            return reinterpret_cast<TValueType*>((valueIntPtr + alignmentIntPtr - 1) & ~(alignmentIntPtr - 1));
+        }
 
-		//------------------------------------------------------------------------------
-		template <typename TValueType, typename TAlignmentType> TValueType Align(TValueType value, TAlignmentType alignment) noexcept
-		{
-			static_assert(std::is_integral<TValueType>::value, "Value must be integral type.");
-			static_assert(std::is_unsigned<TValueType>::value, "Value must be unsigned.");
-			static_assert(std::is_integral<TAlignmentType>::value, "Alignment must be integral type.");
-			static_assert(std::is_unsigned<TAlignmentType>::value, "Alignment must be unsigned.");
+        //------------------------------------------------------------------------------
+        template <typename TValueType, typename TAlignmentType> TValueType Align(TValueType value, TAlignmentType alignment) noexcept
+        {
+            static_assert(std::is_integral<TValueType>::value, "Value must be integral type.");
+            static_assert(std::is_unsigned<TValueType>::value, "Value must be unsigned.");
+            static_assert(std::is_integral<TAlignmentType>::value, "Alignment must be integral type.");
+            static_assert(std::is_unsigned<TAlignmentType>::value, "Alignment must be unsigned.");
 
-			std::uintptr_t valueIntPtr = static_cast<std::uintptr_t>(value);
-			std::uintptr_t alignmentIntPtr = static_cast<std::uintptr_t>(alignment);
+            std::uintptr_t valueIntPtr = static_cast<std::uintptr_t>(value);
+            std::uintptr_t alignmentIntPtr = static_cast<std::uintptr_t>(alignment);
 
-			return static_cast<TValueType>((valueIntPtr + alignmentIntPtr - 1) & ~(alignmentIntPtr - 1));
-		}
+            return static_cast<TValueType>((valueIntPtr + alignmentIntPtr - 1) & ~(alignmentIntPtr - 1));
+        }
 
-		//------------------------------------------------------------------------------
-		template <typename TValueType, typename TAlignmentType> TValueType IsAligned(TValueType value, TAlignmentType alignment) noexcept
-		{
-			static_assert(std::is_integral<TAlignmentType>::value, "Alignment must be integral type.");
-			static_assert(std::is_unsigned<TAlignmentType>::value, "Alignment must be unsigned.");
+        //------------------------------------------------------------------------------
+        template <typename TValueType, typename TAlignmentType> TValueType IsAligned(TValueType value, TAlignmentType alignment) noexcept
+        {
+            static_assert(std::is_integral<TAlignmentType>::value, "Alignment must be integral type.");
+            static_assert(std::is_unsigned<TAlignmentType>::value, "Alignment must be unsigned.");
 
-			return static_cast<TValueType>((static_cast<TAlignmentType>(value) & (alignment - 1)) == 0);
-		}
+            return static_cast<TValueType>((static_cast<TAlignmentType>(value) & (alignment - 1)) == 0);
+        }
 
-		//------------------------------------------------------------------------------
-		template <typename TType> constexpr bool IsPowerOfTwo(TType value) noexcept
-		{
-			static_assert(std::is_integral<TType>::value, "Value must be integral type.");
-			static_assert(std::is_unsigned<TType>::value, "Value must be unsigned.");
+        //------------------------------------------------------------------------------
+        template <typename TType> constexpr bool IsPowerOfTwo(TType value) noexcept
+        {
+            static_assert(std::is_integral<TType>::value, "Value must be integral type.");
+            static_assert(std::is_unsigned<TType>::value, "Value must be unsigned.");
 
-			return (value > 0) && ((value & (~value + 1)) == value);
-		}
+            return (value > 0) && ((value & (~value + 1)) == value);
+        }
 
-		//------------------------------------------------------------------------------
-		template <typename TType> TType NextPowerofTwo(TType value) noexcept
-		{
-			static_assert(std::is_integral<TType>::value, "Value must be integral type.");
-			static_assert(std::is_unsigned<TType>::value, "Value must be unsigned.");
+        //------------------------------------------------------------------------------
+        template <typename TType> TType NextPowerofTwo(TType value) noexcept
+        {
+            static_assert(std::is_integral<TType>::value, "Value must be integral type.");
+            static_assert(std::is_unsigned<TType>::value, "Value must be unsigned.");
 
-			value--;
-			value |= value >> 1;
-			value |= value >> 2;
-			value |= value >> 4;
-			value |= value >> 8;
-			value |= value >> 16;
-			value++;
+            value--;
+            value |= value >> 1;
+            value |= value >> 2;
+            value |= value >> 4;
+            value |= value >> 8;
+            value |= value >> 16;
+            value++;
 
-			return value;
-		}
+            return value;
+        }
 
-		//------------------------------------------------------------------------------
-		template <typename TType> std::size_t CalcShift(TType value) noexcept
-		{
-			assert(IsPowerOfTwo(value));
+        //------------------------------------------------------------------------------
+        template <typename TType> std::size_t CalcShift(TType value) noexcept
+        {
+            assert(IsPowerOfTwo(value));
 
-			TType output = 0;
-			while (value > 1)
-			{
-				output++;
-				value >>= 1;
-			}
+            TType output = 0;
+            while (value > 1)
+            {
+                output++;
+                value >>= 1;
+            }
 
-			return output;
-		}
+            return output;
+        }
 
-		//------------------------------------------------------------------------------
-		template <typename TTypeA, typename TTypeB> std::uintptr_t GetPointerOffset(TTypeA* pointer, TTypeB* relativeTo) noexcept
-		{
-			auto pointerInt = reinterpret_cast<std::uintptr_t>(pointer);
-			auto relativeToInt = reinterpret_cast<std::uintptr_t>(relativeTo);
+        //------------------------------------------------------------------------------
+        template <typename TTypeA, typename TTypeB> std::uintptr_t GetPointerOffset(TTypeA* pointer, TTypeB* relativeTo) noexcept
+        {
+            auto pointerInt = reinterpret_cast<std::uintptr_t>(pointer);
+            auto relativeToInt = reinterpret_cast<std::uintptr_t>(relativeTo);
 
-			assert(pointerInt >= relativeToInt);
-			return (pointerInt - relativeToInt);
-		}
+            assert(pointerInt >= relativeToInt);
+            return (pointerInt - relativeToInt);
+        }
 
-		//------------------------------------------------------------------------------
-		template <typename TObject> constexpr std::size_t GetBlockSize() noexcept
-		{
-			return std::max(sizeof(std::intptr_t) * 2, MemoryUtils::Align(sizeof(TObject), sizeof(std::intptr_t)));
-		}
-	}
+        //------------------------------------------------------------------------------
+        template <typename TObject> constexpr std::size_t GetBlockSize() noexcept
+        {
+            return std::max(sizeof(std::intptr_t) * 2, MemoryUtils::Align(sizeof(TObject), sizeof(std::intptr_t)));
+        }
+    }
 }
 
 #endif

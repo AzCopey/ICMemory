@@ -34,35 +34,35 @@ namespace IC
     LinearAllocator::LinearAllocator(std::size_t pageSize) noexcept
         : m_bufferSize(pageSize)
     {
-		m_buffer = new std::uint8_t[m_bufferSize];
-		m_nextPointer = MemoryUtils::Align(m_buffer, sizeof(std::intptr_t));
+        m_buffer = new std::uint8_t[m_bufferSize];
+        m_nextPointer = MemoryUtils::Align(m_buffer, sizeof(std::intptr_t));
     }
 
     //------------------------------------------------------------------------------
     LinearAllocator::LinearAllocator(IAllocator& parentAllocator, std::size_t pageSize) noexcept
         : m_bufferSize(pageSize), m_parentAllocator(&parentAllocator)
     {
-		m_buffer = reinterpret_cast<std::uint8_t*>(m_parentAllocator->Allocate(m_bufferSize));
-		m_nextPointer = MemoryUtils::Align(m_buffer, sizeof(std::intptr_t));
+        m_buffer = reinterpret_cast<std::uint8_t*>(m_parentAllocator->Allocate(m_bufferSize));
+        m_nextPointer = MemoryUtils::Align(m_buffer, sizeof(std::intptr_t));
     }
 
-	//------------------------------------------------------------------------------
-	std::size_t LinearAllocator::GetFreeSpace() const noexcept
-	{
-		auto freeSpace = m_bufferSize - MemoryUtils::GetPointerOffset(m_nextPointer, m_buffer);
-		auto freeSpaceAligned = freeSpace & ~(sizeof(std::intptr_t) - 1);
-		return freeSpaceAligned;
-	}
+    //------------------------------------------------------------------------------
+    std::size_t LinearAllocator::GetFreeSpace() const noexcept
+    {
+        auto freeSpace = m_bufferSize - MemoryUtils::GetPointerOffset(m_nextPointer, m_buffer);
+        auto freeSpaceAligned = freeSpace & ~(sizeof(std::intptr_t) - 1);
+        return freeSpaceAligned;
+    }
 
     //------------------------------------------------------------------------------
     void* LinearAllocator::Allocate(std::size_t allocationSize) noexcept
     {
-		assert(allocationSize <= GetFreeSpace());
+        assert(allocationSize <= GetFreeSpace());
 
         std::uint8_t* output = m_nextPointer;
         m_nextPointer = MemoryUtils::Align(m_nextPointer + allocationSize, sizeof(std::intptr_t));
 
-		++m_activeAllocationCount;
+        ++m_activeAllocationCount;
 
         return output;
     }
@@ -70,39 +70,39 @@ namespace IC
     //------------------------------------------------------------------------------
     void LinearAllocator::Deallocate(void* pointer) noexcept
     {
-		assert(Contains(pointer));
+        assert(Contains(pointer));
 
-		--m_activeAllocationCount;
+        --m_activeAllocationCount;
     }
 
-	//------------------------------------------------------------------------------
-	bool LinearAllocator::Contains(void* pointer) noexcept
-	{
-		return (pointer >= m_buffer && pointer < reinterpret_cast<std::uint8_t*>(m_buffer) + m_bufferSize);
-	}
+    //------------------------------------------------------------------------------
+    bool LinearAllocator::Contains(void* pointer) noexcept
+    {
+        return (pointer >= m_buffer && pointer < reinterpret_cast<std::uint8_t*>(m_buffer) + m_bufferSize);
+    }
 
     //------------------------------------------------------------------------------
     void LinearAllocator::Reset() noexcept
     {
         assert(m_activeAllocationCount == 0);
 
-		m_nextPointer = MemoryUtils::Align(m_buffer, sizeof(std::intptr_t));
+        m_nextPointer = MemoryUtils::Align(m_buffer, sizeof(std::intptr_t));
     }
 
-	//------------------------------------------------------------------------------
-	LinearAllocator::~LinearAllocator() noexcept
-	{
-		Reset();
+    //------------------------------------------------------------------------------
+    LinearAllocator::~LinearAllocator() noexcept
+    {
+        Reset();
 
-		if (m_parentAllocator)
-		{
-			m_parentAllocator->Deallocate(m_buffer);
-		}
-		else
-		{
-			delete[] m_buffer;
-		}
+        if (m_parentAllocator)
+        {
+            m_parentAllocator->Deallocate(m_buffer);
+        }
+        else
+        {
+            delete[] m_buffer;
+        }
 
-		m_buffer = nullptr;
-	}
+        m_buffer = nullptr;
+    }
 }

@@ -29,89 +29,102 @@
 namespace IC
 {
 
-	//------------------------------------------------------------------------------
-	PagedBlockAllocator::PagedBlockAllocator(std::size_t blockSize, std::size_t numBlocksPerPage) noexcept
-		: m_blockSize(blockSize), m_numBlocksPerPage(numBlocksPerPage), m_pageSize(m_blockSize * m_numBlocksPerPage), m_freeStoreBlockAllocators()
-	{
-		m_freeStoreBlockAllocators.push_back(std::unique_ptr<BlockAllocator>(new BlockAllocator(m_blockSize, m_numBlocksPerPage)));
-	}
+    //------------------------------------------------------------------------------
+    PagedBlockAllocator::PagedBlockAllocator(std::size_t blockSize, std::size_t numBlocksPerPage) noexcept
+        : m_blockSize(blockSize), m_numBlocksPerPage(numBlocksPerPage), m_pageSize(m_blockSize * m_numBlocksPerPage), m_freeStoreBlockAllocators()
+    {
+        m_freeStoreBlockAllocators.push_back(std::unique_ptr<BlockAllocator>(new BlockAllocator(m_blockSize, m_numBlocksPerPage)));
+    }
 
-	//------------------------------------------------------------------------------
-	PagedBlockAllocator::PagedBlockAllocator(IAllocator& parentAllocator, std::size_t blockSize, std::size_t numBlocksPerPage) noexcept
-		: m_blockSize(blockSize), m_numBlocksPerPage(numBlocksPerPage), m_pageSize(m_blockSize * m_numBlocksPerPage), m_parentAllocator(&parentAllocator),
-		m_parentAllocatorBlockAllocators(MakeVector<UniquePtr<BlockAllocator>>(*m_parentAllocator))
-	{
-		m_parentAllocatorBlockAllocators.push_back(MakeUnique<BlockAllocator>(*m_parentAllocator, *m_parentAllocator, m_blockSize, m_numBlocksPerPage));
-	}
+    //------------------------------------------------------------------------------
+    PagedBlockAllocator::PagedBlockAllocator(IAllocator& parentAllocator, std::size_t blockSize, std::size_t numBlocksPerPage) noexcept
+        : m_blockSize(blockSize), m_numBlocksPerPage(numBlocksPerPage), m_pageSize(m_blockSize * m_numBlocksPerPage), m_parentAllocator(&parentAllocator),
+        m_parentAllocatorBlockAllocators(MakeVector<UniquePtr<BlockAllocator>>(*m_parentAllocator))
+    {
+        m_parentAllocatorBlockAllocators.push_back(MakeUnique<BlockAllocator>(*m_parentAllocator, *m_parentAllocator, m_blockSize, m_numBlocksPerPage));
+    }
 
-	//------------------------------------------------------------------------------
-	void* PagedBlockAllocator::Allocate(std::size_t allocationSize) noexcept
-	{
-		if (m_parentAllocator)
-		{
-			for (const auto& blockAllocator : m_parentAllocatorBlockAllocators)
-			{
-				if (blockAllocator->GetNumFreeBlocks() > 0)
-				{
-					return blockAllocator->Allocate(allocationSize);
-				}
-			}
+    //------------------------------------------------------------------------------
+    std::size_t PagedBlockAllocator::GetNumPages() const noexcept
+    {
+        if (m_parentAllocator)
+        {
+            return m_parentAllocatorBlockAllocators.size();
+        }
+        else
+        {
+            return m_freeStoreBlockAllocators.size();
+        }
+    }
 
-			m_parentAllocatorBlockAllocators.push_back(MakeUnique<BlockAllocator>(*m_parentAllocator, *m_parentAllocator, m_blockSize, m_numBlocksPerPage));
-			return m_parentAllocatorBlockAllocators.back()->Allocate(allocationSize);
-		}
-		else
-		{
-			for (const auto& blockAllocator : m_freeStoreBlockAllocators)
-			{
-				if (blockAllocator->GetNumFreeBlocks() > 0)
-				{
-					return blockAllocator->Allocate(allocationSize);
-				}
-			}
+    //------------------------------------------------------------------------------
+    void* PagedBlockAllocator::Allocate(std::size_t allocationSize) noexcept
+    {
+        if (m_parentAllocator)
+        {
+            for (const auto& blockAllocator : m_parentAllocatorBlockAllocators)
+            {
+                if (blockAllocator->GetNumFreeBlocks() > 0)
+                {
+                    return blockAllocator->Allocate(allocationSize);
+                }
+            }
 
-			m_freeStoreBlockAllocators.push_back(std::unique_ptr<BlockAllocator>(new BlockAllocator(m_blockSize, m_numBlocksPerPage)));
-			return m_freeStoreBlockAllocators.back()->Allocate(allocationSize);
-		}
-	}
+            m_parentAllocatorBlockAllocators.push_back(MakeUnique<BlockAllocator>(*m_parentAllocator, *m_parentAllocator, m_blockSize, m_numBlocksPerPage));
+            return m_parentAllocatorBlockAllocators.back()->Allocate(allocationSize);
+        }
+        else
+        {
+            for (const auto& blockAllocator : m_freeStoreBlockAllocators)
+            {
+                if (blockAllocator->GetNumFreeBlocks() > 0)
+                {
+                    return blockAllocator->Allocate(allocationSize);
+                }
+            }
 
-	//------------------------------------------------------------------------------
-	void PagedBlockAllocator::Deallocate(void* pointer) noexcept
-	{
-		if (m_parentAllocator)
-		{
-			for (const auto& blockAllocator : m_parentAllocatorBlockAllocators)
-			{
-				if (blockAllocator->ContainsBlock(pointer))
-				{
-					return blockAllocator->Deallocate(pointer);
-				}
-			}
-		}
-		else
-		{
-			for (const auto& blockAllocator : m_freeStoreBlockAllocators)
-			{
-				if (blockAllocator->ContainsBlock(pointer))
-				{
-					return blockAllocator->Deallocate(pointer);
-				}
-			}
-		}
+            m_freeStoreBlockAllocators.push_back(std::unique_ptr<BlockAllocator>(new BlockAllocator(m_blockSize, m_numBlocksPerPage)));
+            return m_freeStoreBlockAllocators.back()->Allocate(allocationSize);
+        }
+    }
 
-		assert(false);
-	}
-	
-	//------------------------------------------------------------------------------
-	PagedBlockAllocator::~PagedBlockAllocator() noexcept
-	{
-		if (m_parentAllocator)
-		{
-			m_parentAllocatorBlockAllocators.~vector();
-		}
-		else
-		{
-			m_freeStoreBlockAllocators.~vector();
-		}
-	}
+    //------------------------------------------------------------------------------
+    void PagedBlockAllocator::Deallocate(void* pointer) noexcept
+    {
+        if (m_parentAllocator)
+        {
+            for (const auto& blockAllocator : m_parentAllocatorBlockAllocators)
+            {
+                if (blockAllocator->ContainsBlock(pointer))
+                {
+                    return blockAllocator->Deallocate(pointer);
+                }
+            }
+        }
+        else
+        {
+            for (const auto& blockAllocator : m_freeStoreBlockAllocators)
+            {
+                if (blockAllocator->ContainsBlock(pointer))
+                {
+                    return blockAllocator->Deallocate(pointer);
+                }
+            }
+        }
+
+        assert(false);
+    }
+    
+    //------------------------------------------------------------------------------
+    PagedBlockAllocator::~PagedBlockAllocator() noexcept
+    {
+        if (m_parentAllocator)
+        {
+            m_parentAllocatorBlockAllocators.~vector();
+        }
+        else
+        {
+            m_freeStoreBlockAllocators.~vector();
+        }
+    }
 }

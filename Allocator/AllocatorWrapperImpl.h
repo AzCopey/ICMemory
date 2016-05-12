@@ -27,100 +27,100 @@
 
 namespace IC
 {
-	/// Void specialisation of the AllocatorWrapper.
-	///
-	template<> class AllocatorWrapper<void>
-	{
-	public:
-		using pointer = void*;
-		using const_pointer = const void*;
-		using value_type = void;
+    /// Void specialisation of the AllocatorWrapper.
+    ///
+    template<> class AllocatorWrapper<void>
+    {
+    public:
+        using pointer = void*;
+        using const_pointer = const void*;
+        using value_type = void;
 
-		/// Void specialisation of rebind.
-		///
-		template <class TOtherType> struct rebind
-		{
-			using other = AllocatorWrapper<TOtherType>;
-		};
-	};
+        /// Void specialisation of rebind.
+        ///
+        template <class TOtherType> struct rebind
+        {
+            using other = AllocatorWrapper<TOtherType>;
+        };
+    };
 
-	//------------------------------------------------------------------------------
-	template <typename TValueType> AllocatorWrapper<TValueType>::AllocatorWrapper(IAllocator* allocator) noexcept
-		: m_allocator(allocator)
-	{
-	}
+    //------------------------------------------------------------------------------
+    template <typename TValueType> AllocatorWrapper<TValueType>::AllocatorWrapper(IAllocator* allocator) noexcept
+        : m_allocator(allocator)
+    {
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TValueType> AllocatorWrapper<TValueType>::AllocatorWrapper(const AllocatorWrapper& allocatorWrapper) noexcept
-		: m_allocator(allocatorWrapper.get_allocator())
-	{
-	}
+    //------------------------------------------------------------------------------
+    template <typename TValueType> AllocatorWrapper<TValueType>::AllocatorWrapper(const AllocatorWrapper& allocatorWrapper) noexcept
+        : m_allocator(allocatorWrapper.get_allocator())
+    {
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TValueType> template <class TOtherType> AllocatorWrapper<TValueType>::AllocatorWrapper(const AllocatorWrapper<TOtherType>& allocatorWrapper) noexcept
-		: m_allocator(allocatorWrapper.get_allocator())
-	{
-	}
+    //------------------------------------------------------------------------------
+    template <typename TValueType> template <class TOtherType> AllocatorWrapper<TValueType>::AllocatorWrapper(const AllocatorWrapper<TOtherType>& allocatorWrapper) noexcept
+        : m_allocator(allocatorWrapper.get_allocator())
+    {
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TValueType> typename AllocatorWrapper<TValueType>::pointer AllocatorWrapper<TValueType>::address(reference ref) const noexcept
-	{
-		return &ref;
-	}
+    //------------------------------------------------------------------------------
+    template <typename TValueType> typename AllocatorWrapper<TValueType>::pointer AllocatorWrapper<TValueType>::address(reference ref) const noexcept
+    {
+        return &ref;
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TValueType> typename AllocatorWrapper<TValueType>::const_pointer AllocatorWrapper<TValueType>::address(const_reference ref) const noexcept
-	{
-		return &ref;
-	}
+    //------------------------------------------------------------------------------
+    template <typename TValueType> typename AllocatorWrapper<TValueType>::const_pointer AllocatorWrapper<TValueType>::address(const_reference ref) const noexcept
+    {
+        return &ref;
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TValueType> typename AllocatorWrapper<TValueType>::pointer AllocatorWrapper<TValueType>::allocate(size_type count, std::allocator<void>::const_pointer hint = nullptr) noexcept
-	{
-		return reinterpret_cast<TValueType*>(m_allocator->Allocate(sizeof(TValueType) * count));
-	}
+    //------------------------------------------------------------------------------
+    template <typename TValueType> typename AllocatorWrapper<TValueType>::pointer AllocatorWrapper<TValueType>::allocate(size_type count, std::allocator<void>::const_pointer hint = nullptr) noexcept
+    {
+        return reinterpret_cast<TValueType*>(m_allocator->Allocate(sizeof(TValueType) * count));
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TValueType> void AllocatorWrapper<TValueType>::deallocate(pointer pointer, size_type count) noexcept
-	{
-		m_allocator->Deallocate(reinterpret_cast<void*>(pointer));
-	}
+    //------------------------------------------------------------------------------
+    template <typename TValueType> void AllocatorWrapper<TValueType>::deallocate(pointer pointer, size_type count) noexcept
+    {
+        m_allocator->Deallocate(reinterpret_cast<void*>(pointer));
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TValueType> typename AllocatorWrapper<TValueType>::size_type AllocatorWrapper<TValueType>::max_size() const noexcept
-	{
-		return m_allocator->GetMaxAllocationSize();
-	}
+    //------------------------------------------------------------------------------
+    template <typename TValueType> typename AllocatorWrapper<TValueType>::size_type AllocatorWrapper<TValueType>::max_size() const noexcept
+    {
+        return m_allocator->GetMaxAllocationSize();
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TValueType> void AllocatorWrapper<TValueType>::construct(pointer pointer, TValueType&& value) noexcept
-	{
-		new (pointer) TValueType(std::forward<TValueType>(value));
-	}
+    //------------------------------------------------------------------------------
+    template <typename TValueType> void AllocatorWrapper<TValueType>::construct(pointer pointer, TValueType&& value) noexcept
+    {
+        new (pointer) TValueType(std::forward<TValueType>(value));
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TValueType> void AllocatorWrapper<TValueType>::destroy(pointer pointer) noexcept
-	{
-		pointer->~TValueType();
-	}
+    //------------------------------------------------------------------------------
+    template <typename TValueType> void AllocatorWrapper<TValueType>::destroy(pointer pointer) noexcept
+    {
+        pointer->~TValueType();
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TValueType> IAllocator* AllocatorWrapper<TValueType>::get_allocator() const noexcept
-	{
-		return m_allocator;
-	}
+    //------------------------------------------------------------------------------
+    template <typename TValueType> IAllocator* AllocatorWrapper<TValueType>::get_allocator() const noexcept
+    {
+        return m_allocator;
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TValueType> bool AllocatorWrapper<TValueType>::operator==(const AllocatorWrapper& allocatorWrapper) noexcept
-	{
-		return (&m_allocator == &allocatorWrapper.get_allocator());
-	}
+    //------------------------------------------------------------------------------
+    template <typename TValueType> bool AllocatorWrapper<TValueType>::operator==(const AllocatorWrapper& allocatorWrapper) noexcept
+    {
+        return (&m_allocator == &allocatorWrapper.get_allocator());
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TValueType> bool AllocatorWrapper<TValueType>::operator!=(const AllocatorWrapper& allocatorWrapper) noexcept
-	{
-		return !operator==(allocatorWrapper);
-	}
+    //------------------------------------------------------------------------------
+    template <typename TValueType> bool AllocatorWrapper<TValueType>::operator!=(const AllocatorWrapper& allocatorWrapper) noexcept
+    {
+        return !operator==(allocatorWrapper);
+    }
 }
 
 #endif

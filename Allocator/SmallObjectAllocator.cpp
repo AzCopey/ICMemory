@@ -28,65 +28,65 @@
 
 namespace IC
 {
-	//------------------------------------------------------------------------------
-	SmallObjectAllocator::SmallObjectAllocator(std::size_t bufferSize) noexcept
-		: m_level1Allocator(k_level1BlockSize, bufferSize / k_level1BlockSize), m_level2Allocator(k_level2BlockSize, bufferSize / k_level2BlockSize), 
-		m_level3Allocator(k_level3BlockSize, bufferSize / k_level3BlockSize), m_level4Allocator(k_level4BlockSize, bufferSize / k_level4BlockSize)
-	{
-		assert(MemoryUtils::IsPowerOfTwo(bufferSize));
-	}
+    //------------------------------------------------------------------------------
+    SmallObjectAllocator::SmallObjectAllocator(std::size_t bufferSize) noexcept
+        : m_level1Allocator(k_level1BlockSize, bufferSize / k_level1BlockSize), m_level2Allocator(k_level2BlockSize, bufferSize / k_level2BlockSize), 
+        m_level3Allocator(k_level3BlockSize, bufferSize / k_level3BlockSize), m_level4Allocator(k_level4BlockSize, bufferSize / k_level4BlockSize)
+    {
+        assert(MemoryUtils::IsPowerOfTwo(bufferSize));
+    }
 
-	//------------------------------------------------------------------------------
-	SmallObjectAllocator::SmallObjectAllocator(IAllocator& parentAllocator, std::size_t bufferSize) noexcept
-		: m_level1Allocator(parentAllocator, k_level1BlockSize, bufferSize / k_level1BlockSize), m_level2Allocator(parentAllocator, k_level2BlockSize, bufferSize / k_level2BlockSize),
-		m_level3Allocator(parentAllocator, k_level3BlockSize, bufferSize / k_level3BlockSize), m_level4Allocator(parentAllocator, k_level4BlockSize, bufferSize / k_level4BlockSize)
-	{
-		assert(MemoryUtils::IsPowerOfTwo(bufferSize));
-	}
+    //------------------------------------------------------------------------------
+    SmallObjectAllocator::SmallObjectAllocator(IAllocator& parentAllocator, std::size_t bufferSize) noexcept
+        : m_level1Allocator(parentAllocator, k_level1BlockSize, bufferSize / k_level1BlockSize), m_level2Allocator(parentAllocator, k_level2BlockSize, bufferSize / k_level2BlockSize),
+        m_level3Allocator(parentAllocator, k_level3BlockSize, bufferSize / k_level3BlockSize), m_level4Allocator(parentAllocator, k_level4BlockSize, bufferSize / k_level4BlockSize)
+    {
+        assert(MemoryUtils::IsPowerOfTwo(bufferSize));
+    }
 
-	//------------------------------------------------------------------------------
-	void* SmallObjectAllocator::Allocate(std::size_t allocationSize) noexcept
-	{
-		auto roundedBlockSize = std::max(sizeof(std::intptr_t) * 2, MemoryUtils::NextPowerofTwo(allocationSize));
+    //------------------------------------------------------------------------------
+    void* SmallObjectAllocator::Allocate(std::size_t allocationSize) noexcept
+    {
+        auto roundedBlockSize = std::max(sizeof(std::intptr_t) * 2, MemoryUtils::NextPowerofTwo(allocationSize));
 
-		switch (roundedBlockSize)
-		{
-		case k_level1BlockSize:
-			return m_level1Allocator.Allocate(allocationSize);
-		case k_level2BlockSize:
-			return m_level2Allocator.Allocate(allocationSize);
-		case k_level3BlockSize:
-			return m_level3Allocator.Allocate(allocationSize);
-		case k_level4BlockSize:
-			return m_level4Allocator.Allocate(allocationSize);
-		default:
-			assert(false);
-			return nullptr;
-		}
-	}
+        switch (roundedBlockSize)
+        {
+        case k_level1BlockSize:
+            return m_level1Allocator.Allocate(allocationSize);
+        case k_level2BlockSize:
+            return m_level2Allocator.Allocate(allocationSize);
+        case k_level3BlockSize:
+            return m_level3Allocator.Allocate(allocationSize);
+        case k_level4BlockSize:
+            return m_level4Allocator.Allocate(allocationSize);
+        default:
+            assert(false);
+            return nullptr;
+        }
+    }
 
-	//------------------------------------------------------------------------------
-	void SmallObjectAllocator::Deallocate(void* pointer) noexcept
-	{
-		if (m_level1Allocator.ContainsBlock(pointer))
-		{
-			m_level1Allocator.Deallocate(pointer);
-		}
-		else if (m_level2Allocator.ContainsBlock(pointer))
-		{
-			m_level2Allocator.Deallocate(pointer);
-		}
-		else if (m_level3Allocator.ContainsBlock(pointer))
-		{
-			m_level3Allocator.Deallocate(pointer);
-		}
-		else if (m_level4Allocator.ContainsBlock(pointer))
-		{
-			m_level4Allocator.Deallocate(pointer);
-		}
-		else
-		{
-			assert(false);
-		}
-	}
+    //------------------------------------------------------------------------------
+    void SmallObjectAllocator::Deallocate(void* pointer) noexcept
+    {
+        if (m_level1Allocator.ContainsBlock(pointer))
+        {
+            m_level1Allocator.Deallocate(pointer);
+        }
+        else if (m_level2Allocator.ContainsBlock(pointer))
+        {
+            m_level2Allocator.Deallocate(pointer);
+        }
+        else if (m_level3Allocator.ContainsBlock(pointer))
+        {
+            m_level3Allocator.Deallocate(pointer);
+        }
+        else if (m_level4Allocator.ContainsBlock(pointer))
+        {
+            m_level4Allocator.Deallocate(pointer);
+        }
+        else
+        {
+            assert(false);
+        }
+    }
 }

@@ -41,7 +41,7 @@ namespace IC
     ///
     /// @return The new vector.
     ///
-	template <typename TType> Vector<TType> MakeVector(IAllocator& allocator) noexcept;
+    template <typename TType> Vector<TType> MakeVector(IAllocator& allocator) noexcept;
 
     /// Creates a new vector from the given range. The given allocator is used for all 
     /// memory allocations.
@@ -55,7 +55,7 @@ namespace IC
     ///
     /// @return The new vector.
     ///
-	template <typename TValueType, typename TIteratorType> Vector<TValueType> MakeVector(IAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
+    template <typename TValueType, typename TIteratorType> Vector<TValueType> MakeVector(IAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 
     /// Creates a new vector from the std::vector. The given allocator is used for all 
     /// memory allocations.
@@ -67,7 +67,7 @@ namespace IC
     ///
     /// @return The new vector.
     ///
-	template <typename TType> Vector<TType> MakeVector(IAllocator& allocator, const std::vector<TType>& toCopy) noexcept;
+    template <typename TType> Vector<TType> MakeVector(IAllocator& allocator, const std::vector<TType>& toCopy) noexcept;
 }
 
 #include "VectorImpl.h"

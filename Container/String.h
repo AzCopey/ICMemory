@@ -93,7 +93,7 @@ namespace IC
     ///
     /// @return The new string.
     ///
-	template <typename TIteratorType> String MakeString(IAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
+    template <typename TIteratorType> String MakeString(IAllocator& allocator, const TIteratorType& first, const TIteratorType& last) noexcept;
 }
 
 #include "StringImpl.h"

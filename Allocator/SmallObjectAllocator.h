@@ -31,47 +31,47 @@
 
 namespace IC
 {
-	/// TODO: !?
-	///
-	class SmallObjectAllocator final : public IAllocator
-	{
-	public:
-		/// TODO: !?
-		/// 
-		SmallObjectAllocator(std::size_t bufferSize) noexcept;
+    /// TODO: !?
+    ///
+    class SmallObjectAllocator final : public IAllocator
+    {
+    public:
+        /// TODO: !?
+        /// 
+        SmallObjectAllocator(std::size_t bufferSize) noexcept;
 
-		/// TODO: !?
-		/// 
-		SmallObjectAllocator(IAllocator& parentAllocator, std::size_t bufferSize) noexcept;
+        /// TODO: !?
+        /// 
+        SmallObjectAllocator(IAllocator& parentAllocator, std::size_t bufferSize) noexcept;
 
-		/// TODO: !?
-		///
-		std::size_t GetMaxAllocationSize() const noexcept override { return k_level4BlockSize; }
+        /// TODO: !?
+        ///
+        std::size_t GetMaxAllocationSize() const noexcept override { return k_level4BlockSize; }
 
-		/// TODO: !?
-		///
-		void* Allocate(std::size_t allocationSize) noexcept override;
+        /// TODO: !?
+        ///
+        void* Allocate(std::size_t allocationSize) noexcept override;
 
-		/// TODO: !?
-		///
-		void Deallocate(void* pointer) noexcept override;
+        /// TODO: !?
+        ///
+        void Deallocate(void* pointer) noexcept override;
 
-	private:
-		static constexpr std::size_t k_level1BlockSize = sizeof(std::intptr_t) * 2;
-		static constexpr std::size_t k_level2BlockSize = sizeof(std::intptr_t) * 4;
-		static constexpr std::size_t k_level3BlockSize = sizeof(std::intptr_t) * 8;
-		static constexpr std::size_t k_level4BlockSize = sizeof(std::intptr_t) * 16;
+    private:
+        static constexpr std::size_t k_level1BlockSize = sizeof(std::intptr_t) * 2;
+        static constexpr std::size_t k_level2BlockSize = sizeof(std::intptr_t) * 4;
+        static constexpr std::size_t k_level3BlockSize = sizeof(std::intptr_t) * 8;
+        static constexpr std::size_t k_level4BlockSize = sizeof(std::intptr_t) * 16;
 
-		SmallObjectAllocator(SmallObjectAllocator&) = delete;
-		SmallObjectAllocator& operator=(SmallObjectAllocator&) = delete;
-		SmallObjectAllocator(SmallObjectAllocator&&) = delete;
-		SmallObjectAllocator& operator=(SmallObjectAllocator&&) = delete;
+        SmallObjectAllocator(SmallObjectAllocator&) = delete;
+        SmallObjectAllocator& operator=(SmallObjectAllocator&) = delete;
+        SmallObjectAllocator(SmallObjectAllocator&&) = delete;
+        SmallObjectAllocator& operator=(SmallObjectAllocator&&) = delete;
 
-		BlockAllocator m_level1Allocator;
-		BlockAllocator m_level2Allocator;
-		BlockAllocator m_level3Allocator;
-		BlockAllocator m_level4Allocator;
-	};
+        BlockAllocator m_level1Allocator;
+        BlockAllocator m_level2Allocator;
+        BlockAllocator m_level3Allocator;
+        BlockAllocator m_level4Allocator;
+    };
 }
 
 #endif

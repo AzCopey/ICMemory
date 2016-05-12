@@ -33,67 +33,67 @@
 
 namespace IC
 {
-	/// A fixed size object pool. A contiguous memory block is pre-allocated for all
-	/// objects in the pool, which is then used as each new object created.
-	///
-	/// The object pool can be backed by any of the allocators.
-	///
-	/// This is not thread-safe and should not be accessed from multiple threads at
-	/// the same time.
-	///
-	template <typename TObject> class ObjectPool final
-	{
-	public:
-		/// Creates a new object pool containing the given number of objects. The
-		/// memory block used for the pool is allocated from the free store.
-		///
-		/// @param numObjects
-		///		The number of objects which should be in the pool.
-		///
-		ObjectPool(std::size_t numObjects) noexcept;
+    /// A fixed size object pool. A contiguous memory block is pre-allocated for all
+    /// objects in the pool, which is then used as each new object created.
+    ///
+    /// The object pool can be backed by any of the allocators.
+    ///
+    /// This is not thread-safe and should not be accessed from multiple threads at
+    /// the same time.
+    ///
+    template <typename TObject> class ObjectPool final
+    {
+    public:
+        /// Creates a new object pool containing the given number of objects. The
+        /// memory block used for the pool is allocated from the free store.
+        ///
+        /// @param numObjects
+        ///        The number of objects which should be in the pool.
+        ///
+        ObjectPool(std::size_t numObjects) noexcept;
 
-		/// Creates a new object pool containing the given number of objects. The 
-		/// memory block used for the pool is allocated from the given allocator.
-		///
-		/// @param allocator
-		///		The allocator from which to allocate the memory block.
-		/// @param numObjects
-		///		The number of objects in the pool.
-		///
-		ObjectPool(IAllocator& allocator, std::size_t numObjects) noexcept;
-		
-		/// This is thread safe.
-		///
-		/// @return The number of objects in the pool.
-		///
-		std::size_t GetNumObjects() const noexcept { return m_blockAllocator.GetNumBlocks(); }
+        /// Creates a new object pool containing the given number of objects. The 
+        /// memory block used for the pool is allocated from the given allocator.
+        ///
+        /// @param allocator
+        ///        The allocator from which to allocate the memory block.
+        /// @param numObjects
+        ///        The number of objects in the pool.
+        ///
+        ObjectPool(IAllocator& allocator, std::size_t numObjects) noexcept;
+        
+        /// This is thread safe.
+        ///
+        /// @return The number of objects in the pool.
+        ///
+        std::size_t GetNumObjects() const noexcept { return m_blockAllocator.GetNumBlocks(); }
 
-		/// @return The number of objects in the pool which are not yet allocated.
-		///
-		std::size_t GetNumAllocatedObjects() const noexcept { return m_blockAllocator.GetNumAllocatedBlocks(); }
+        /// @return The number of objects in the pool which are not yet allocated.
+        ///
+        std::size_t GetNumAllocatedObjects() const noexcept { return m_blockAllocator.GetNumAllocatedBlocks(); }
 
-		/// @return The number of objects in the pool which are not yet allocated.
-		///
-		std::size_t GetNumFreeObjects() const noexcept { return m_blockAllocator.GetNumFreeBlocks(); }
+        /// @return The number of objects in the pool which are not yet allocated.
+        ///
+        std::size_t GetNumFreeObjects() const noexcept { return m_blockAllocator.GetNumFreeBlocks(); }
 
-		/// Creates a new object from the pool. If there are no free objects left
-		/// in the pool then this will assert.
-		///
-		///  @param constructorArgs
-		///		The arguments for the constructor if appropriate.
-		///
-		/// @return The newly constructed object.
-		///
-		template <typename... TConstructorArgs> UniquePtr<TObject> Create(TConstructorArgs&&... constructorArgs) noexcept;
+        /// Creates a new object from the pool. If there are no free objects left
+        /// in the pool then this will assert.
+        ///
+        ///  @param constructorArgs
+        ///        The arguments for the constructor if appropriate.
+        ///
+        /// @return The newly constructed object.
+        ///
+        template <typename... TConstructorArgs> UniquePtr<TObject> Create(TConstructorArgs&&... constructorArgs) noexcept;
 
-	private:
-		ObjectPool(ObjectPool&) = delete;
-		ObjectPool& operator=(ObjectPool&) = delete;
-		ObjectPool(ObjectPool&&) = delete;
-		ObjectPool& operator=(ObjectPool&&) = delete;
+    private:
+        ObjectPool(ObjectPool&) = delete;
+        ObjectPool& operator=(ObjectPool&) = delete;
+        ObjectPool(ObjectPool&&) = delete;
+        ObjectPool& operator=(ObjectPool&&) = delete;
 
-		BlockAllocator m_blockAllocator;
-	};
+        BlockAllocator m_blockAllocator;
+    };
 }
 
 #include "ObjectPoolImpl.h"

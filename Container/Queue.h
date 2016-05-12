@@ -40,7 +40,7 @@ namespace IC
     ///
     /// @return The new queue.
     ///
-	template <typename TType> Queue<TType> MakeQueue(IAllocator& allocator) noexcept;
+    template <typename TType> Queue<TType> MakeQueue(IAllocator& allocator) noexcept;
 }
 
 #include "QueueImpl.h"

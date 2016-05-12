@@ -29,29 +29,29 @@
 
 namespace IC
 {
-	//------------------------------------------------------------------------------
-	template <typename TObject> ObjectPool<TObject>::ObjectPool(std::size_t numObjects) noexcept
-		: m_blockAllocator(MemoryUtils::GetBlockSize<TObject>(), numObjects)
-	{
-	}
-	//------------------------------------------------------------------------------
-	template <typename TObject> ObjectPool<TObject>::ObjectPool(IAllocator& allocator, std::size_t numObjects) noexcept
-		: m_blockAllocator(allocator, MemoryUtils::GetBlockSize<TObject>(), numObjects)
-	{
-	}
+    //------------------------------------------------------------------------------
+    template <typename TObject> ObjectPool<TObject>::ObjectPool(std::size_t numObjects) noexcept
+        : m_blockAllocator(MemoryUtils::GetBlockSize<TObject>(), numObjects)
+    {
+    }
+    //------------------------------------------------------------------------------
+    template <typename TObject> ObjectPool<TObject>::ObjectPool(IAllocator& allocator, std::size_t numObjects) noexcept
+        : m_blockAllocator(allocator, MemoryUtils::GetBlockSize<TObject>(), numObjects)
+    {
+    }
 
-	//------------------------------------------------------------------------------
-	template <typename TObject> template <typename... TConstructorArgs> UniquePtr<TObject> ObjectPool<TObject>::Create(TConstructorArgs&&... constructorArgs) noexcept
-	{
-		void* memory = m_blockAllocator.Allocate(sizeof(TObject));
-		TObject* newObject = new (memory) TObject(std::forward<TConstructorArgs>(constructorArgs)...);
+    //------------------------------------------------------------------------------
+    template <typename TObject> template <typename... TConstructorArgs> UniquePtr<TObject> ObjectPool<TObject>::Create(TConstructorArgs&&... constructorArgs) noexcept
+    {
+        void* memory = m_blockAllocator.Allocate(sizeof(TObject));
+        TObject* newObject = new (memory) TObject(std::forward<TConstructorArgs>(constructorArgs)...);
 
-		return UniquePtr<TObject>(newObject, [=](TObject* objectForDeallocation) noexcept -> void
-		{
-			objectForDeallocation->~TObject();
-			m_blockAllocator.Deallocate(reinterpret_cast<void*>(objectForDeallocation));
-		});
-	}
+        return UniquePtr<TObject>(newObject, [=](TObject* objectForDeallocation) noexcept -> void
+        {
+            objectForDeallocation->~TObject();
+            m_blockAllocator.Deallocate(reinterpret_cast<void*>(objectForDeallocation));
+        });
+    }
 }
 
 #endif

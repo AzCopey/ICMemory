@@ -34,8 +34,8 @@ namespace IC
     template <typename TType> using SharedPtr = std::shared_ptr<TType>;
 
     /// Allocates a new shared pointer from the given Allocator with the given 
-	/// constructor parameters. This follows the make_* convention set in the 
-	/// standard library.
+    /// constructor parameters. This follows the make_* convention set in the 
+    /// standard library.
     ///
     /// @param allocator
     ///     The allocator from which to allocate the requested type.
@@ -44,7 +44,7 @@ namespace IC
     ///
     /// @return A shared pointer to the allocated instance.
     ///
-	template <typename TType, typename... TConstructorArgs> SharedPtr<TType> MakeShared(IAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept;
+    template <typename TType, typename... TConstructorArgs> SharedPtr<TType> MakeShared(IAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept;
 }
 
 #include "SharedPtrImpl.h"

@@ -45,7 +45,7 @@ namespace IC
         ///
         /// @return The aligned pointer.
         ///
-		template <typename TValueType, typename TAlignmentType> TValueType* Align(TValueType* value, TAlignmentType alignment) noexcept;
+        template <typename TValueType, typename TAlignmentType> TValueType* Align(TValueType* value, TAlignmentType alignment) noexcept;
 
         /// Aligns the given integer to the given alignment. The alignment should be a power
         /// of two.
@@ -57,7 +57,7 @@ namespace IC
         ///
         /// @return The aligned integer.
         ///
-		template <typename TValueType, typename TAlignmentType> TValueType Align(TValueType value, TAlignmentType alignment) noexcept;
+        template <typename TValueType, typename TAlignmentType> TValueType Align(TValueType value, TAlignmentType alignment) noexcept;
 
         /// @param value
         ///     The value.
@@ -66,28 +66,28 @@ namespace IC
         ///
         /// @return Whether or not the given integer is aligned.
         ///
-		template <typename TValueType, typename TAlignmentType> TValueType IsAligned(TValueType value, TAlignmentType alignment) noexcept;
+        template <typename TValueType, typename TAlignmentType> TValueType IsAligned(TValueType value, TAlignmentType alignment) noexcept;
 
         /// @param value
         ///     The value to check.
         ///
         /// @return Whether or not the given integer is a power of two.
         ///
-		template <typename TType> constexpr bool IsPowerOfTwo(TType value) noexcept;
+        template <typename TType> constexpr bool IsPowerOfTwo(TType value) noexcept;
 
         /// @param value
         ///     The value.
         ///
         /// @return The next power ot two on from the given value. This only supports 32-bit values.
         ///
-		template <typename TType> TType NextPowerofTwo(TType value) noexcept;
+        template <typename TType> TType NextPowerofTwo(TType value) noexcept;
 
         /// @param value
         ///     The value. Must be a power of two.
         ///
         /// @return The number of times 0x1 has to be shifted to get the given value. 
         ///
-		template <typename TType> std::size_t CalcShift(TType value) noexcept;
+        template <typename TType> std::size_t CalcShift(TType value) noexcept;
 
         /// @param pointer
         ///     The pointer.
@@ -97,13 +97,13 @@ namespace IC
         ///
         /// @return The offset in bytes between the two pointers. 
         ///
-		template <typename TTypeA, typename TTypeB> std::uintptr_t GetPointerOffset(TTypeA* pointer, TTypeB* relativeTo) noexcept;
+        template <typename TTypeA, typename TTypeB> std::uintptr_t GetPointerOffset(TTypeA* pointer, TTypeB* relativeTo) noexcept;
 
-		/// Calculates the size of block required for the given object type
-		///
-		/// @return The block size.
-		///
-		template <typename TObject> constexpr std::size_t GetBlockSize() noexcept;
+        /// Calculates the size of block required for the given object type
+        ///
+        /// @return The block size.
+        ///
+        template <typename TObject> constexpr std::size_t GetBlockSize() noexcept;
     }
 }
 

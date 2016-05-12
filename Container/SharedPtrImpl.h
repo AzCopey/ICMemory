@@ -27,11 +27,11 @@
 
 namespace IC
 {
-	//------------------------------------------------------------------------------
-	template <typename TType, typename... TConstructorArgs> SharedPtr<TType> MakeShared(IAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept
-	{
-		return MakeUnique<TType>(allocator, std::forward<TConstructorArgs>(constructorArgs)...);
-	}
+    //------------------------------------------------------------------------------
+    template <typename TType, typename... TConstructorArgs> SharedPtr<TType> MakeShared(IAllocator& allocator, TConstructorArgs&&... constructorArgs) noexcept
+    {
+        return MakeUnique<TType>(allocator, std::forward<TConstructorArgs>(constructorArgs)...);
+    }
 }
 
 #endif
