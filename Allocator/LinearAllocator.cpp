@@ -32,25 +32,32 @@ namespace IC
 {
     //------------------------------------------------------------------------------
     LinearAllocator::LinearAllocator(std::size_t pageSize) noexcept
-        : m_pageSize(pageSize)
+        : m_bufferSize(pageSize)
     {
+		m_buffer = new std::uint8_t[m_bufferSize];
+		m_nextPointer = MemoryUtils::Align(m_buffer, sizeof(std::intptr_t));
     }
 
     //------------------------------------------------------------------------------
     LinearAllocator::LinearAllocator(IAllocator& parentAllocator, std::size_t pageSize) noexcept
-        : m_pageSize(pageSize), m_parentAllocator(&parentAllocator)
+        : m_bufferSize(pageSize), m_parentAllocator(&parentAllocator)
     {
+		m_buffer = reinterpret_cast<std::uint8_t*>(m_parentAllocator->Allocate(m_bufferSize));
+		m_nextPointer = MemoryUtils::Align(m_buffer, sizeof(std::intptr_t));
     }
+
+	//------------------------------------------------------------------------------
+	std::size_t LinearAllocator::GetFreeSpace() const noexcept
+	{
+		auto freeSpace = m_bufferSize - MemoryUtils::GetPointerOffset(m_nextPointer, m_buffer);
+		auto freeSpaceAligned = freeSpace & ~(sizeof(std::intptr_t) - 1);
+		return freeSpaceAligned;
+	}
 
     //------------------------------------------------------------------------------
     void* LinearAllocator::Allocate(std::size_t allocationSize) noexcept
     {
-        assert(allocationSize <= m_pageSize);
-
-        if (!m_currentPage || m_nextPointer + allocationSize > m_currentPage + m_pageSize)
-        {
-            CreatePage();
-        }
+		assert(allocationSize <= GetFreeSpace());
 
         std::uint8_t* output = m_nextPointer;
         m_nextPointer = MemoryUtils::Align(m_nextPointer + allocationSize, sizeof(std::intptr_t));
@@ -63,64 +70,39 @@ namespace IC
     //------------------------------------------------------------------------------
     void LinearAllocator::Deallocate(void* pointer) noexcept
     {
+		assert(Contains(pointer));
+
 		--m_activeAllocationCount;
     }
+
+	//------------------------------------------------------------------------------
+	bool LinearAllocator::Contains(void* pointer) noexcept
+	{
+		return (pointer >= m_buffer && pointer < reinterpret_cast<std::uint8_t*>(m_buffer) + m_bufferSize);
+	}
 
     //------------------------------------------------------------------------------
     void LinearAllocator::Reset() noexcept
     {
         assert(m_activeAllocationCount == 0);
 
-        if (m_currentPage)
-        {
-            if (m_parentAllocator)
-            {
-                for (auto& page : m_previousPages)
-                {
-					m_parentAllocator->Deallocate(reinterpret_cast<void*>(page));
-                }
-
-				m_parentAllocator->Deallocate(reinterpret_cast<void*>(m_currentPage));
-            }
-            else
-            {
-                for (auto& page : m_previousPages)
-                {
-                    delete[] page;
-                }
-
-                delete[] m_currentPage;
-            }
-
-            m_previousPages.clear();
-            m_currentPage = nullptr;
-            m_nextPointer = nullptr;
-        }
-    }
-
-    //------------------------------------------------------------------------------
-    void LinearAllocator::CreatePage() noexcept
-    {
-        if (m_currentPage)
-        {
-            m_previousPages.push_back(m_currentPage);
-        }
-
-        if (m_parentAllocator)
-        {
-            m_currentPage = reinterpret_cast<std::uint8_t*>(m_parentAllocator->Allocate(m_pageSize));
-        }
-        else
-        {
-            m_currentPage = new std::uint8_t[m_pageSize];
-        }
-
-        m_nextPointer = MemoryUtils::Align(m_currentPage, sizeof(std::intptr_t));
+		m_nextPointer = MemoryUtils::Align(m_buffer, sizeof(std::intptr_t));
     }
 
 	//------------------------------------------------------------------------------
 	LinearAllocator::~LinearAllocator() noexcept
 	{
 		Reset();
+
+		if (m_parentAllocator)
+		{
+			m_parentAllocator->Deallocate(m_buffer);
+		}
+		else
+		{
+			delete[] m_buffer;
+		}
+
+		m_buffer = nullptr;
 	}
 }

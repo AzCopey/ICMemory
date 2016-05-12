@@ -34,6 +34,7 @@ namespace IC
 	class IAllocator;
     class LinearAllocator;
 	class PagedBlockAllocator;
+	class PagedLinearAllocator;
 	class SmallObjectAllocator;
 
 	// Pool

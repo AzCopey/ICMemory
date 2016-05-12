@@ -29,6 +29,7 @@
 #include "Allocator/BuddyAllocator.h"
 #include "Allocator/LinearAllocator.h"
 #include "Allocator/PagedBlockAllocator.h"
+#include "Allocator/PagedLinearAllocator.h"
 #include "Allocator/SmallObjectAllocator.h"
 #include "Container/Deque.h"
 #include "Container/Queue.h"

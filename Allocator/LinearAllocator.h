@@ -31,14 +31,13 @@
 
 namespace IC
 {
-    /// A paged Linear Allocator. Within a single page all allocations are allocated
-    /// linearly. If a requested allocation will not fit in the current page, a new
-    /// page is allocated. It is not possible to allocate a buffer large than the
-    /// size of a single page. Allocated memory is not available for reuse until
-    /// after reset() has been called.
+    /// A linear allocator which allocates from a large buffer by simply moving the
+	/// next allocation pointer through the buffer by the size of the allocation. All 
+	/// allocations are 'deallocated' at the same time by resetting the allocation 
+	/// pointer back to the start of the buffer.
     ///
-    /// A LinearAllocator can be backed by other allocator types, from which pages will be
-    /// allocated, otherwise they are allocated from the free store.
+    /// A LinearAllocator can be backed by other allocator types, from which the buffer
+	/// will be allocated, otherwise it's allocated from the free store.
     ///
     /// Note that this is not thread-safe and should not be accessed from multiple
     /// threads at the same time.
@@ -46,44 +45,43 @@ namespace IC
     class LinearAllocator final : public IAllocator
     {
     public:
-        static constexpr std::size_t k_defaultPageSize = 4 * 1024;
-
-        /// Initialises a new Linear Allocator with the given page size without a buddy allocator.
-        /// Pages will be allocated from the freestore.
+        /// Initialises a new Linear Allocator with the given buffer size. The buffer will be allocated
+		/// from the free store.
         ///
-        /// @param buddyAllocator
-        ///     The buddy allocator from which pages will be allocated.
-        /// @param pageSize
-        ///     Optional. The size of each page. Although not required, ideally pages should be powers
-        ///     of two.
+        /// @param bufferSize
+        ///     The size of the buffer.
         /// 
-        LinearAllocator(std::size_t pageSize = k_defaultPageSize) noexcept;
+        LinearAllocator(std::size_t bufferSize) noexcept;
 
-		/// Initialises a new Linear Allocator with the given page size and backed by the given Buddy
-		/// Allocator.
+		/// Initialises a new Linear Allocator with the given buffer size. The buffer will be allocated
+		/// from the given parent allocator.
 		///
 		/// @param parentAllocator
-		///     The allocator from which pages will be allocated.
-		/// @param pageSize
-		///     Optional. The size of each page. Although not required, ideally pages should be powers 
-		///     of two.
+		///     The allocator from which the buffer will be allocated.
+		/// @param bufferSize
+		///     The size of the buffer.
 		/// 
-		LinearAllocator(IAllocator& parentAllocator, std::size_t pageSize = k_defaultPageSize) noexcept;
+		LinearAllocator(IAllocator& parentAllocator, std::size_t bufferSize) noexcept;
 
         /// This thread-safe.
         ///
         /// @return The maximum allocation size from this allocator. This will always be 
-        /// the size of a single page.
+        /// the size of the buffer.
         ///
-        std::size_t GetMaxAllocationSize() const noexcept override { return GetPageSize(); }
+        std::size_t GetMaxAllocationSize() const noexcept override { return GetBufferSize(); }
 
-        /// This thread-safe.
-        ///
-        /// @return The size of the buffer. 
-        ///
-        std::size_t GetPageSize() const noexcept { return m_pageSize; }
+		/// This thread-safe.
+		///
+		/// @return The size of the buffer. 
+		///
+		std::size_t GetBufferSize() const noexcept { return m_bufferSize; }
 
-        /// Allocates a new block of memory of the requested size.
+		/// @return The number of bytes which are free in the buffer. 
+		///
+		std::size_t GetFreeSpace() const noexcept;
+
+        /// Allocates a new block of memory of the requested size. If there is no space left in the
+		/// buffer for the alloaction then this will assert.
         ///
         /// @param allocationSize
         ///     The size of the allocation.
@@ -100,6 +98,16 @@ namespace IC
         ///
         void Deallocate(void* pointer) noexcept override;
 
+		/// Evaluates whether or not the given pointer was allocated from this linear
+		/// allocator.
+		///
+		/// @param pointer
+		///		The pointer.
+		///
+		/// @return Whether or not the pointer was allocated from this allocator.
+		///
+		bool Contains(void* pointer) noexcept;
+
         /// Resets the buffer, allowing all previously allocated memory to be reused. Deallocate() must
         /// have been called for all allocated blocks prior to reset() being called.
         /// 
@@ -113,20 +121,11 @@ namespace IC
 		LinearAllocator(LinearAllocator&&) = delete;
 		LinearAllocator& operator=(LinearAllocator&&) = delete;
 
-        /// Creates a new page to allocate from. If there is a current page prior to this being called
-        /// it will be added to the previous pages list.
-        ///
-        /// If the linear allocator was created using a buddy allocator then the page will be allocated
-        /// from it, otherwise it will be allocated from the freestore.
-        ///
-        void CreatePage() noexcept;
-
-        const std::size_t m_pageSize;
+        const std::size_t m_bufferSize;
 
         IAllocator* m_parentAllocator;
 
-        std::uint8_t* m_currentPage;
-        std::vector<std::uint8_t*> m_previousPages;
+        std::uint8_t* m_buffer;
         std::uint8_t* m_nextPointer = nullptr;
 
 		std::size_t m_activeAllocationCount = 0;
