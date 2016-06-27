@@ -27,6 +27,7 @@
 
 #include "IAllocator.h"
 
+#include <memory>
 #include <mutex>
 
 namespace IC
