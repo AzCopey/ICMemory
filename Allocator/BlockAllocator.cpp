@@ -36,7 +36,7 @@ namespace IC
         assert(MemoryUtils::IsAligned(blockSize, sizeof(std::intptr_t)));
         assert(blockSize >= sizeof(FreeBlock));
 
-        m_buffer = new std::int8_t[m_bufferSize];
+        m_buffer = new std::uint8_t[m_bufferSize];
 
         InitFreeBlockList();
     }
@@ -48,7 +48,7 @@ namespace IC
         assert(MemoryUtils::IsAligned(blockSize, sizeof(std::intptr_t)));
         assert(blockSize >= sizeof(FreeBlock));
 
-        m_buffer = m_parentAllocator->Allocate(m_bufferSize);
+        m_buffer = reinterpret_cast<std::uint8_t*>(m_parentAllocator->Allocate(m_bufferSize));
 
         InitFreeBlockList();
     }
@@ -88,7 +88,7 @@ namespace IC
     //------------------------------------------------------------------------------
     bool BlockAllocator::ContainsBlock(void* block) noexcept
     {
-        return (block >= m_buffer && block < reinterpret_cast<std::uint8_t*>(m_buffer) + m_bufferSize);
+        return (block >= m_buffer && block < m_buffer + m_bufferSize);
     }
 
     //------------------------------------------------------------------------------
@@ -97,7 +97,7 @@ namespace IC
         FreeBlock* previous = nullptr;
         for (std::size_t i = 0; i < m_numBlocks; ++i)
         {
-            auto current = reinterpret_cast<FreeBlock*>(reinterpret_cast<std::int8_t*>(m_buffer) + m_blockSize * i);
+            auto current = reinterpret_cast<FreeBlock*>(m_buffer + m_blockSize * i);
             current->m_next = nullptr;
             current->m_previous = previous;
 

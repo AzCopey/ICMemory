@@ -147,7 +147,7 @@ namespace IC
 
         IAllocator* m_parentAllocator = nullptr;
 
-        void* m_buffer = nullptr;
+        std::uint8_t* m_buffer = nullptr;
         FreeBlock* m_freeBlockList = nullptr;
         std::size_t m_numAllocatedBlocks = 0;
     };

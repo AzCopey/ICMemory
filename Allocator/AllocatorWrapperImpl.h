@@ -25,6 +25,8 @@
 #ifndef _ICMEMORY_ALLOCATOR_ALLOCATORIMPL_H_
 #define _ICMEMORY_ALLOCATOR_ALLOCATORIMPL_H_
 
+#include "../Allocator/IAllocator.h"
+
 namespace IC
 {
     /// Void specialisation of the AllocatorWrapper.
@@ -75,7 +77,7 @@ namespace IC
     }
 
     //------------------------------------------------------------------------------
-    template <typename TValueType> typename AllocatorWrapper<TValueType>::pointer AllocatorWrapper<TValueType>::allocate(size_type count, std::allocator<void>::const_pointer hint = nullptr) noexcept
+    template <typename TValueType> typename AllocatorWrapper<TValueType>::pointer AllocatorWrapper<TValueType>::allocate(size_type count, std::allocator<void>::const_pointer hint) noexcept
     {
         return reinterpret_cast<TValueType*>(m_allocator->Allocate(sizeof(TValueType) * count));
     }
