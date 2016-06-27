@@ -31,28 +31,57 @@
 
 namespace IC
 {
-    /// TODO: !?
+    /// An allocator for allocating small objects. This is built out of muliple Block Allocators
+    /// each of increasing allocation size. Allocating an object will use the smallest Block
+    /// Allocator possible to reduce wasted memory. The maximum allocation size is 64 bytes for
+    /// 32-bit architecture and 128 bytes for 64-bit.
+    ///
+    /// A SmallObjectAllocator can be backed by other allocator types, from which pages 
+    /// will be allocated, otherwise they are allocated from the free store.
+    ///
+    /// Note that this is not thread-safe and should not be accessed from multiple
+    /// threads at the same time.
     ///
     class SmallObjectAllocator final : public IAllocator
     {
     public:
-        /// TODO: !?
+        /// Creates a new small object allocator with the given buffer size; each block allocator
+        /// will be this size. All allocators will be from the free store.
+        ///
+        /// @param bufferSize
+        ///     The size of each of the internal block allocators.
         /// 
         SmallObjectAllocator(std::size_t bufferSize) noexcept;
-
-        /// TODO: !?
+        
+        /// Creates a new small object allocator with the given buffer size; each block allocator
+        /// will be this size. The given parent allocator will be used for all allocations.
+        ///
+        /// @param parentAllocator
+        ///     The parent allocator.
+        /// @param bufferSize
+        ///     The size of each of the internal block allocators.
         /// 
         SmallObjectAllocator(IAllocator& parentAllocator, std::size_t bufferSize) noexcept;
 
-        /// TODO: !?
+        /// @return The maximum allocator size that this can allocate. This will be 64 bytes for
+        /// 32-bit architecture and 128 bytes for 64-bit.
         ///
         std::size_t GetMaxAllocationSize() const noexcept override { return k_level4BlockSize; }
 
-        /// TODO: !?
+        /// Allocates a new block of memory of the requested size. If there is no space left in the
+        /// buffer for the alloaction then this will assert.
+        ///
+        /// @param allocationSize
+        ///     The size of the allocation.
+        ///
+        /// @return The allocated memory.
         ///
         void* Allocate(std::size_t allocationSize) noexcept override;
 
-        /// TODO: !?
+        /// Deallocates the given object, freeing it for reuse.
+        ///
+        /// @param pointer
+        ///        The pointer which should be deallocated.
         ///
         void Deallocate(void* pointer) noexcept override;
 
