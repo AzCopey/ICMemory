@@ -69,7 +69,7 @@ namespace IC
         ///
         /// @return The number of objects in each page.
         ///
-        std::size_t GetNumObjectsPerPage() const noexcept { return m_numObjectsPerPage; }
+        std::size_t GetNumObjectsPerPage() const noexcept { return m_pagedBlockAllocator.GetNumBlocksPerPage(); }
 
         /// Creates a new object from the pool. If there are no free objects in any
         /// of the current pages, a new page will be allocated.

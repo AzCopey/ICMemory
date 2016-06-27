@@ -3,7 +3,7 @@
 A collection of efficient memory allocators and pools. This provides four allocator types:
 
 * `BuddyAllocator`: A general allocator which efficiently handles external fragmentation by splitting blocks into "buddies". This is primarily for large allocations.
-* `LinearAllocator`: A very fast general allocator which de-allocations all allocations at the same time. This is primarily for large numbers of short lived allocations.
+* `LinearAllocator`: A very fast general allocator which allocates from a linear buffer, and deallocates the entire buffer when `Reset()` is called. This is primarily for large numbers of short lived allocations.
 * `BlockAllocator`: A very fast allocator for fixed sized blocks. This is primarily used by `ObjectPool`.
 * `SmallObjectAllocator`: A very fast allocator for small objects. This is similar to `BlockAllocator` but has several block sizes. This is primarily used for small objects that aren't suitable for pooling.
 
